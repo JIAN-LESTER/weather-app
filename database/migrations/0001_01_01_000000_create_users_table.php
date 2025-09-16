@@ -4,19 +4,27 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
+            $table->id('userID');
+            $table->string('fname')->nullable();
+            $table->string('lname')->nullable();
+
             $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->enum('role', ['admin', 'user'])->default('user');
+            $table->enum('user_status', ['active', 'inactive'])->default('active');
+            $table->string('avatar')->nullable(); // Profile picture 
+            $table->boolean('is_verified')->default(false);
+            $table->boolean('isCompleted')->default(false);
+            $table->string('verification_token')->nullable();
+            $table->string('two_factor_code')->nullable();
+            $table->timestamp('two_factor_expires_at')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

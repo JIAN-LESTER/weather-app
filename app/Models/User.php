@@ -21,6 +21,14 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
+        'user_status',
+        'avatar',
+        'is_verified',
+        'isCompleted',
+        'verification_token',
+        'two_factor_code',
+        'two_factor_code_expires_at'
     ];
 
     /**
@@ -45,4 +53,15 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+        public function logs(){
+        return $this->hasMany(Logs::class, 'userID', 'userID');
+    }
+
+       public function snapshot(){
+        return $this->hasMany(Snapshot::class, 'userID', 'userID');
+    }
+
+
+
 }
