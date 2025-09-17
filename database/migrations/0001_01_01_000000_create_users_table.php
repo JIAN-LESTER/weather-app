@@ -24,7 +24,9 @@ return new class extends Migration {
             $table->boolean('isCompleted')->default(false);
             $table->string('verification_token')->nullable();
             $table->string('two_factor_code')->nullable();
-            $table->timestamp('two_factor_expires_at')->nullable();
+            $table->timestamp('two_factor_code_expires_at')->nullable();
+            $table->integer('failed_attempts')->default(0);
+            $table->timestamp('lockout_time')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

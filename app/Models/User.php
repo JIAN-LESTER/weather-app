@@ -12,13 +12,18 @@ class User extends Authenticatable
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
+    protected $primaryKey = 'userID';
+public $incrementing = true;
+protected $keyType = 'int';
+
     /**
      * The attributes that are mass assignable.
      *
      * @var list<string>
      */
     protected $fillable = [
-        'name',
+        'fname',
+        'lname',
         'email',
         'password',
         'role',
@@ -28,7 +33,9 @@ class User extends Authenticatable
         'isCompleted',
         'verification_token',
         'two_factor_code',
-        'two_factor_code_expires_at'
+        'two_factor_code_expires_at',
+        'failed_attempts',
+        'lockout_time',
     ];
 
     /**

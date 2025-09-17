@@ -10,7 +10,7 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class VerifyEmail extends Mailable
+class TwoFactorCodeMail extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -24,21 +24,21 @@ class VerifyEmail extends Mailable
         $this->user = $user;
     }
 
+     public function build()
+    {
+        return $this->markdown('emails.two-factor')
+        ->subject('Your 2FA Code')
+        ->with(['two_factor_code' => $this->user->two_factor_code]);
+    }
+
     /**
      * Get the message envelope.
      */
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Verify Email',
+            subject: 'Two Factor Code Mail',
         );
-    }
-
-       public function build()
-    {
-        return $this->markdown('emails.verify')
-        ->subject('Verify Your Email')
-        ->with(['user' => $this->user]);
     }
 
     /**
@@ -47,7 +47,7 @@ class VerifyEmail extends Mailable
     public function content(): Content
     {
         return new Content(
-            markdown: 'emails.verify',
+            markdown: 'emails.two-factor',
         );
     }
 

@@ -1,12 +1,19 @@
-<x-mail::message>
-# Introduction
+@component('mail::message')
+# 📧 Email Verification Required
 
-The body of your message.
+Hi {{ $user->first_name }},
 
-<x-mail::button :url="''">
-Button Text
-</x-mail::button>
+Thank you for registering with **Weather App**.  
+To complete your registration and activate your account, please verify your email address by clicking the button below:
+
+@component('mail::button', ['url' => url("/verify-email/" . $user->verification_token), 'color' => 'success'])
+✅ Verify My Email
+@endcomponent
+
+This helps us ensure the security of your account.
+
+> If you didn’t create an account, please ignore this email.
 
 Thanks,<br>
-{{ config('app.name') }}
-</x-mail::message>
+**- Weather App**
+@endcomponent
