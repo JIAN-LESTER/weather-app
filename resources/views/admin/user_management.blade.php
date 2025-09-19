@@ -7,7 +7,7 @@
     <header class="p-4 flex justify-end items-center">
 
         <button onclick="openModal('addUserModal')"
-            class="flex items-center px-3 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700">
+            class="flex items-center px-3 py-2 rounded-lg bg-gray-600 text-white hover:bg-gray-700">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
                 class="w-5 h-5 mr-2">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
@@ -17,16 +17,16 @@
 
     </header>
     <main class="bg-white shadow-md rounded-lg overflow-hidden">
-        <!-- Page Header -->
 
 
-        <!-- Search & Filter Section -->
+
+    
         <section class="p-4 border-t border-b border-gray-200" aria-label="Search users">
             <form method="GET" action="{{ route('admin.user_management') }}" class="flex gap-2 items-center" role="search">
                 <label for="search" class="sr-only">Search by name</label>
                 <input type="text" id="search" name="search" value="{{ request('search') }}" placeholder="Search by name..."
-                    class="border rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-green-500">
-                <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+                    class="border rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-gray-500">
+                <button type="submit" class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">
                     Search
                 </button>
                 @if(request('search'))
@@ -35,7 +35,7 @@
             </form>
         </section>
 
-        <!-- Users Table Section -->
+   
         <section class="overflow-x-auto" aria-labelledby="users-table">
             <table class="min-w-full border border-gray-200 text-sm" role="table">
                 <caption id="users-table" class="sr-only">List of all users</caption>
@@ -66,16 +66,16 @@
                             <td class="px-6 py-4">
                                 <span
                                     class="px-2 py-1 text-xs rounded-full 
-                                                    {{ $user->user_status === 'active' ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-600' }}">
+                                                    {{ $user->user_status === 'active' ? 'bg-gray-100 text-gray-700' : 'bg-gray-200 text-gray-600' }}">
                                     {{ $user->user_status === 'active' ? 'Active' : 'Inactive' }}
                                 </span>
                             </td>
 
                             <td class="px-4 py-2 text-center">
                                 <div class="flex items-center justify-center space-x-3 text-center">
-                                    <!-- Edit -->
-                                    <button onclick="openEditModal('{{ $user->userID }}')"
-                                        class="text-blue-500 hover:text-blue-700" title="Edit">
+                         
+                                  <button onclick="editUser('{{ $user->userID }}')" class="text-blue-500 hover:text-blue-700" title="Edit">
+
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                             stroke="currentColor" class="w-5 h-5">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -83,7 +83,7 @@
                                         </svg>Edit
                                     </button>
 
-                                    <!-- Delete -->
+                                
                                     <button onclick="openDeleteModal('{{ route('admin.users-destroy', $user->userID) }}')"
                                         class="text-red-500 hover:text-red-700 text-center" title="Delete">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -109,7 +109,7 @@
 
 @if($users->total() > 0)
 <div class="flex items-center justify-between p-4 text-sm text-gray-600">
-    <!-- Pagination Info -->
+
     <div>
         Showing 
         <span class="font-medium">{{ $users->firstItem() }}</span>
@@ -119,18 +119,18 @@
         <span class="font-medium">{{ $users->total() }}</span> users
     </div>
 
-    <!-- Previous / Next Buttons -->
+
     <div class="flex space-x-2">
         @if($users->onFirstPage())
             <span class="px-3 py-1 rounded-lg bg-gray-200 text-gray-500 cursor-not-allowed">Previous</span>
         @else
             <a href="{{ $users->previousPageUrl() }}"
-                class="px-3 py-1 rounded-lg bg-green-600 text-white hover:bg-green-700">Previous</a>
+                class="px-3 py-1 rounded-lg bg-gray-600 text-white hover:bg-gray-700">Previous</a>
         @endif
 
         @if($users->hasMorePages())
             <a href="{{ $users->nextPageUrl() }}"
-                class="px-3 py-1 rounded-lg bg-green-600 text-white hover:bg-green-700">Next</a>
+                class="px-3 py-1 rounded-lg bg-gray-600 text-white hover:bg-gray-700">Next</a>
         @else
             <span class="px-3 py-1 rounded-lg bg-gray-200 text-gray-500 cursor-not-allowed">Next</span>
         @endif
@@ -143,89 +143,88 @@
 
 
 
-    <!-- Add User Modal -->
+
     <div id="addUserModal" class="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm hidden">
-        <!-- Overlay -->
+
         <div class="absolute inset-0 " onclick="closeModal('addUserModal')"></div>
 
-        <!-- Modal Content -->
+     
         <div class="relative bg-gray-100 dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-xl mx-4 overflow-hidden">
-            <header class="bg-green-600 text-white p-5 rounded-t-2xl">
+            <header class="bg-gray-600 text-white p-5 rounded-t-2xl">
                 <h2 class="text-xl font-semibold">Add New User</h2>
             </header>
 
             <form action="{{ route('admin.users-store') }}" method="POST" class="p-6 md:p-8 space-y-6 relative z-10">
                 @csrf
 
-                <!-- Name Fields -->
+        
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label for="fname" class="block text-sm font-medium text-gray-700 dark:text-gray-300">First
                             Name</label>
                         <input type="text" name="fname" id="fname" required
-                            class="mt-1 block w-full rounded-lg border-gray-300 bg-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                            class="mt-1 block w-full rounded-lg border-gray-300 bg-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 px-4 py-2 focus:ring-2 focus:ring-gray-500 focus:border-gray-500">
                     </div>
                     <div>
                         <label for="lname" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Last
                             Name</label>
                         <input type="text" name="lname" id="lname" required
-                            class="mt-1 block w-full rounded-lg border-gray-300 bg-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                            class="mt-1 block w-full rounded-lg border-gray-300 bg-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 px-4 py-2 focus:ring-2 focus:ring-gray-500 focus:border-gray-500">
                     </div>
                 </div>
 
-                <!-- Email -->
+             
                 <div>
                     <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
                     <input type="email" name="email" id="email" required
-                        class="mt-1 block w-full rounded-lg border-gray-300 bg-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                        class="mt-1 block w-full rounded-lg border-gray-300 bg-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 px-4 py-2 focus:ring-2 focus:ring-gray-500 focus:border-gray-500">
                 </div>
 
-                <!-- Password Fields -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label for="password"
                             class="block text-sm font-medium text-gray-700 dark:text-gray-300">Password</label>
                         <input type="password" name="password" id="password" required
-                            class="mt-1 block w-full rounded-lg border-gray-300 bg-gray-200 bg-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                            class="mt-1 block w-full rounded-lg border-gray-300 bg-gray-200 bg-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 px-4 py-2 focus:ring-2 focus:ring-gray-500 focus:border-gray-500">
                     </div>
                     <div>
                         <label for="password_confirmation"
                             class="block text-sm font-medium text-gray-700 dark:text-gray-300">Confirm Password</label>
                         <input type="password" name="password_confirmation" id="password_confirmation" required
-                            class="mt-1 block w-full rounded-lg border-gray-300 bg-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                            class="mt-1 block w-full rounded-lg border-gray-300 bg-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 px-4 py-2 focus:ring-2 focus:ring-gray-500 focus:border-gray-500">
                     </div>
                 </div>
 
-                <!-- Role -->
+        
                 <div>
                     <label for="role" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Role</label>
                     <select name="role" id="role"
-                        class="mt-1 block w-full rounded-lg border-gray-300 bg-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                        class="mt-1 block w-full rounded-lg border-gray-300 bg-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 px-4 py-2 focus:ring-2 focus:ring-gray-500 focus:border-gray-500">
                         <option value="user">User</option>
                         <option value="admin">Admin</option>
                     </select>
                 </div>
 
-                <!-- Action Buttons -->
+            
                 <div class="flex flex-col sm:flex-row justify-end gap-3 pt-6 border-t border-gray-200 dark:border-gray-700">
                     <button type="button" onclick="closeModal('addUserModal')"
                         class="px-6 py-2 rounded-lg bg-gray-400 text-white hover:bg-gray-500 w-full sm:w-auto">Cancel</button>
                     <button type="submit"
-                        class="px-6 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 w-full sm:w-auto">Add
+                        class="px-6 py-2 rounded-lg bg-gray-600 text-white hover:bg-gray-700 w-full sm:w-auto">Add
                         User</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Edit User Modal -->
+
     <div id="editUserModal" class="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm hidden">
-        <!-- Overlay -->
+   
         <div class="absolute inset-0 " onclick="closeModal('editUserModal')"></div>
 
-        <!-- Modal Content -->
+     
         <div class="relative bg-gray-100 dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-xl mx-4 overflow-hidden">
-            <header class="bg-green-600 text-white p-5 rounded-t-2xl">
+            <header class="bg-gray-600 text-white p-5 rounded-t-2xl">
                 <h2 class="text-xl font-semibold">Edit User</h2>
             </header>
 
@@ -234,65 +233,65 @@
                 @method('PUT')
                 <input type="hidden" id="editUserId">
 
-                <!-- Name Fields -->
+        
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label for="edit_fname" class="block text-sm font-medium text-gray-700 dark:text-gray-300">First
                             Name</label>
                         <input type="text" name="fname" id="edit_fname" required
-                            class="mt-1 block w-full rounded-lg border-gray-300 bg-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                            class="mt-1 block w-full rounded-lg border-gray-300 bg-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 px-4 py-2 focus:ring-2 focus:ring-gray-500 focus:border-gray-500">
                     </div>
                     <div>
                         <label for="edit_lname" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Last
                             Name</label>
                         <input type="text" name="lname" id="edit_lname" required
-                            class="mt-1 block w-full rounded-lg border-gray-300 bg-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                            class="mt-1 block w-full rounded-lg border-gray-300 bg-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 px-4 py-2 focus:ring-2 focus:ring-gray-500 focus:border-gray-500">
                     </div>
                 </div>
 
-                <!-- Email -->
+          
                 <div>
                     <label for="edit_email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
                     <input type="email" name="email" id="edit_email" required
-                        class="mt-1 block w-full rounded-lg border-gray-300 bg-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                        class="mt-1 block w-full rounded-lg border-gray-300 bg-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 px-4 py-2 focus:ring-2 focus:ring-gray-500 focus:border-gray-500">
                 </div>
 
-                <!-- Password and Role -->
+      
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label for="edit_password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">New
                             Password (Optional)</label>
                         <input type="password" name="password" id="edit_password"
-                            class="mt-1 block w-full rounded-lg border-gray-300 bg-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                            class="mt-1 block w-full rounded-lg border-gray-300 bg-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 px-4 py-2 focus:ring-2 focus:ring-gray-500 focus:border-gray-500">
                     </div>
                     <div>
                         <label for="edit_role"
                             class="block text-sm font-medium text-gray-700 dark:text-gray-300">Role</label>
                         <select name="role" id="edit_role"
-                            class="mt-1 block w-full rounded-lg border-gray-300 bg-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                            class="mt-1 block w-full rounded-lg border-gray-300 bg-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 px-4 py-2 focus:ring-2 focus:ring-gray-500 focus:border-gray-500">
                             <option value="user">User</option>
                             <option value="admin">Admin</option>
                         </select>
                     </div>
                 </div>
 
-                <!-- Status -->
+            
                 <div>
                     <label for="edit_status"
                         class="block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
                     <select name="user_status" id="edit_status"
-                        class="mt-1 block w-full rounded-lg border-gray-300 bg-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                        class="mt-1 block w-full rounded-lg border-gray-300 bg-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 px-4 py-2 focus:ring-2 focus:ring-gray-500 focus:border-gray-500">
                         <option value="active">Active</option>
                         <option value="inactive">Inactive</option>
                     </select>
                 </div>
 
-                <!-- Action Buttons -->
+           
                 <div class="flex flex-col sm:flex-row justify-end gap-3 pt-6 border-t border-gray-200 dark:border-gray-700">
                     <button type="button" onclick="closeModal('editUserModal')"
                         class="px-6 py-2 rounded-lg bg-gray-400 text-white hover:bg-gray-500 w-full sm:w-auto">Cancel</button>
                     <button type="submit"
-                        class="px-6 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 w-full sm:w-auto">Update
+                        class="px-6 py-2 rounded-lg bg-gray-600 text-white hover:bg-gray-700 w-full sm:w-auto">Update
                         User</button>
                 </div>
             </form>
@@ -300,25 +299,25 @@
     </div>
 
 
-    <!-- Delete Confirmation Modal -->
+
     <div id="deleteConfirmModal" class="hidden fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm">
         <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg w-full max-w-md mx-4 overflow-hidden">
 
-            <!-- Header -->
-            <div class="bg-green-600 text-white px-4 py-3 flex justify-between items-center">
+  
+            <div class="bg-gray-600 text-white px-4 py-3 flex justify-between items-center">
                 <h2 class="text-lg font-semibold">Confirm Delete</h2>
                 <button type="button" onclick="closeModal('deleteConfirmModal')"
                     class="text-white hover:text-gray-200">✕</button>
             </div>
 
-            <!-- Body -->
+ 
             <div class="p-6">
                 <p class="text-gray-700 dark:text-gray-200">
                     Are you sure you want to delete this user? This action cannot be undone.
                 </p>
             </div>
 
-            <!-- Footer -->
+
             <div class="flex justify-end gap-2 px-6 py-4 border-t border-gray-200 dark:border-gray-700">
                 <button type="button" onclick="closeModal('deleteConfirmModal')"
                     class="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">
@@ -358,7 +357,6 @@
             document.getElementById(modalId).classList.add('hidden');
         }
 
-        // Populate Edit Form via AJAX
         function editUser(userId) {
             fetch(`/admin/user_crud/edit/${userId}`)
 
@@ -372,7 +370,7 @@
                     document.getElementById('edit_role').value = user.role;
                     document.getElementById('edit_status').value = user.user_status;
 
-                    // Update form action dynamically
+                   
                     document.getElementById('editUserForm').action = `/admin/user_crud/update/${user.id}`;
                     openModal('editUserModal');
                 });

@@ -43,15 +43,15 @@ class TwoFactorAuthController extends Controller
             'timestamp' => now(),
         ]);
 
-        // 🔹 Check if profile is completed
+       
         if (!$user->isCompleted) {
-            // send them to dashboard but trigger modal
+       
             return redirect()
                 ->route($user->role === 'admin' ? 'admin.dashboard' : 'user.dashboard')
                 ->with('completeProfileModal', true);
         }
 
-        // Normal redirect if profile already completed
+ 
         if ($user->role === 'admin') {
             return redirect()->route('admin.dashboard');
         } elseif ($user->role === 'user') {

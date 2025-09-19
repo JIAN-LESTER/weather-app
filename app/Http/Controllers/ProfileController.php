@@ -28,7 +28,7 @@ class ProfileController extends Controller
             'new_password' => 'nullable|min:6|confirmed',
         ]);
 
-        // Check current password if new password is provided
+
         if ($request->filled('new_password')) {
             if (!Hash::check($request->old_password, $user->password)) {
                 return back()->withErrors(['old_password' => 'The current password is incorrect.'])->withInput();
@@ -36,14 +36,14 @@ class ProfileController extends Controller
             $user->password = Hash::make($request->new_password);
         }
 
-        // Check if profile was previously incomplete
+    
         $wasIncomplete = !$user->isCompleted;
 
         $user->fname = $validated['fname'];
         $user->lname = $validated['lname'];
         $user->email = $validated['email'];
 
-        // Mark profile as completed if all required fields are filled
+    
         if ($this->isComplete($user)) {
             $user->isCompleted = true;
         }
@@ -58,7 +58,7 @@ class ProfileController extends Controller
             'timestamp' => now(),
         ]);
 
-        // Different success messages based on whether it was completion or update
+   
         $message = $wasIncomplete ? 
             'Profile completed successfully! Welcome to the platform.' : 
             'Profile updated successfully!';
@@ -73,20 +73,15 @@ class ProfileController extends Controller
         return view('profile.profile', compact('user'));
     }
 
-    /**
-     * Check if user profile is complete
-     */
     private function isComplete($user)
     {
-        // Define what constitutes a complete profile
+      
         return !empty($user->fname) && 
                !empty($user->lname) && 
                !empty($user->email);
     }
 
-    /**
-     * Force profile completion check (can be called from other controllers)
-     */
+
     public function checkProfileCompletion()
     {
         $user = auth()->user();
@@ -95,6 +90,6 @@ class ProfileController extends Controller
             return redirect()->back()->with('showProfileModal', true);
         }
 
-        return null; // Profile is complete
+        return null; 
     }
 }

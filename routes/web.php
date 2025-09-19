@@ -81,3 +81,22 @@ Route::middleware(['auth'])->group(function () {
     // Alternative route if you prefer POST
     // Route::post('/profile/update', [ProfileController::class, 'updateProfile'])->name('profile.update');
 });
+
+
+
+
+Route::post('/weather/store-snapshot', [WeatherController::class, 'storeWeatherSnapshot'])
+    ->name('weather.store-snapshot');
+
+Route::get('/weather/location-history/{locID}', [WeatherController::class, 'getLocationWeatherHistory'])
+    ->name('weather.location-history');
+
+Route::get('/weather/todays-snapshots', [WeatherController::class, 'getTodaysWeatherSnapshots'])
+    ->name('weather.todays-snapshots');
+
+// Optional: Additional utility routes
+Route::get('/weather/reports', [WeatherController::class, 'getAllReports'])
+    ->name('weather.all-reports');
+
+Route::delete('/weather/snapshot/{snapshotID}', [WeatherController::class, 'deleteSnapshot'])
+    ->name('weather.delete-snapshot');

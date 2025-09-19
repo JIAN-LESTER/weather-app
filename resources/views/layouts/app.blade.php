@@ -8,8 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Dashboard')</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    
-    <!-- Fix for x-cloak -->
+
     <style>
         [x-cloak] {
             display: none !important;
@@ -30,12 +29,11 @@
 
     
 
-    <!-- Sidebar -->
-    <aside class="bg-white dark:bg-gray-800 shadow-md flex flex-col transition-all duration-300"
+    <aside class="bg-gray-800 text-white dark:bg-white dark:text-gray-800 shadow-md flex flex-col transition-all duration-300"
         :class="sidebarOpen ? 'w-64' : 'w-16'">
 
 
-        <div class="p-4 font-bold text-green-700 text-lg truncate">
+        <div class="p-4 font-bold text-white dark:text-gray-800 text-lg truncate">
             <span x-show="sidebarOpen" x-cloak class="transition-opacity">My App</span>
             <span x-show="!sidebarOpen" x-cloak class="transition-opacity">M</span>
         </div>
@@ -44,12 +42,12 @@
        
        
         <nav class="flex-1 px-2 space-y-2">
-            <!-- Dashboard -->
+
             @if(auth()->user()->role === 'admin')
                 <a href="{{ route('admin.dashboard') }}"
                   @click="profileOpen = false"
 
-                    class="flex items-center space-x-2 px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 rounded {{ request()->routeIs('admin.dashboard') ? 'bg-green-100 dark:bg-green-800 text-green-700 dark:text-green-200' : '' }}">
+                    class="flex items-center space-x-2 px-4 py-2  dark:text-gray-800 hover:bg-gray-800 hover:text-gray-800 dark:hover:bg-gray-800 dark:hover:text-white rounded {{ request()->routeIs('admin.dashboard') ? 'bg-white text-gray-800 dark:bg-gray-800 dark:text-white' : '' }}">
 
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
@@ -62,7 +60,7 @@
                 <a href="{{ route('user.dashboard') }}"
                     @click="profileOpen = false"
 
-                    class="flex items-center space-x-2 px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 rounded {{ request()->routeIs('user.dashboard') ? 'bg-green-100 dark:bg-green-800 text-green-700 dark:text-green-200' : '' }}">
+                    class="flex items-center space-x-2 px-4 py-2 dark:text-gray-800 hover:bg-white hover:text-gray-800 dark:hover:bg-gray-800 dark:hover:text-white rounded {{ request()->routeIs('user.dashboard') ? 'text-gray-800 dark:bg-gray-800 dark:text-white' : '' }}">
 
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
@@ -73,12 +71,12 @@
                 </a>
             @endif
 
-            <!-- Maps -->
+     
                @if(auth()->user()->role === 'admin')
             <a href="{{ route('map.show') }}"
                  @click="profileOpen = false"
 
-               class="flex items-center space-x-2 px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 rounded {{ request()->routeIs('maps.show') ? 'bg-green-100 dark:bg-green-800 text-green-700 dark:text-green-200' : '' }}">
+               class="flex items-center space-x-2 px-4 py-2  dark:text-gray-800 hover:bg-white hover:text-gray-800 dark:hover:bg-gray-800 dark:hover:text-white rounded {{ request()->routeIs('map.show') ? 'bg-white text-gray-800 dark:bg-gray-800 dark:text-white' : '' }}">
 
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor">
@@ -91,7 +89,7 @@
                <a href="{{ route('user.map.show') }}"
                  @click="profileOpen = false"
 
-               class="flex items-center space-x-2 px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 rounded {{ request()->routeIs('user.map.show') ? 'bg-green-100 dark:bg-green-800 text-green-700 dark:text-green-200' : '' }}">
+               class="flex items-center space-x-2 px-4 py-2  dark:text-gray-800 hover:bg-white hover:text-gray-800 dark:hover:bg-gray-800 dark:hover:text-white rounded {{ request()->routeIs('user.map.show') ? 'bg-white text-gray-800 dark:bg-gray-800 dark:text-white' : '' }}">
 
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor">
@@ -103,12 +101,12 @@
 
             @endif
 
-            <!-- Weather -->
+   
                @if(auth()->user()->role === 'admin')
             <a href="{{ route( 'weather_reports.show') }}"
                 @click="profileOpen = false"
 
-                class="flex items-center space-x-2 px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 rounded {{ request()->routeIs('weather_reports.show') ? 'bg-green-100 dark:bg-green-800 text-green-700 dark:text-green-200' : '' }}">
+                class="flex items-center space-x-2 px-4 py-2  dark:text-gray-800 hover:bg-white hover:text-gray-800 dark:hover:bg-gray-800 dark:hover:text-white rounded {{ request()->routeIs('weather_reports.show') ? 'bg-white text-gray-800 dark:bg-gray-800 dark:text-white' : '' }}">
 
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor">
@@ -121,7 +119,7 @@
                 <a href="{{ route( 'user.weather_reports.show') }}"
                 @click="profileOpen = false"
 
-                class="flex items-center space-x-2 px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 rounded {{ request()->routeIs('user.weather_reports.show') ? 'bg-green-100 dark:bg-green-800 text-green-700 dark:text-green-200' : '' }}">
+                class="flex items-center space-x-2 px-4 py-2  dark:text-gray-800 hover:bg-white hover:text-gray-800 dark:hover:bg-gray-800 dark:hover:text-white rounded {{ request()->routeIs('user.weather_reports.show') ? 'bg-white text-gray-800 dark:bg-gray-800 dark:text-white' : '' }}">
 
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor">
@@ -132,13 +130,13 @@
             </a>
             @endif
 
-            <!-- Snapshots -->
+   
 
               @if(auth()->user()->role === 'admin')
             <a href="{{ route('snapshots.show') }}"
                  @click="profileOpen = false"
 
-                class="flex items-center space-x-2 px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 rounded {{ request()->routeIs('snapshots.show') ? 'bg-green-100 dark:bg-green-800 text-green-700 dark:text-green-200' : '' }}">
+                class="flex items-center space-x-2 px-4 py-2  dark:text-gray-800 hover:bg-white hover:text-gray-800 dark:hover:bg-gray-800 dark:hover:text-white rounded {{ request()->routeIs('snapshots.show') ? 'bg-white text-gray-800 dark:bg-gray-800 dark:text-white' : '' }}">
 
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor">
@@ -153,7 +151,7 @@
     <a href="{{ route('user.snapshots.show') }}"
                  @click="profileOpen = false"
 
-                class="flex items-center space-x-2 px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 rounded {{ request()->routeIs('user.snapshots.show') ? 'bg-green-100 dark:bg-green-800 text-green-700 dark:text-green-200' : '' }}">
+                class="flex items-center space-x-2 px-4 py-2  dark:text-gray-800 hover:bg-white hover:text-gray-800 dark:hover:bg-gray-800 dark:hover:text-white rounded {{ request()->routeIs('user.snapshots.show') ? 'bg-white text-gray-800 dark:bg-gray-800 dark:text-white' : '' }}">
 
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor">
@@ -168,11 +166,11 @@
             @endif
 
             @if(auth()->user()->role === 'admin')
-                <!-- User Management (Admin Only) -->
+       
                 <a href="{{ route('admin.user_management') }}"
                  @click="profileOpen = false"
 
-                    class="flex items-center space-x-2 px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 rounded {{ request()->routeIs('admin.user_management') ? 'bg-green-100 dark:bg-green-800 text-green-700 dark:text-green-200' : '' }}">
+                    class="flex items-center space-x-2 px-4 py-2  dark:text-gray-800 hover:bg-white hover:text-gray-800 dark:hover:bg-gray-800 dark:hover:text-white rounded {{ request()->routeIs('admin.user_management') ? 'bg-white text-gray-800 dark:bg-gray-800 dark:text-white' : '' }}">
 
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
@@ -182,11 +180,11 @@
                     <span x-show="sidebarOpen" x-cloak class="transition-opacity">User Management</span>
                 </a>
 
-                <!-- Logs (Admin Only) -->
+        
                 <a href="{{ route( 'logs.show') }}"
                      @click="profileOpen = false"
 
-                    class="flex items-center space-x-2 px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 rounded {{ request()->routeIs('logs.show') ? 'bg-green-100 dark:bg-green-800 text-green-700 dark:text-green-200' : '' }}">
+                    class="flex items-center space-x-2 px-4 py-2  dark:text-gray-800 hover:bg-white hover:text-gray-800 dark:hover:bg-gray-800 dark:hover:text-white rounded {{ request()->routeIs('logs.show') ? 'bg-white text-gray-800 dark:bg-gray-800 dark:text-white' : '' }}">
 
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
@@ -199,15 +197,14 @@
         </nav>
     </aside>
 
-    <!-- Main Content -->
     <div class="flex-1 flex flex-col">
-        <!-- Header/Appbar -->
-        <header class="bg-green-600 text-white p-4 flex justify-between items-center shadow-sm dark:bg-green-700">
+  
+        <header class="bg-white text-gray-800 p-4 flex justify-between items-center shadow-sm dark:bg-gray-800 dark:text-white">
 
             <div class="flex items-center space-x-3">
-                <!-- Toggle Button -->
+      
                 <button @click="sidebarOpen = !sidebarOpen"
-                    class="p-2 rounded hover:bg-green-700 focus:outline-none transition-colors">
+                    class="p-2 rounded hover:bg-gray-800 hover:text-white dark:hover:bg-white dark:hover:text-gray-800 focus:outline-none transition-colors">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -217,37 +214,37 @@
                 <h1 class="text-lg font-semibold">@yield('header', 'Page')</h1>
             </div>
 
-            <!-- User Menu - FIXED SECTION -->
-            <div x-data="{ profileOpen: false }" class="relative">
-                <!-- User Name with Profile Completion Indicator -->
-                <button @click="profileOpen = !profileOpen"
-                    class="flex items-center space-x-2 focus:outline-none hover:bg-green-700 px-3 py-2 rounded transition-colors">
-                    <div class="flex items-center space-x-2">
-                        <!-- User Avatar with indicator -->
-                        <div class="relative">
-                            <div
-                                class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-white font-semibold">
-                                {{ strtoupper(substr(Auth::user()->fname ?? Auth::user()->name ?? 'U', 0, 1)) }}
-                            </div>
-                            @if(!Auth::user()->isCompleted)
-                                <!-- Red dot indicator for incomplete profile -->
-                                <div class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white">
-                                </div>
-                            @endif
-                        </div>
-                        <span class="hidden md:block">{{ Auth::user()->fname ?? Auth::user()->name }}</span>
-                        @if(!Auth::user()->isCompleted)
-                            <span class="hidden lg:block text-xs bg-red-500 px-2 py-1 rounded-full">Incomplete</span>
-                        @endif
-                    </div>
-                    <!-- FIXED: Changed 'open' to 'profileOpen' -->
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-transform"
-                        :class="profileOpen ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                    </svg>
-                </button>
+     <div x-data="{ profileOpen: false }" class="relative">
+   
+    <button @click="profileOpen = !profileOpen"
+        class="flex items-center space-x-2 focus:outline-none px-3 py-2 rounded transition-colors 
+               hover:bg-gray-700 hover:text-white">
+        <div class="flex items-center space-x-2">
+     
+            <div class="relative">
+                <div
+                    class="w-8 h-8 bg-gray-800 text-white dark:bg-white dark:text-gray-800 rounded-full flex items-center justify-center font-semibold transition-colors duration-200">
+                    {{ strtoupper(substr(Auth::user()->fname ?? Auth::user()->name ?? 'U', 0, 1)) }}
+                </div>
 
-                <!-- Dropdown Menu - FIXED: Added x-cloak -->
+                @if(!Auth::user()->isCompleted)
+              
+                    <div class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white">
+                    </div>
+                @endif
+            </div>
+            <span class="hidden md:block">{{ Auth::user()->fname ?? Auth::user()->name }}</span>
+            @if(!Auth::user()->isCompleted)
+                <span class="hidden lg:block text-xs bg-red-500 px-2 py-1 rounded-full">Incomplete</span>
+            @endif
+        </div>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-transform"
+            :class="profileOpen ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+    </button>
+
+              
                 <div x-show="profileOpen" 
                      x-cloak
                      @click.away="profileOpen = false" 
@@ -259,7 +256,7 @@
                      x-transition:leave-end="opacity-0 scale-95"
                      class="absolute right-0 mt-2 w-48 bg-white text-gray-800 rounded-lg shadow-lg z-50 border border-gray-200">
 
-                    <!-- Profile Info -->
+                
                     <div class="px-4 py-3 border-b border-gray-200">
                         <p class="text-sm font-medium text-gray-900">
                             {{ Auth::user()->fname }} {{ Auth::user()->lname }}
@@ -274,10 +271,9 @@
                         @endif
                     </div>
 
-                    <!-- Menu Items -->
                     <div class="py-1">
                         @if(!Auth::user()->isCompleted)
-                            <!-- Complete Profile - Priority Item -->
+                       
                             <button onclick="openCompleteProfileModal(); document.querySelector('[x-data]').__x.$data.profileOpen = false"
                                 class="flex items-center w-full px-4 py-2 text-sm text-white bg-red-500 hover:bg-red-600">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-3" fill="none" viewBox="0 0 24 24"
@@ -328,21 +324,21 @@
             </div>
         </header>
 
-        <!-- Page Content -->
-        <main class="flex-1 overflow-y-auto p-6">
+       
+        <main class="flex-1 overflow-y-auto p-6 dark:bg-gray-200">
             @yield('content')
         </main>
     </div>
 
-    <!-- Profile Completion Modal -->
+
     @if(!Auth::user()->isCompleted)
         <div id="completeProfileModal" class="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm">
-            <!-- Overlay -->
-            <div class="absolute inset-0 bg-black bg-opacity-40 dark:bg-opacity-60"></div>
+           
+            <div class="absolute inset-0 "></div>
 
-            <!-- Modal Content -->
+            
             <div class="relative bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden">
-                <!-- Header -->
+              
                 <div class="bg-red-500 text-white p-5 rounded-t-2xl">
                     <div class="flex items-center space-x-3">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
@@ -356,7 +352,7 @@
                         information.</p>
                 </div>
 
-                <!-- Body -->
+             
                 <form id="completeProfileForm" action="{{ route('profile.update') }}" method="POST"
                     class="p-6 md:p-8 space-y-6 relative z-10">
                     @csrf
@@ -365,17 +361,17 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label for="complete_fname"
-                                class="block text-sm font-medium text-gray-700 dark:text-gray-300">First Name <span
+                                class="block text-sm font-medium text-gray-700  dark:text-gray-300">First Name <span
                                     class="text-red-500">*</span></label>
                             <input type="text" name="fname" id="complete_fname" value="{{ Auth::user()->fname }}" required
-                                class="mt-2 block w-full rounded-xl border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 px-4 py-3 focus:ring-2 focus:ring-red-500 focus:border-red-500">
+                                class="mt-2 block w-full rounded-xl border-gray-300 bg-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 px-4 py-3 focus:ring-2 focus:ring-red-500 focus:border-red-500">
                         </div>
                         <div>
                             <label for="complete_lname"
                                 class="block text-sm font-medium text-gray-700 dark:text-gray-300">Last Name <span
                                     class="text-red-500">*</span></label>
                             <input type="text" name="lname" id="complete_lname" value="{{ Auth::user()->lname }}" required
-                                class="mt-2 block w-full rounded-xl border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 px-4 py-3 focus:ring-2 focus:ring-red-500 focus:border-red-500">
+                                class="mt-2 block w-full rounded-xl border-gray-300 bg-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 px-4 py-3 focus:ring-2 focus:ring-red-500 focus:border-red-500">
                         </div>
                     </div>
 
@@ -383,10 +379,10 @@
                         <label for="complete_email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Email
                             Address <span class="text-red-500">*</span></label>
                         <input type="email" name="email" id="complete_email" value="{{ Auth::user()->email }}" required
-                            class="mt-2 block w-full rounded-xl border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 px-4 py-3 focus:ring-2 focus:ring-red-500 focus:border-red-500">
+                            class="mt-2 block w-full rounded-xl border-gray-300 bg-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 px-4 py-3 focus:ring-2 focus:ring-red-500 focus:border-red-500">
                     </div>
 
-                    <!-- Optional Password Update -->
+                
                     <div class="border-t pt-6 space-y-4">
                         <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Update Password (Optional)
                         </h3>
@@ -394,24 +390,24 @@
                             <label for="complete_old_password"
                                 class="block text-sm font-medium text-gray-700 dark:text-gray-300">Current Password</label>
                             <input type="password" name="old_password" id="complete_old_password"
-                                class="mt-2 block w-full rounded-xl border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 px-4 py-3 focus:ring-red-500 focus:border-red-500">
+                                class="mt-2 block w-full rounded-xl border-gray-300 bg-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 px-4 py-3 focus:ring-red-500 focus:border-red-500">
                         </div>
                         <div>
                             <label for="complete_new_password"
                                 class="block text-sm font-medium text-gray-700 dark:text-gray-300">New Password</label>
                             <input type="password" name="new_password" id="complete_new_password"
-                                class="mt-2 block w-full rounded-xl border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 px-4 py-3 focus:ring-red-500 focus:border-red-500">
+                                class="mt-2 block w-full rounded-xl border-gray-300 bg-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 px-4 py-3 focus:ring-red-500 focus:border-red-500">
                         </div>
                         <div>
                             <label for="complete_new_password_confirmation"
                                 class="block text-sm font-medium text-gray-700 dark:text-gray-300">Confirm New
                                 Password</label>
                             <input type="password" name="new_password_confirmation" id="complete_new_password_confirmation"
-                                class="mt-2 block w-full rounded-xl border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 px-4 py-3 focus:ring-red-500 focus:border-red-500">
+                                class="mt-2 block w-full rounded-xl border-gray-300 bg-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 px-4 py-3 focus:ring-red-500 focus:border-red-500">
                         </div>
                     </div>
 
-                    <!-- Footer -->
+              
                     <div class="flex justify-end pt-6 border-t border-gray-200 dark:border-gray-700">
                         <button type="submit"
                             class="px-6 py-3 rounded-xl bg-red-600 text-white hover:bg-red-700 font-medium">Complete
@@ -422,17 +418,17 @@
         </div>
     @endif
 
-    <!-- Profile Modal -->
+ 
     <div id="profileModal" class="hidden fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm">
         <div class="bg-gray-100 dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden">
-            <!-- Header -->
+          
             <div class="flex justify-between items-center p-5 border-b border-gray-200 dark:border-gray-700">
                 <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100">Profile</h2>
                 <button onclick="closeProfileModal()"
                     class="text-gray-500 hover:text-gray-800 dark:hover:text-gray-200">✕</button>
             </div>
 
-            <!-- Body -->
+         
             <div class="p-6 space-y-5">
                 <div>
                     <p class="text-sm text-gray-500 dark:text-gray-400">First Name</p>
@@ -448,7 +444,7 @@
                 </div>
             </div>
 
-            <!-- Footer -->
+     
             <div class="flex justify-end p-5 border-t border-gray-200 dark:border-gray-700">
                 <button onclick="closeProfileModal()"
                     class="px-5 py-2 rounded-xl bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600">Close</button>
@@ -456,17 +452,17 @@
         </div>
     </div>
 
-    <!-- Edit Profile Modal -->
+   
     <div id="editProfileModal" class="hidden fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm">
         <div class="bg-gray-100 dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden">
-            <!-- Header -->
+         
             <div class="flex justify-between items-center p-5 border-b border-gray-200 dark:border-gray-700">
                 <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100">Edit Profile</h2>
                 <button onclick="closeEditProfileModal()"
                     class="text-gray-500 hover:text-gray-800 dark:hover:text-gray-200">✕</button>
             </div>
 
-            <!-- Body -->
+          
             <form action="{{ route('profile.update') }}" method="POST" class="p-6 md:p-8 space-y-5">
                 @csrf
                 @method('PUT')
@@ -476,44 +472,44 @@
                         <label for="fname" class="block text-sm font-medium text-gray-700 dark:text-gray-200">First
                             Name</label>
                         <input type="text" name="fname" id="fname" value="{{ auth()->user()->fname }}"
-                            class="mt-2 block w-full rounded-xl border-gray-300 bg-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 px-4 py-3 focus:ring-green-500 focus:border-green-500">
+                            class="mt-2 block w-full rounded-xl border-gray-300 bg-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 px-4 py-3 focus:ring-gray-800 focus:border-gray-800">
                     </div>
                     <div>
                         <label for="lname" class="block text-sm font-medium text-gray-700 dark:text-gray-200">Last
                             Name</label>
                         <input type="text" name="lname" id="lname" value="{{ auth()->user()->lname }}"
-                            class="mt-2 block w-full rounded-xl border-gray-300 bg-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 px-4 py-3 focus:ring-green-500 focus:border-green-500">
+                            class="mt-2 block w-full rounded-xl border-gray-300 bg-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 px-4 py-3 focus:ring-gray-800 focus:border-gray-800">
                     </div>
                 </div>
 
                 <div>
                     <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-200">Email</label>
                     <input type="email" name="email" id="email" value="{{ auth()->user()->email }}"
-                        class="mt-2 block w-full rounded-xl border-gray-300 bg-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 px-4 py-3 focus:ring-green-500 focus:border-green-500">
+                        class="mt-2 block w-full rounded-xl border-gray-300 bg-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 px-4 py-3 focus:ring-gray-800 focus:border-gray-800">
                 </div>
 
                 <div>
                     <label for="old_password" class="block text-sm font-medium text-gray-700 dark:text-gray-200">Current
                         Password</label>
                     <input type="password" name="old_password" id="old_password"
-                        class="mt-2 block w-full rounded-xl border-gray-300 bg-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 px-4 py-3 focus:ring-green-500 focus:border-green-500">
+                        class="mt-2 block w-full rounded-xl border-gray-300 bg-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 px-4 py-3 focus:ring-gray-800 focus:border-gray-800">
                 </div>
 
                 <div>
                     <label for="new_password" class="block text-sm font-medium text-gray-700 dark:text-gray-200">New
                         Password</label>
                     <input type="password" name="new_password" id="new_password"
-                        class="mt-2 block w-full rounded-xl border-gray-300 bg-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 px-4 py-3 focus:ring-green-500 focus:border-green-500">
+                        class="mt-2 block w-full rounded-xl border-gray-300 bg-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 px-4 py-3 focus:ring-gray-800 focus:border-gray-800">
                 </div>
 
                 <div>
                     <label for="new_password_confirmation"
                         class="block text-sm font-medium text-gray-700 dark:text-gray-200">Confirm New Password</label>
                     <input type="password" name="new_password_confirmation" id="new_password_confirmation"
-                        class="mt-2 block w-full rounded-xl border-gray-300 bg-gray-200 bg-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 px-4 py-3 focus:ring-green-500 focus:border-green-500">
+                        class="mt-2 block w-full rounded-xl border-gray-300 bg-gray-200  dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 px-4 py-3 focus:ring-gray-800 focus:border-gray-800">
                 </div>
 
-                <!-- Footer -->
+          
                 <div class="flex justify-end gap-3 pt-6 border-t border-gray-200 dark:border-gray-700">
                     <button type="button" onclick="closeEditProfileModal()"
                         class="px-5 py-3 rounded-xl bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600">Cancel</button>
@@ -526,12 +522,11 @@
 
 
 
-    <!-- Alpine.js -->
+
     <script src="//unpkg.com/alpinejs" defer></script>
 
-    <!-- Global Scripts -->
     <script>
-        // Global modal functions for profile
+       
         function openProfileModal() {
             const modal = document.getElementById('profileModal');
             if (modal) {
@@ -560,7 +555,7 @@
             }
         }
 
-        // Complete Profile Modal Functions
+      
         function openCompleteProfileModal() {
             const modal = document.getElementById('completeProfileModal');
             if (modal) {
@@ -575,19 +570,19 @@
             }
         }
 
-        // Auto-open modal if flagged from controller or if profile is incomplete
+     
         document.addEventListener("DOMContentLoaded", function () {
             @if(session('showProfileModal'))
                 openEditProfileModal();
             @elseif(!Auth::user()->isCompleted)
-                // Auto-open completion modal after a short delay
+            
                 setTimeout(function () {
                     openCompleteProfileModal();
                 }, 1000);
             @endif
         });
 
-        // Close modal on escape key
+   
         document.addEventListener('keydown', function (event) {
             if (event.key === 'Escape') {
                 closeProfileModal();
@@ -598,12 +593,12 @@
             }
         });
 
-        // Prevent closing completion modal by clicking outside if profile is incomplete
+
         @if(!Auth::user()->isCompleted)
             document.addEventListener('click', function (event) {
                 const modal = document.getElementById('completeProfileModal');
                 if (modal && event.target === modal) {
-                    // Don't close - force user to complete profile
+         
                     event.preventDefault();
                 }
             });

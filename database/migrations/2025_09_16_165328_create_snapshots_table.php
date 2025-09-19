@@ -6,27 +6,33 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('snapshots', function (Blueprint $table) {
             $table->id('snapshotID');
-            $table->foreignId('userID')->references('userID')->on('users')->onDelete('cascade');
-            $table->string('title');
-            $table->text('description')->nullable();
-            $table->date('date');
-            $table->enum('snapshot_status', ['pending', 'in-progress', 'completed'])->default('pending');
+            $table->foreignId('wrID')->references('wrID')->on('weather_reports')->onDelete('cascade');
+            $table->enum('snapshot_time', ['morning','noon','afternoon','evening']);
+            
+        
+            $table->float('temperature');
+            $table->float('feels_like');
+            $table->integer('humidity');
+            $table->integer('pressure');
+            $table->float('wind_speed');
+            $table->string('wind_direction', 5);
+            $table->integer('cloudiness');
+            $table->float('precipitation');
+            $table->string('weather_main');
+            $table->string('weather_desc');
+            $table->string('weather_icon');
+            $table->enum('storm_status', ['none','light','moderate','severe'])->default('none');
+            
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('snapshots');
+        Schema::dropIfExists('weather_snapshots');
     }
 };

@@ -11,7 +11,7 @@ class LogsController extends Controller
     {
 
        $search = $request->get('search');
-        $filter = $request->get('filter', 'all'); // user, action, or all
+        $filter = $request->get('filter', 'all'); 
         $startDate = $request->get('start_date');
         $endDate = $request->get('end_date');
 
@@ -24,7 +24,7 @@ class LogsController extends Controller
                 });
             } elseif ($filter === 'action') {
                 $logs->where('action', 'like', "%{$search}%");
-            } else { // all
+            } else { 
                 $logs->where(function ($query) use ($search) {
                     $query->whereHas('user', function ($q) use ($search) {
                         $q->where('name', 'like', "%{$search}%");

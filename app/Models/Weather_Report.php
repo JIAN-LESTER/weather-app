@@ -4,22 +4,29 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Notifications\Notifiable;
 
 class Weather_Report extends Model
 {
-    use HasFactory, Notifiable;
+    use HasFactory;
 
+    protected $primaryKey = 'wrID';
+    public $incrementing = true;
+    protected $keyType = 'int';
 
     protected $fillable = [
         'locID',
-        'temperature',
-        'storm',
-        'fetched_at'
+        'report_date',
     ];
 
-    public function location(){
-        return $this->hasMany(Location::class, 'locID', 'locID');
+
+    public function location()
+    {
+        return $this->belongsTo(Location::class, 'locID', 'locID');
     }
 
+
+    public function snapshots()
+    {
+        return $this->hasMany(Snapshot::class, 'wrID', 'wrID');
+    }
 }

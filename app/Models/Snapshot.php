@@ -4,24 +4,31 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Notifications\Notifiable;
 
 class Snapshot extends Model
 {
-    use HasFactory, Notifiable;
+    use HasFactory;
 
     protected $fillable = [
-        'userID',
-        'title',
-        'description',
-        'date',
-        'snapshot_status',
+        'wrID',
+        'snapshot_time',
+        'temperature',
+        'feels_like',
+        'humidity',
+        'pressure',
+        'wind_speed',
+        'wind_direction',
+        'cloudiness',
+        'precipitation',
+        'weather_main',
+        'weather_desc',
+        'weather_icon',
+        'storm_status',
     ];
 
 
-    
-    public function user() { return $this->belongsTo(User::class); }
-    public function location() { return $this->belongsTo(Location::class); }
-
-
+    public function report()
+    {
+        return $this->belongsTo(Weather_Report::class, 'wrID', 'wrID');
+    }
 }

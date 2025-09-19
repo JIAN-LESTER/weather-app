@@ -5,48 +5,10 @@
 
 @section('content')
 
-<!-- Enhanced Header Controls -->
-<div class="bg-white rounded-lg shadow-sm border mb-6 p-4">
-    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-        <!-- Map Controls -->
-        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-            <div class="flex items-center gap-2">
-                <label for="mapScope" class="text-sm font-medium text-gray-700">Map Scope:</label>
-                <select id="mapScope" class="border border-gray-300 rounded-md px-3 py-2 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
-                    <option value="bukidnon" selected>🏔️ Bukidnon Province</option>
-                    <option value="all">🇵🇭 All Philippines</option>
-                </select>
-            </div>
-            
-            <div class="flex items-center gap-2">
-                <label for="mapStyle" class="text-sm font-medium text-gray-700">Map Style:</label>
-                <select id="mapStyle" class="border border-gray-300 rounded-md px-3 py-2 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
-                    <option value="light" selected>☀️ Light Mode</option>
-                    <option value="dark">🌙 Dark Mode</option>
-                    <option value="satellite">🛰️ Satellite</option>
-                </select>
-            </div>
-        </div>
 
-        <!-- Weather Controls -->
-        <div class="flex flex-wrap items-center gap-3">
-            <span class="text-sm font-medium text-gray-700">Weather Layers:</span>
-            <div class="flex flex-wrap gap-2">
-                <button id="toggleTemp" class="weather-btn bg-orange-50 text-orange-700 border border-orange-200 hover:bg-orange-100" data-layer="temp">
-                    🌡️ Temperature
-                </button>
-                <button id="toggleStorm" class="weather-btn bg-purple-50 text-purple-700 border border-purple-200 hover:bg-purple-100" data-layer="storm">
-                    🌩️ Storms
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Map Container with Enhanced Styling -->
 <div class="relative bg-white rounded-lg shadow-lg border overflow-hidden">
     <!-- Map Loading Indicator -->
-    <div id="mapLoader" class="absolute inset-0 bg-gray-50 flex items-center justify-center z-50">
+    <div id="mapLoader" class="absolute inset-0 bg-gray-50 flex items-center justify-center z-20">
         <div class="flex items-center gap-3">
             <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
             <span class="text-gray-600 font-medium">Loading map...</span>
@@ -54,66 +16,71 @@
     </div>
     
     <!-- Map -->
-    <div id="map" class="h-[80vh] w-full"></div>
+    <div id="map" class="h-[80vh] w-full z-0"></div>
     
-    <!-- Map Info Panel -->
-    <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-lg shadow-lg border p-3 max-w-xs z-10">
-        <div class="text-sm">
-            <div class="flex items-center gap-2 mb-2">
-                <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                <span class="font-medium text-gray-800">Live Weather Data</span>
+<div id="weatherPanel" class="absolute top-4 left-4 bg-white/90 backdrop-blur-sm rounded-lg shadow-lg border p-4 max-w-sm z-20 hidden">
+    <!-- Content will be injected dynamically -->
+</div>
+
+
+    <!-- Header Controls (Bottom-Right Overlay) -->
+  <div class="absolute bottom-4 right-4 bg-white/90 backdrop-blur-sm rounded-lg shadow-lg border p-4 flex flex-col gap-4 z-10 max-w-xs max-h-[60vh] overflow-y-auto">
+    <!-- Map Scope -->
+    <div class="flex flex-col gap-2">
+        <label for="mapScope" class="text-sm font-medium text-gray-700">Map Scope:</label>
+        <select id="mapScope" class="border border-gray-300 rounded-md px-3 py-2 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+            <option value="bukidnon" selected>Bukidnon</option>
+            <option value="all">Philippines</option>
+        </select>
+    </div>
+
+    <!-- Map Style -->
+    <div class="flex flex-col gap-2">
+        <label for="mapStyle" class="text-sm font-medium text-gray-700">Map Style:</label>
+        <select id="mapStyle" class="border border-gray-300 rounded-md px-3 py-2 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+            <option value="light" selected>Light Mode</option>
+            <option value="dark">Dark Mode</option>
+            <option value="satellite">Satellite</option>
+        </select>
+    </div>
+
+    <!-- Weather Layers -->
+<div class="flex flex-col gap-2">
+    <span class="text-sm font-medium text-gray-700">Weather Layers:</span>
+    <div class="flex flex-wrap gap-2">
+        <button 
+            class="weather-radio flex items-center gap-2 px-4 py-2 rounded-full border border-orange-200 text-orange-700 bg-orange-50 hover:bg-orange-100 transition-all duration-200 active:bg-orange-200"
+            data-layer="temp">
+            🌡️ Temperature
+        </button>
+
+        <button 
+            class="weather-radio flex items-center gap-2 px-4 py-2 rounded-full border border-purple-200 text-purple-700 bg-purple-50 hover:bg-purple-100 transition-all duration-200 active:bg-purple-200"
+            data-layer="storm">
+            🌩️ Storms
+        </button>
+    </div>
+</div>
+</div>
+
+
+
+    <!-- Map Legend -->
+    <div class="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm rounded-lg shadow-lg border p-4 max-w-xs z-10">
+        <h3 class="text-lg font-semibold text-gray-800 mb-3">🗺️ Map Legend</h3>
+        <div class="space-y-2 text-sm text-gray-600">
+            <div class="flex items-center gap-2">
+                <div class="w-4 h-3 bg-gradient-to-r from-blue-500 to-red-500 rounded opacity-50"></div>
+                <span>Temperature (°C)</span>
             </div>
-            <div class="text-gray-600 text-xs space-y-1">
-                <div>📍 Current View: <span id="currentScope" class="font-medium">Bukidnon</span></div>
-                <div>🔄 Last Updated: <span id="lastUpdate">Now</span></div>
-                <div>⚡ Data Source: OpenWeatherMap</div>
-                <div class="mt-2 p-2 bg-blue-50 rounded text-blue-700">
-                    💡 <strong>Tip:</strong> Click anywhere on the map to get detailed weather information for that location!
-                </div>
+            <div class="flex items-center gap-2">
+                <div class="w-4 h-3 bg-purple-400 rounded opacity-60"></div>
+                <span>Precipitation & Wind</span>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Legend -->
-<div class="mt-6 bg-white rounded-lg shadow-sm border p-4">
-    <h3 class="text-lg font-semibold text-gray-800 mb-3">🗺️ Map Legend</h3>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div class="space-y-2">
-            <h4 class="font-medium text-gray-700">Weather Layers</h4>
-            <div class="space-y-1 text-sm text-gray-600">
-                <div class="flex items-center gap-2">
-                    <div class="w-4 h-3 bg-blue-300 rounded opacity-50"></div>
-                    <span>Cloud Coverage</span>
-                </div>
-                <div class="flex items-center gap-2">
-                    <div class="w-4 h-3 bg-gradient-to-r from-blue-500 to-red-500 rounded opacity-50"></div>
-                    <span>Temperature (°C)</span>
-                </div>
-                <div class="flex items-center gap-2">
-                    <div class="w-4 h-3 bg-purple-400 rounded opacity-60"></div>
-                    <span>Precipitation & Wind</span>
-                </div>
-            </div>
-        </div>
-        <div class="space-y-2">
-            <h4 class="font-medium text-gray-700">Map Controls</h4>
-            <div class="space-y-1 text-sm text-gray-600">
-                <div>🖱️ Click & drag to pan</div>
-                <div>🔍 Scroll to zoom in/out</div>
-                <div>📱 Touch gestures supported</div>
-            </div>
-        </div>
-        <div class="space-y-2">
-            <h4 class="font-medium text-gray-700">Coverage Areas</h4>
-            <div class="space-y-1 text-sm text-gray-600">
-                <div>🏔️ Bukidnon: Detailed provincial view</div>
-                <div>🇵🇭 Philippines: National overview</div>
-                <div>🛰️ Real-time weather updates</div>
-            </div>
-        </div>
-    </div>
-</div>
 
 @endsection
 
@@ -293,23 +260,34 @@ map.whenReady(function() {
     }, 1000);
 });
 
-// Enhanced scope toggle
 document.getElementById('mapScope').addEventListener('change', function() {
     const scope = this.value;
     const scopeDisplay = document.getElementById('currentScope');
-    
+
     if (scope === 'bukidnon') {
+        // Temporarily remove bounds to allow full zoom/fly
+        map.setMaxBounds(null);
         map.flyTo([7.9, 125.1], 10, { duration: 1.5 });
-        map.setMaxBounds(bukidnonBounds);
+
+        // Restore bounds after animation
+        setTimeout(() => {
+            map.setMaxBounds(bukidnonBounds);
+        }, 1600); // slightly longer than duration
+
         scopeDisplay.textContent = 'Bukidnon Province';
     } else {
-        map.flyTo([12.5, 122.5], 6, { duration: 1.5 });
-        map.setMaxBounds(philippinesBounds);
+        map.setMaxBounds(null);
+        map.flyTo([12.5, 122.5], 5, { duration: 1.5 });
+        setTimeout(() => {
+            map.setMaxBounds(philippinesBounds);
+        }, 1600);
+
         scopeDisplay.textContent = 'All Philippines';
     }
-    
+
     updateLastUpdated();
 });
+
 
 // Map style switcher
 document.getElementById('mapStyle').addEventListener('change', function() {
@@ -414,53 +392,48 @@ let clickMarker = null;
 map.on('click', async function(e) {
     const lat = e.latlng.lat.toFixed(4);
     const lng = e.latlng.lng.toFixed(4);
-    
-    // Remove previous click marker
+
+    // Remove previous marker
     if (clickMarker) {
         map.removeLayer(clickMarker);
     }
-    
-    // Add temporary marker with loading state
-    clickMarker = L.marker([lat, lng], {
-        icon: L.divIcon({
-            html: `<div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 bg-white"></div>`,
-            className: 'custom-loading-marker',
-            iconSize: [30, 30],
-            iconAnchor: [15, 15]
-        })
-    }).addTo(map);
-    
+
+clickMarker = L.marker([lat, lng], {
+    icon: L.divIcon({
+        html: `
+            <div class="flex flex-col items-center">
+                <!-- Circle head -->
+                <div class="w-4 h-4 bg-blue-500 rounded-full border-2 border-white"></div>
+                <!-- Sharp pointer -->
+                <div class="w-0 h-0 border-l-4 border-r-4 border-t-6 border-l-transparent border-r-transparent border-t-blue-500"></div>
+            </div>
+        `,
+        className: '', // remove extra default classes
+        iconSize: [16, 24], // adjust for pointer size
+        iconAnchor: [8, 24] // bottom tip is the anchor
+    })
+}).addTo(map);
+
+    // Show loading in panel
+    const weatherPanel = document.getElementById('weatherPanel');
+    weatherPanel.innerHTML = `
+        <div class="flex justify-center items-center p-4">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            <span class="ml-2 text-gray-600 font-medium">Loading weather...</span>
+        </div>
+    `;
+    weatherPanel.classList.remove('hidden');
+
     try {
-        // Fetch weather data for clicked location
         const weatherData = await fetchWeatherData(lat, lng);
-        
-        // Update marker with weather info
-        clickMarker.setIcon(L.divIcon({
-            html: `<div class="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center text-xs font-bold shadow-lg">📍</div>`,
-            className: 'custom-weather-marker',
-            iconSize: [32, 32],
-            iconAnchor: [16, 16]
-        }));
-        
-        // Create detailed popup content
         const popupContent = createWeatherPopup(weatherData, lat, lng);
-        clickMarker.bindPopup(popupContent, {
-            maxWidth: 300,
-            className: 'weather-popup'
-        }).openPopup();
-        
+
+        // Populate panel with weather info
+        weatherPanel.innerHTML = popupContent;
+
     } catch (error) {
         console.error('Error fetching weather data:', error);
-        
-        // Show error popup with basic location info
-        clickMarker.setIcon(L.divIcon({
-            html: `<div class="bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center text-xs font-bold shadow-lg">❌</div>`,
-            className: 'custom-error-marker',
-            iconSize: [32, 32],
-            iconAnchor: [16, 16]
-        }));
-        
-        clickMarker.bindPopup(`
+        weatherPanel.innerHTML = `
             <div class="p-3">
                 <h3 class="font-bold text-gray-800 mb-2 flex items-center gap-2">
                     <span class="text-red-500">⚠️</span>
@@ -480,9 +453,11 @@ map.on('click', async function(e) {
                     </div>
                 </div>
             </div>
-        `).openPopup();
+        `;
     }
 });
+
+
 
 // Fetch weather data from OpenWeatherMap API
 async function fetchWeatherData(lat, lng) {
@@ -572,6 +547,15 @@ function createWeatherPopup(weatherData, lat, lng) {
                 </div>
             </div>
 
+            <!-- Save Weather Data Button -->
+            <button id="saveWeatherBtn" onclick="saveWeatherData('${lat}', '${lng}', ${JSON.stringify(weatherData).replace(/'/g, "&apos;")})" 
+                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 mb-3 flex items-center justify-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3-3m0 0l-3 3m3-3v12"></path>
+                </svg>
+                Save Weather Data
+            </button>
+
             <div class="mt-3 pt-3 border-t border-gray-200 text-xs text-gray-500 space-y-1">
                 <div class="flex justify-between">
                     <span>📍 Latitude:</span>
@@ -589,6 +573,221 @@ function createWeatherPopup(weatherData, lat, lng) {
     `;
 }
 
+// Function to save weather data to database
+async function saveWeatherData(lat, lng, weatherData) {
+    const saveBtn = document.getElementById('saveWeatherBtn');
+    const originalContent = saveBtn.innerHTML;
+    
+    // Show loading state
+    saveBtn.disabled = true;
+    saveBtn.innerHTML = `
+        <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+        Saving...
+    `;
+
+    try {
+        // Prepare data for API
+        const postData = {
+            latitude: parseFloat(lat),
+            longitude: parseFloat(lng),
+            location_name: weatherData.name || `Location (${lat}, ${lng})`,
+            temperature: weatherData.main.temp,
+            feels_like: weatherData.main.feels_like,
+            humidity: weatherData.main.humidity,
+            pressure: weatherData.main.pressure,
+            wind_speed: weatherData.wind?.speed || 0,
+            wind_direction: weatherData.wind?.deg ? weatherData.wind.deg.toString() : '0',
+            cloudiness: weatherData.clouds?.all || 0,
+            precipitation: weatherData.rain?.['1h'] || weatherData.snow?.['1h'] || 0,
+            weather_main: weatherData.weather[0].main,
+            weather_desc: weatherData.weather[0].description,
+            weather_icon: weatherData.weather[0].icon,
+            _token: document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+        };
+
+        const response = await fetch('/weather/store-snapshot', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify(postData)
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            // Success feedback
+            saveBtn.innerHTML = `
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                Saved Successfully!
+            `;
+            saveBtn.className = 'w-full bg-green-600 text-white font-medium py-2 px-4 rounded-lg mb-3 flex items-center justify-center gap-2';
+            
+            // Show success message
+            showNotification('Weather data saved successfully!', 'success');
+            
+            setTimeout(() => {
+                saveBtn.innerHTML = originalContent;
+                saveBtn.className = 'w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 mb-3 flex items-center justify-center gap-2';
+                saveBtn.disabled = false;
+            }, 2000);
+
+        } else {
+            throw new Error(result.message || 'Failed to save weather data');
+        }
+
+    } catch (error) {
+        console.error('Error saving weather data:', error);
+        
+        // Error feedback
+        saveBtn.innerHTML = `
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+            Save Failed
+        `;
+        saveBtn.className = 'w-full bg-red-600 text-white font-medium py-2 px-4 rounded-lg mb-3 flex items-center justify-center gap-2';
+        
+        // Show error message
+        showNotification(error.message || 'Failed to save weather data. Please try again.', 'error');
+        
+        setTimeout(() => {
+            saveBtn.innerHTML = originalContent;
+            saveBtn.className = 'w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 mb-3 flex items-center justify-center gap-2';
+            saveBtn.disabled = false;
+        }, 3000);
+    }
+}
+
+// Notification system
+function showNotification(message, type = 'info') {
+    // Remove existing notifications
+    const existingNotifications = document.querySelectorAll('.weather-notification');
+    existingNotifications.forEach(notif => notif.remove());
+
+    const notification = document.createElement('div');
+    notification.className = `weather-notification fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg max-w-sm transform transition-all duration-300 translate-x-full`;
+    
+    // Set colors based on type
+    if (type === 'success') {
+        notification.className += ' bg-green-100 border border-green-400 text-green-700';
+    } else if (type === 'error') {
+        notification.className += ' bg-red-100 border border-red-400 text-red-700';
+    } else {
+        notification.className += ' bg-blue-100 border border-blue-400 text-blue-700';
+    }
+
+    notification.innerHTML = `
+        <div class="flex items-center">
+            <div class="flex-1">${message}</div>
+            <button onclick="this.parentElement.parentElement.remove()" class="ml-2 text-lg">&times;</button>
+        </div>
+    `;
+
+    document.body.appendChild(notification);
+
+    // Animate in
+    setTimeout(() => {
+        notification.classList.remove('translate-x-full');
+    }, 100);
+
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+        notification.classList.add('translate-x-full');
+        setTimeout(() => notification.remove(), 300);
+    }, 5000);
+}
+
+// Function to load today's weather snapshots (for dashboard)
+async function loadTodaysSnapshots() {
+    try {
+        const response = await fetch('/weather/todays-snapshots', {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            displaySnapshotsOnMap(result.snapshots);
+        } else {
+            console.error('Failed to load snapshots:', result.message);
+        }
+
+    } catch (error) {
+        console.error('Error loading snapshots:', error);
+    }
+}
+
+// Function to display existing snapshots on map
+function displaySnapshotsOnMap(snapshots) {
+    // Clear existing snapshot markers
+    if (window.snapshotMarkers) {
+        window.snapshotMarkers.forEach(marker => map.removeLayer(marker));
+    }
+    window.snapshotMarkers = [];
+
+    snapshots.forEach(snapshot => {
+        const marker = L.marker([snapshot.latitude, snapshot.longitude], {
+            icon: L.divIcon({
+                html: `
+                    <div class="flex flex-col items-center">
+                        <div class="w-6 h-6 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
+                            <span class="text-white text-xs font-bold">${Math.round(snapshot.temperature)}°</span>
+                        </div>
+                        <div class="w-0 h-0 border-l-3 border-r-3 border-t-4 border-l-transparent border-r-transparent border-t-green-500"></div>
+                    </div>
+                `,
+                className: '',
+                iconSize: [24, 32],
+                iconAnchor: [12, 32]
+            })
+        }).addTo(map);
+
+        marker.bindPopup(`
+            <div class="p-3">
+                <h3 class="font-bold text-gray-800 mb-2">${snapshot.location}</h3>
+                <div class="text-sm space-y-1">
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">Time:</span>
+                        <span class="font-medium capitalize">${snapshot.snapshot_time}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">Temperature:</span>
+                        <span class="font-medium text-orange-600">${snapshot.temperature}°C</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">Storm Status:</span>
+                        <span class="font-medium capitalize">${snapshot.storm_status}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">Saved:</span>
+                        <span class="font-medium text-green-600">${new Date(snapshot.created_at).toLocaleTimeString()}</span>
+                    </div>
+                </div>
+            </div>
+        `);
+
+        window.snapshotMarkers.push(marker);
+    });
+}
+
+// Load existing snapshots when map is ready
+map.whenReady(function() {
+    setTimeout(() => {
+        document.getElementById('mapLoader').style.display = 'none';
+        updateLastUpdated();
+        loadTodaysSnapshots(); // Load existing snapshots
+    }, 1000);
+});
+
 
 // Auto-refresh weather data every 5 minutes
 setInterval(() => {
@@ -605,11 +804,68 @@ setInterval(() => {
     updateLastUpdated();
 }, 300000); // 5 minutes
 
-// Add attribution
-L.control.attribution({
-    position: 'bottomright'
-}).addTo(map).addAttribution('Weather data © OpenWeatherMap');
 
 console.log('🗺️ Enhanced Maps Management loaded successfully!');
+</script>
+<script>
+const radios = document.querySelectorAll('.weather-radio');
+
+radios.forEach(btn => {
+    btn.addEventListener('click', () => {
+        const layerType = btn.dataset.layer;
+        
+        if (btn.classList.contains('bg-orange-200') || btn.classList.contains('bg-purple-200')) {
+            // Remove layer
+            btn.classList.remove('bg-orange-200', 'bg-purple-200', 'text-white');
+            btn.classList.add('text-orange-700', 'bg-orange-50');
+            activeWeatherLayers.delete(layerType);
+            
+            if (layerType === 'storm') {
+                map.removeLayer(stormLayer);
+            } else {
+                map.removeLayer(weatherLayers[layerType]);
+            }
+        } else {
+            // Remove active from all first
+            radios.forEach(b => {
+                b.classList.remove('bg-orange-200', 'bg-purple-200', 'text-white');
+                if (b.dataset.layer === 'temp') {
+                    b.classList.add('text-orange-700', 'bg-orange-50');
+                } else {
+                    b.classList.add('text-purple-700', 'bg-purple-50');
+                }
+            });
+            
+            // Add active to clicked
+            if (layerType === 'temp') {
+                btn.classList.remove('text-orange-700', 'bg-orange-50');
+                btn.classList.add('bg-orange-200', 'text-white');
+            } else if (layerType === 'storm') {
+                btn.classList.remove('text-purple-700', 'bg-purple-50');
+                btn.classList.add('bg-purple-200', 'text-white');
+            }
+            
+ 
+            activeWeatherLayers.forEach(layer => {
+                if (layer === 'storm') {
+                    map.removeLayer(stormLayer);
+                } else {
+                    map.removeLayer(weatherLayers[layer]);
+                }
+            });
+            activeWeatherLayers.clear();
+            
+   
+            activeWeatherLayers.add(layerType);
+            if (layerType === 'storm') {
+                stormLayer.addTo(map);
+            } else {
+                weatherLayers[layerType].addTo(map);
+            }
+        }
+        
+        updateLastUpdated();
+    });
+});
 </script>
 @endpush

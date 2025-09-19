@@ -124,7 +124,7 @@ class AuthController extends Controller
     {
         $user->failed_attempts++;
         if ($user->failed_attempts >= 5) {
-            // Lock the account for 15 minutes after 5 failed attempts
+    
             $user->lockout_time = now()->addMinutes(5);
             $user->save();
         } else {
@@ -135,7 +135,7 @@ class AuthController extends Controller
     protected function resetFailedAttempts($user)
     {
         $user->failed_attempts = 0;
-        $user->lockout_time = null; // Reset lockout time
+        $user->lockout_time = null; 
         $user->save();
     }
 
