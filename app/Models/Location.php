@@ -16,5 +16,8 @@ class Location extends Model
         'longitude',
     ];
 
+
+     public function snapshots() { return $this->hasMany(Snapshot::class); }
+    public function weatherReports() { return $this->hasMany(Weather_Report::class); }
     
 }

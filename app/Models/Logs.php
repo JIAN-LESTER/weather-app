@@ -17,6 +17,6 @@ class Logs extends Model
     ];
 
           public function user(){
-        return $this->hasMany(User::class, 'userID', 'userID');
+        return $this->belongsTo(User::class, 'userID', 'userID');
     }
 }

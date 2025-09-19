@@ -1,8 +1,8 @@
 @extends('layouts.app')
 
-@section('title', 'Snapshot Management')
+@section('title', 'Snapshot')
 
-@section('header', 'Snapshot Management')
+@section('header', 'Snapshot')
 
 @section('content')
     <div class="bg-white p-6 rounded shadow">

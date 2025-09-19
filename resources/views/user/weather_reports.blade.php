@@ -1,8 +1,8 @@
 @extends('layouts.app')
 
-@section('title', 'Weather Reports Management')
+@section('title', 'Weather Reports')
 
-@section('header', 'Weather Reports Management')
+@section('header', 'Weather Reports')
 
 @section('content')
     <div class="bg-white p-6 rounded shadow">

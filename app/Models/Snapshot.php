@@ -20,9 +20,8 @@ class Snapshot extends Model
 
 
     
-       public function user(){
-        return $this->hasMany(User::class, 'userID', 'userID');
-    }
+    public function user() { return $this->belongsTo(User::class); }
+    public function location() { return $this->belongsTo(Location::class); }
 
 
 }
