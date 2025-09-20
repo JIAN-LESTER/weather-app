@@ -9,6 +9,8 @@ class Location extends Model
 {
     use HasFactory;
 
+    protected $primaryKey = 'locID';
+
     protected $fillable = [
         'name',
         'latitude',
@@ -18,11 +20,11 @@ class Location extends Model
 
     public function weatherReports()
     {
-        return $this->hasMany(Weather_Report::class, 'locID', 'id');
+        return $this->hasMany(WeatherReport::class, 'locID', 'locID');
     }
 
     public function snapshots()
     {
-        return $this->hasMany(Snapshot::class, 'locID', 'id');
+        return $this->hasMany(Snapshot::class, 'locID', 'locID');
     }
 }

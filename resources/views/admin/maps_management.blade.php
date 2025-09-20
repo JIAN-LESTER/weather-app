@@ -23,45 +23,52 @@
 </div>
 
 
-    <!-- Header Controls (Bottom-Right Overlay) -->
-  <div class="absolute bottom-4 right-4 bg-white/90 backdrop-blur-sm rounded-lg shadow-lg border p-4 flex flex-col gap-4 z-10 max-w-xs max-h-[60vh] overflow-y-auto">
+   <!-- Collapsible Header Controls -->
+<details class="absolute bottom-4 right-4 z-10 max-w-xs">
+  <summary class="cursor-pointer bg-white/90 backdrop-blur-sm rounded-lg shadow-lg border px-4 py-2 text-gray-700 font-medium hover:bg-white">
+    ⚙️ Map Controls
+  </summary>
+
+  <div class="bg-white/90 backdrop-blur-sm rounded-lg shadow-lg border p-4 flex flex-col gap-4 max-h-[60vh] overflow-y-auto mt-2">
     <!-- Map Scope -->
     <div class="flex flex-col gap-2">
-        <label for="mapScope" class="text-sm font-medium text-gray-700">Map Scope:</label>
-        <select id="mapScope" class="border border-gray-300 rounded-md px-3 py-2 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
-            <option value="bukidnon" selected>Bukidnon</option>
-            <option value="all">Philippines</option>
-        </select>
+      <label for="mapScope" class="text-sm font-medium text-gray-700">Map Scope:</label>
+      <select id="mapScope" class="border border-gray-300 rounded-md px-3 py-2 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+        <option value="bukidnon" selected>Bukidnon</option>
+        <option value="all">Philippines</option>
+      </select>
     </div>
 
     <!-- Map Style -->
     <div class="flex flex-col gap-2">
-        <label for="mapStyle" class="text-sm font-medium text-gray-700">Map Style:</label>
-        <select id="mapStyle" class="border border-gray-300 rounded-md px-3 py-2 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
-            <option value="light" selected>Light Mode</option>
-            <option value="dark">Dark Mode</option>
-            <option value="satellite">Satellite</option>
-        </select>
+      <label for="mapStyle" class="text-sm font-medium text-gray-700">Map Style:</label>
+      <select id="mapStyle" class="border border-gray-300 rounded-md px-3 py-2 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+        <option value="light" selected>Light Mode</option>
+        <option value="dark">Dark Mode</option>
+        <option value="satellite">Satellite</option>
+      </select>
     </div>
 
     <!-- Weather Layers -->
-<div class="flex flex-col gap-2">
-    <span class="text-sm font-medium text-gray-700">Weather Layers:</span>
-    <div class="flex flex-wrap gap-2">
+    <div class="flex flex-col gap-2">
+      <span class="text-sm font-medium text-gray-700">Weather Layers:</span>
+      <div class="flex flex-wrap gap-2">
         <button 
-            class="weather-radio flex items-center gap-2 px-4 py-2 rounded-full border border-orange-200 text-orange-700 bg-orange-50 hover:bg-orange-100 transition-all duration-200 active:bg-orange-200"
-            data-layer="temp">
-            🌡️ Temperature
+          class="weather-radio flex items-center gap-2 px-4 py-2 rounded-full border border-orange-200 text-orange-700 bg-orange-50 hover:bg-orange-100 transition-all duration-200 active:bg-orange-200"
+          data-layer="temp">
+          🌡️ Temperature
         </button>
 
         <button 
-            class="weather-radio flex items-center gap-2 px-4 py-2 rounded-full border border-purple-200 text-purple-700 bg-purple-50 hover:bg-purple-100 transition-all duration-200 active:bg-purple-200"
-            data-layer="storm">
-            🌩️ Storms
+          class="weather-radio flex items-center gap-2 px-4 py-2 rounded-full border border-purple-200 text-purple-700 bg-purple-50 hover:bg-purple-100 transition-all duration-200 active:bg-purple-200"
+          data-layer="storm">
+          🌩️ Storms
         </button>
+      </div>
     </div>
-</div>
-</div>
+  </div>
+</details>
+
 
 
 
@@ -75,7 +82,7 @@
             </div>
             <div class="flex items-center gap-2">
                 <div class="w-4 h-3 bg-purple-400 rounded opacity-60"></div>
-                <span>Precipitation & Wind</span>
+                <span>Storm</span>
             </div>
         </div>
     </div>
@@ -522,6 +529,9 @@ function createWeatherPopup(weatherData, lat, lng) {
         stormColor = 'text-yellow-600';
     }
 
+    // Store weather data in a global variable to avoid JSON parsing issues
+    window.currentWeatherData = weatherData;
+
     return `
         <div class="p-4 max-w-sm">
             <div class="flex items-center justify-between mb-3">
@@ -548,7 +558,7 @@ function createWeatherPopup(weatherData, lat, lng) {
             </div>
 
             <!-- Save Weather Data Button -->
-            <button id="saveWeatherBtn" onclick="saveWeatherData('${lat}', '${lng}', ${JSON.stringify(weatherData).replace(/'/g, "&apos;")})" 
+            <button id="saveWeatherBtn" onclick="saveWeatherData('${lat}', '${lng}', window.currentWeatherData)" 
                     class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 mb-3 flex items-center justify-center gap-2">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3-3m0 0l-3 3m3-3v12"></path>
@@ -807,6 +817,7 @@ setInterval(() => {
 
 console.log('🗺️ Enhanced Maps Management loaded successfully!');
 </script>
+
 <script>
 const radios = document.querySelectorAll('.weather-radio');
 

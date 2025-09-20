@@ -7,6 +7,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SnapshotsController;
 use App\Http\Controllers\TwoFactorAuthController;
 use App\Http\Controllers\UserManagementController;
+
 use App\Http\Controllers\WeatherController;
 use App\Http\Controllers\WeatherReportsController;
 use Illuminate\Support\Facades\Route;
@@ -85,18 +86,37 @@ Route::middleware(['auth'])->group(function () {
 
 
 
-Route::post('/weather/store-snapshot', [WeatherController::class, 'storeWeatherSnapshot'])
-    ->name('weather.store-snapshot');
 
-Route::get('/weather/location-history/{locID}', [WeatherController::class, 'getLocationWeatherHistory'])
-    ->name('weather.location-history');
+// Weather-related routes
+Route::middleware(['auth'])->group(function () {
+    // Enhanced real-time weather snapshot routes (with full day option)
+    Route::post('/weather/store-snapshot-enhanced', [WeatherController::class, 'storeCurrentWeatherSnapshotEnhanced'])
+        ->name('weather.store-snapshot-enhanced');
+    
+    // Full day weather storage route
+    Route::post('/weather/store-full-day', [WeatherController::class, 'storeFullDayWeatherSnapshot'])
+        ->name('weather.store-full-day');
+    
+    // Original real-time snapshot route (kept for backward compatibility)
+    Route::post('/weather/store-snapshot', [WeatherController::class, 'storeCurrentWeatherSnapshot'])
+        ->name('weather.store-snapshot');
+    
+    // Daily forecast routes
+    Route::post('/weather/store-forecast', [WeatherController::class, 'storeDailyForecast'])
+        ->name('weather.store-forecast');
+    
+    Route::get('/weather/forecast/{locID}', [WeatherController::class, 'fetchAndStoreDailyForecast'])
+        ->name('weather.fetch-forecast');
+    
+    // Data retrieval routes
+    Route::get('/weather/location-history/{locID}', [WeatherController::class, 'getLocationWeatherHistory'])
+        ->name('weather.location-history');
+    
+    Route::get('/weather/todays-snapshots', [WeatherController::class, 'getTodaysWeatherSnapshots'])
+        ->name('weather.todays-snapshots');
+});
 
-Route::get('/weather/todays-snapshots', [WeatherController::class, 'getTodaysWeatherSnapshots'])
-    ->name('weather.todays-snapshots');
+// Public weather API endpoint (if needed)
+Route::get('/api/weather/point', [WeatherController::class, 'point'])
+    ->name('api.weather.point');
 
-// Optional: Additional utility routes
-Route::get('/weather/reports', [WeatherController::class, 'getAllReports'])
-    ->name('weather.all-reports');
-
-Route::delete('/weather/snapshot/{snapshotID}', [WeatherController::class, 'deleteSnapshot'])
-    ->name('weather.delete-snapshot');

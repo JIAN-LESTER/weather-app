@@ -11,13 +11,19 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('locations', function (Blueprint $table) {
-            $table->id('locID');
-            $table->string('name');
-            $table->decimal('latitude', 10, 6);
-            $table->decimal('longitude', 10, 6);
-            $table->timestamps();
-        });
+        // Create locations table if not exists
+        if (!Schema::hasTable('locations')) {
+            Schema::create('locations', function (Blueprint $table) {
+                $table->id('locID');
+                $table->string('name');
+                $table->decimal('latitude', 10, 8);
+                $table->decimal('longitude', 11, 8);
+                $table->timestamps();
+
+                // Add index for better performance
+                $table->index(['latitude', 'longitude']);
+            });
+        }
     }
 
     /**

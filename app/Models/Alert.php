@@ -10,6 +10,8 @@ class Alert extends Model
 {
     use HasFactory, Notifiable;
 
+        protected $primaryKey = 'alertID';
+
     protected $fillable = [
         'locID',
         'title',

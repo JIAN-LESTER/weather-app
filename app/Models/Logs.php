@@ -10,7 +10,7 @@ class Logs extends Model
 {
     use HasFactory, Notifiable;
 
-
+    protected $primaryKey = 'logID';
     protected $fillable = [
         'userID',
         'action'

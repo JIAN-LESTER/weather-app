@@ -5,10 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Weather_Report extends Model
+class WeatherReport extends Model
 {
     use HasFactory;
 
+
+    protected $table = 'weather_reports';
     protected $primaryKey = 'wrID';
     public $incrementing = true;
     protected $keyType = 'int';

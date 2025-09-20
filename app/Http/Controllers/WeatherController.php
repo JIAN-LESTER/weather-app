@@ -4,11 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Location;
 use App\Models\Snapshot;
-use App\Models\Weather_Report;
+use App\Models\WeatherReport;
 use Cache;
-use Dotenv\Exception\ValidationException;
 use Http;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class WeatherController extends Controller
 {
@@ -35,93 +35,180 @@ class WeatherController extends Controller
         return response()->json($data);
     }
 
-     public function storeWeatherSnapshot(Request $request)
+    // ✅ NEW: Store real-time snapshot from current weather data
+    public function storeCurrentWeatherSnapshot(Request $request)
     {
-        try {
-            $validated = $request->validate([
-                'latitude' => 'required|numeric|between:-90,90',
-                'longitude' => 'required|numeric|between:-180,180',
-                'location_name' => 'nullable|string|max:255',
-                'temperature' => 'required|numeric',
-                'feels_like' => 'required|numeric',
-                'humidity' => 'required|integer|between:0,100',
-                'pressure' => 'required|integer',
-                'wind_speed' => 'required|numeric|min:0',
-                'wind_direction' => 'required|string|max:5',
-                'cloudiness' => 'required|integer|between:0,100',
-                'precipitation' => 'required|numeric|min:0',
-                'weather_main' => 'required|string',
-                'weather_desc' => 'required|string',
-                'weather_icon' => 'required|string',
-            ]);
+        $request->validate([
+            'latitude' => 'required|numeric',
+            'longitude' => 'required|numeric',
+            'location_name' => 'nullable|string',
+            'temperature' => 'required|numeric',
+            'feels_like' => 'required|numeric',
+            'humidity' => 'required|numeric',
+            'pressure' => 'required|numeric',
+            'wind_speed' => 'nullable|numeric',
+            'wind_direction' => 'nullable|string',
+            'cloudiness' => 'nullable|numeric',
+            'precipitation' => 'nullable|numeric',
+            'weather_main' => 'nullable|string',
+            'weather_desc' => 'nullable|string',
+            'weather_icon' => 'nullable|string',
+        ]);
 
-     
+        try {
+            // Find or create location
             $location = $this->findOrCreateLocation(
-                $validated['latitude'],
-                $validated['longitude'],
-                $validated['location_name'] ?? null
+                $request->latitude, 
+                $request->longitude, 
+                $request->location_name
             );
 
-   
+            // Get or create today's weather report
             $weatherReport = $this->getOrCreateTodaysReport($location->locID);
 
-          
+            // Determine current snapshot time
             $snapshotTime = $this->determineSnapshotTime();
 
-  
-            $stormStatus = $this->calculateStormStatus($validated['precipitation']);
-
+            // Create the snapshot with real-time data
             $snapshot = Snapshot::updateOrCreate(
                 [
                     'wrID' => $weatherReport->wrID,
-                    'snapshot_time' => $snapshotTime
+                    'snapshot_time' => $snapshotTime,
                 ],
                 [
-                    'temperature' => $validated['temperature'],
-                    'feels_like' => $validated['feels_like'],
-                    'humidity' => $validated['humidity'],
-                    'pressure' => $validated['pressure'],
-                    'wind_speed' => $validated['wind_speed'],
-                    'wind_direction' => $validated['wind_direction'],
-                    'cloudiness' => $validated['cloudiness'],
-                    'precipitation' => $validated['precipitation'],
-                    'weather_main' => $validated['weather_main'],
-                    'weather_desc' => $validated['weather_desc'],
-                    'weather_icon' => $validated['weather_icon'],
-                    'storm_status' => $stormStatus,
+                    'temperature' => $request->temperature,
+                    'feels_like' => $request->feels_like,
+                    'humidity' => $request->humidity,
+                    'pressure' => $request->pressure,
+                    'wind_speed' => $request->wind_speed ?? 0,
+                    'wind_direction' => $request->wind_direction ?? '0',
+                    'cloudiness' => $request->cloudiness ?? 0,
+                    'precipitation' => $request->precipitation ?? 0,
+                    'weather_main' => $request->weather_main ?? '',
+                    'weather_desc' => $request->weather_desc ?? '',
+                    'weather_icon' => $request->weather_icon ?? '',
                 ]
             );
 
             return response()->json([
                 'success' => true,
-                'message' => 'Weather data saved successfully',
+                'message' => 'Real-time weather snapshot saved successfully',
                 'data' => [
-                    'snapshot_id' => $snapshot->snapshotID,
-                    'location' => $location->name,
-                    'snapshot_time' => $snapshotTime,
-                    'storm_status' => $stormStatus
+                    'location' => $location,
+                    'snapshot' => $snapshot,
+                    'snapshot_time' => $snapshotTime
                 ]
             ]);
-
-        } catch (ValidationException $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation failed',
-                'errors' => $e->errors()
-            ], 422);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to save weather data: ' . $e->getMessage()
+                'message' => 'Failed to save weather snapshot: ' . $e->getMessage()
             ], 500);
         }
     }
 
+    // ✅ Store daily forecast (existing functionality)
+    public function storeDailyForecast(Request $request)
+    {
+        $request->validate([
+            'locID' => 'required|integer|exists:locations,locID',
+            'latitude' => 'required|numeric',
+            'longitude' => 'required|numeric',
+        ]);
+
+        return $this->processDailyForecast(
+            $request->locID,
+            $request->latitude,
+            $request->longitude
+        );
+    }
+
+    // ✅ Fetch and store daily forecast based on location
+    public function fetchAndStoreDailyForecast($locID)
+    {
+        $location = Location::findOrFail($locID);
+
+        $this->processDailyForecast(
+            $location->locID,
+            $location->latitude,
+            $location->longitude
+        );
+
+        return redirect()->back()->with('success', 'Daily forecast stored!');
+    }
+
+    // ✅ Process daily forecast using OneCall API
+    private function processDailyForecast($locID, $lat, $lon)
+    {
+        $apiKey = env('OPENWEATHER_API_KEY');
+        $url = "https://api.openweathermap.org/data/3.0/onecall?lat={$lat}&lon={$lon}&exclude=minutely,hourly,alerts&units=metric&appid={$apiKey}";
+        $response = Http::get($url);
+
+        if ($response->failed()) {
+            throw new \Exception("Failed to fetch daily forecast data");
+        }
+
+        $data = $response->json();
+
+        $today = now()->toDateString();
+        $weatherReport = WeatherReport::firstOrCreate([
+            'locID' => $locID,
+            'report_date' => $today,
+        ]);
+
+        $daily = $data['daily'][0];
+
+        $snapshots = [
+            'morning' => $daily['temp']['morn'],
+            'noon' => $daily['temp']['day'],
+            'afternoon' => $daily['temp']['eve'],
+            'evening' => $daily['temp']['night'],
+        ];
+
+        foreach ($snapshots as $time => $temp) {
+            Snapshot::updateOrCreate(
+                [
+                    'wrID' => $weatherReport->wrID,
+                    'snapshot_time' => $time,
+                ],
+                [
+                    'temperature' => $temp,
+                    'feels_like' => $daily['feels_like'][$this->mapSnapshotKey($time)],
+                    'humidity' => $daily['humidity'],
+                    'pressure' => $daily['pressure'],
+                    'wind_speed' => $daily['wind_speed'],
+                    'wind_direction' => $daily['wind_deg'],
+                    'cloudiness' => $daily['clouds'],
+                    'precipitation' => $daily['pop'] ?? 0,
+                    'weather_main' => $daily['weather'][0]['main'] ?? '',
+                    'weather_desc' => $daily['weather'][0]['description'] ?? '',
+                    'weather_icon' => $daily['weather'][0]['icon'] ?? '',
+                ]
+            );
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Daily forecast stored successfully'
+        ]);
+    }
+
+    // ✅ Map snapshot time to forecast key
+    private function mapSnapshotKey($time)
+    {
+        $mapping = [
+            'morning' => 'morn',
+            'noon' => 'day', 
+            'afternoon' => 'eve',
+            'evening' => 'night'
+        ];
+        
+        return $mapping[$time] ?? 'day';
+    }
 
     private function findOrCreateLocation($latitude, $longitude, $locationName = null)
     {
-       
         $existingLocation = Location::where('latitude', '>=', $latitude - 0.01)
             ->where('latitude', '<=', $latitude + 0.01)
             ->where('longitude', '>=', $longitude - 0.01)
@@ -139,19 +226,17 @@ class WeatherController extends Controller
         ]);
     }
 
-
     private function getOrCreateTodaysReport($locID)
     {
         $today = now()->toDateString();
 
-        return Weather_Report::firstOrCreate(
+        return WeatherReport::firstOrCreate(
             [
                 'locID' => $locID,
                 'report_date' => $today
             ]
         );
     }
-
 
     private function determineSnapshotTime()
     {
@@ -168,7 +253,6 @@ class WeatherController extends Controller
         }
     }
 
-
     private function calculateStormStatus($precipitation)
     {
         if ($precipitation > 10) {
@@ -182,13 +266,12 @@ class WeatherController extends Controller
         return 'none';
     }
 
-
     public function getLocationWeatherHistory($locID, $days = 7)
     {
         try {
             $location = Location::findOrFail($locID);
             
-            $reports = Weather_Report::with('snapshots')
+            $reports = WeatherReport::with('snapshots')
                 ->where('locID', $locID)
                 ->where('report_date', '>=', now()->subDays($days))
                 ->orderBy('report_date', 'desc')
@@ -207,7 +290,6 @@ class WeatherController extends Controller
             ], 500);
         }
     }
-
 
     public function getTodaysWeatherSnapshots()
     {
