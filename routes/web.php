@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmailVerificationController;
 use App\Http\Controllers\LogsController;
 use App\Http\Controllers\ProfileController;
@@ -33,6 +34,45 @@ Route::get('/admin/dashboard', function () {
 Route::get('/user/dashboard', function () {
     return view('user.dashboard');
 })->name('user.dashboard');
+
+// Route::middleware(['auth', 'admin'])->group(function () {
+    
+//     // Main Admin Dashboard
+//     Route::get('/admin/dashboard', [DashboardController::class, 'viewAdminDashboard'])
+//         ->name('admin.dashboard');
+    
+//     // Users Management
+//     Route::get('/admin/users', [DashboardController::class, 'users'])
+//         ->name('admin.users');
+    
+//     // Logs Management
+//     Route::get('/admin/logs', [DashboardController::class, 'logs'])
+//         ->name('admin.logs');
+    
+//     // Dashboard Stats API (for AJAX requests)
+//     Route::get('/admin/dashboard/stats', [DashboardController::class, 'getDashboardStats'])
+//         ->name('admin.dashboard.stats');
+// });
+
+
+Route::middleware(['auth'])->group(function () {
+    
+    // Main Admin Dashboard
+    Route::get('/admin/dashboard', [DashboardController::class, 'viewAdminDashboard'])
+        ->name('admin.dashboard');
+    
+    // Users Management
+    Route::get('/admin/users', [DashboardController::class, 'users'])
+        ->name('admin.users');
+    
+    // Logs Management
+    Route::get('/admin/logs', [DashboardController::class, 'logs'])
+        ->name('admin.logs');
+    
+    // Dashboard Stats API
+    Route::get('/admin/dashboard/stats', [DashboardController::class, 'getDashboardStats'])
+        ->name('admin.dashboard.stats');
+});
 
 // For authenticated users
 Route::middleware(['auth'])->group(function () {
@@ -91,3 +131,10 @@ Route::get('/weather/current-weather', [WeatherController::class, 'getCurrentWea
 
 Route::get('/api/weather/point', [WeatherController::class, 'point'])
     ->name('api.weather.point');
+
+    Route::get('/weather/full-day-forecast', [WeatherController::class, 'getFullDayForecastData']);
+
+Route::get('/weather/current-weather', [WeatherController::class, 'getCurrentWeatherData']);
+Route::get('/weather/full-day-forecast', [WeatherController::class, 'getFullDayForecastData']);
+Route::post('/weather/store-forecast-snapshots', [WeatherController::class, 'storeForecastSnapshots']);
+Route::get('/weather/todays-forecast-snapshots', [WeatherController::class, 'getTodaysForecastSnapshots']);
