@@ -16,59 +16,18 @@ class Snapshot extends Model
 
     protected $fillable = [
         'wrID',
-        'snapshot_time',
-        'temperature',
-        'feels_like',
-        'humidity',
-        'pressure',
-        'wind_speed',
-        'wind_direction',
-        'cloudiness',
-        'precipitation',
-        'weather_main',
-        'weather_desc',
-        'weather_icon',
-        'storm_status',
+        'snapshots',
     ];
 
     protected $casts = [
-        'temperature' => 'float',
-        'feels_like' => 'float',
-        'humidity' => 'integer',
-        'pressure' => 'float',
-        'wind_speed' => 'float',
-        'cloudiness' => 'integer',
-        'precipitation' => 'float',
+        'snapshots' => 'array', // JSON cast to array
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
 
-
     public function weatherReport()
     {
         return $this->belongsTo(WeatherReport::class, 'wrID', 'wrID');
-    }
-
-    // Keep the old method for backward compatibility
-    public function report()
-    {
-        return $this->weatherReport();
-    }
-
-    // Add storm status calculation as model accessor
-    public function getCalculatedStormStatusAttribute()
-    {
-        $precipitation = $this->precipitation ?? 0;
-        
-        if ($precipitation > 10) {
-            return 'severe';
-        } elseif ($precipitation > 3) {
-            return 'moderate';
-        } elseif ($precipitation > 0) {
-            return 'light';
-        }
-        
-        return 'none';
     }
 
     // Scope for today's snapshots
@@ -79,9 +38,49 @@ class Snapshot extends Model
         });
     }
 
-    // Scope for specific time period
-    public function scopeByTime($query, $time)
+    // Get snapshot for a specific time period
+    public function getSnapshotForTime($time)
     {
-        return $query->where('snapshot_time', $time);
+        return $this->snapshots[$time] ?? null;
+    }
+
+    // Get all time periods with data
+    public function getAvailableTimePeriods()
+    {
+        return array_keys($this->snapshots ?? []);
+    }
+
+    // Check if snapshot has data for specific time
+    public function hasTimeData($time)
+    {
+        return isset($this->snapshots[$time]);
+    }
+
+    // Get formatted snapshot data for display
+    public function getFormattedSnapshots()
+    {
+        if (!$this->snapshots) {
+            return [];
+        }
+
+        $formatted = [];
+        foreach ($this->snapshots as $time => $data) {
+            $formatted[$time] = [
+                'temperature' => $data['temperature'] ?? 0,
+                'feels_like' => $data['feels_like'] ?? 0,
+                'precipitation' => $data['precipitation'] ?? 0,
+                'storm_status' => $data['storm_status'] ?? 'none',
+                'weather_desc' => $data['weather_desc'] ?? '',
+                'weather_icon' => $data['weather_icon'] ?? '',
+                'humidity' => $data['humidity'] ?? 0,
+                'pressure' => $data['pressure'] ?? 0,
+                'wind_speed' => $data['wind_speed'] ?? 0,
+                'wind_direction' => $data['wind_direction'] ?? '0',
+                'cloudiness' => $data['cloudiness'] ?? 0,
+                'weather_main' => $data['weather_main'] ?? '',
+            ];
+        }
+
+        return $formatted;
     }
 }
