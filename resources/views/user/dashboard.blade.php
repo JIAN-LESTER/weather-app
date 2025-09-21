@@ -5,7 +5,7 @@
 
 @section('content')
     <div class="max-w-8xl mx-auto">
-    <!-- Header Section - Compressed -->
+
     <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-4 space-y-3 lg:space-y-0">
         <div class="flex-1">
             <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-gray-800 mb-1">
@@ -25,21 +25,20 @@
         </div>
     </div>
 
-    <!-- Weather Dashboard Content -->
+
     <div id="weatherDashboard">
-        <!-- Loading State -->
+    
         <div id="loadingState" class="text-center py-12">
             <div class="inline-block animate-spin rounded-full h-8 w-8 sm:h-10 sm:w-10 border-4 border-gray-300 dark:border-gray-600 border-t-blue-600 dark:border-t-blue-400 mb-3"></div>
             <p class="text-gray-600 dark:text-gray-400 text-sm sm:text-base">Loading weather data...</p>
         </div>
 
-        <!-- Main Weather Content (Hidden Initially) -->
         <div id="weatherContent" class="hidden space-y-3 sm:space-y-4">
-            <!-- First Row: Temperature & Precipitation Cards -->
+        
             <div class="grid grid-cols-1 xl:grid-cols-2 gap-3 sm:gap-4">
              
                 <div class="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300">
-                    <!-- Location and Date Header - Compressed -->
+             
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 pb-3 border-b border-gray-200 dark:border-gray-600">
                         <div class="mb-2 sm:mb-0">
                             <div class="flex items-center text-gray-700 dark:text-gray-300 text-xs sm:text-sm mb-1">
@@ -58,7 +57,7 @@
                         </div>
                     </div>
 
-                    <!-- Main Temperature Display - Compressed -->
+             
                     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-3 sm:space-y-0">
                         <div class="flex items-center space-x-3 sm:space-x-4">
                             <div class="text-3xl sm:text-4xl lg:text-5xl" id="mainWeatherIcon">
@@ -78,7 +77,7 @@
                     </div>
                 </div>
 
-                <!-- Precipitation Card - Compressed -->
+              
                 <div class="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300">
                     <div class="flex items-center justify-between mb-4">
                         <h3 class="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">Precipitation</h3>
@@ -121,7 +120,7 @@
                 </div>
             </div>
 
-            <!-- Second Row: Today's Hourly Forecast - Compressed -->
+
             <div class="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl p-3 sm:p-5 border border-gray-200 dark:border-gray-700 shadow-lg">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-3 sm:mb-4">
                     <h3 class="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-2 sm:mb-0">Today's Hourly Forecast</h3>
@@ -132,12 +131,12 @@
 
                 <div id="hourlyForecast" class="overflow-x-auto">
                     <div class="flex space-x-2 sm:space-x-3 min-w-max pb-2">
-                        <!-- Hourly forecast items will be populated here -->
+                
                     </div>
                 </div>
             </div>
 
-            <!-- Third Row: 5-Day Forecast - Compressed -->
+        
             <div class="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl p-3 sm:p-5 border border-gray-200 dark:border-gray-700 shadow-lg">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-3 sm:mb-4">
                     <h3 class="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-2 sm:mb-0">5-Day Forecast</h3>
@@ -147,13 +146,13 @@
                 </div>
 
                 <div id="dailyForecast" class="space-y-2 sm:space-y-3">
-                    <!-- Daily forecast items will be populated here -->
+              
                 </div>
             </div>
 
-            <!-- Weather Details Grid - Compressed -->
+       
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3">
-                <!-- Wind Status -->
+             
                 <div class="bg-white dark:bg-gray-800 rounded-lg sm:rounded-xl p-3 sm:p-4 border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300">
                     <div class="flex items-center justify-between mb-2">
                         <span class="text-gray-600 dark:text-gray-400 text-xs font-medium">Wind Status</span>
@@ -167,7 +166,7 @@
                     </div>
                 </div>
 
-                <!-- UV Index -->
+            
                 <div class="bg-white dark:bg-gray-800 rounded-lg sm:rounded-xl p-3 sm:p-4 border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300">
                     <div class="flex items-center justify-between mb-2">
                         <span class="text-gray-600 dark:text-gray-400 text-xs font-medium">UV Index</span>
@@ -179,7 +178,6 @@
                     <div class="text-gray-600 dark:text-gray-400 text-xs" id="uvStatus">Moderate</div>
                 </div>
 
-                <!-- Visibility -->
                 <div class="bg-white dark:bg-gray-800 rounded-lg sm:rounded-xl p-3 sm:p-4 border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300">
                     <div class="flex items-center justify-between mb-2">
                         <span class="text-gray-600 dark:text-gray-400 text-xs font-medium">Visibility</span>
@@ -191,7 +189,7 @@
                     <div class="text-gray-600 dark:text-gray-400 text-xs">Clear visibility</div>
                 </div>
 
-                <!-- Pressure -->
+        
                 <div class="bg-white dark:bg-gray-800 rounded-lg sm:rounded-xl p-3 sm:p-4 border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300">
                     <div class="flex items-center justify-between mb-2">
                         <span class="text-gray-600 dark:text-gray-400 text-xs font-medium">Pressure</span>
@@ -205,7 +203,7 @@
             </div>
         </div>
 
-        <!-- Error State -->
+     
         <div id="errorState" class="hidden text-center py-12">
             <div class="text-red-500 dark:text-red-400 text-3xl sm:text-5xl mb-3">
                 <i class="fas fa-exclamation-triangle"></i>

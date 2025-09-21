@@ -51,12 +51,14 @@
         </div>
 
     
-        <button type="button" 
-                class="w-full flex items-center justify-center gap-2 border border-gray-300 dark:border-gray-600 
-                       bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200 font-medium py-2 px-4 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+
+        <a href="{{ route('auth.google') }}" 
+           class="w-full flex items-center justify-center gap-3 border border-gray-300 dark:border-gray-600 
+                  bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200 font-medium py-3 px-4 rounded-md 
+                  hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-200 shadow-sm hover:shadow-md mb-6">
             <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" class="w-5 h-5">
-            Continue with Google
-        </button>
+            Log in with Google
+        </a>
 
  
         <p class="text-center text-sm mt-6">

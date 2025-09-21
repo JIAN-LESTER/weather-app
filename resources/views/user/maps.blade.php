@@ -728,7 +728,7 @@ function createFullDayWeatherPopup(currentWeather, fullDayForecast, lat, lng) {
     const formattedLng = parseFloat(lng).toFixed(4);
 
     return `
-        <div class="p-4 max-w-lg w-full overflow-hidden bg-white rounded-lg shadow-lg">
+        <div class="p-4 max-w-lg w-full overflow-hidden rounded-lg">
             <!-- Header Section -->
             <div class="flex items-start justify-between mb-4 gap-3">
                 <div class="min-w-0 flex-1">

@@ -55,13 +55,14 @@
             <div class="flex-grow h-px bg-gray-300 dark:bg-gray-700"></div>
         </div>
 
-        <button type="button" 
-                class="w-full flex items-center justify-center gap-2 border border-gray-300 dark:border-gray-600 
-                       bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200 font-medium py-2 px-4 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+     <!-- Google Sign In Button - Prominent Position -->
+        <a href="{{ route('auth.google') }}" 
+           class="w-full flex items-center justify-center gap-3 border border-gray-300 dark:border-gray-600 
+                  bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200 font-medium py-3 px-4 rounded-md 
+                  hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-200 shadow-sm hover:shadow-md mb-6">
             <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" class="w-5 h-5">
             Sign up with Google
-        </button>
-
+        </a>
         <p class="text-center text-sm mt-6">
             Already have an account? 
             <a href="{{ route('loginForm') }}" class="text-blue-600 hover:underline dark:text-blue-400">Login</a>

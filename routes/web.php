@@ -16,13 +16,47 @@ use App\Http\Controllers\MapsController;
 Route::get('/', [AuthController::class, 'showLoginForm'])->name('home');
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('loginForm');
 Route::post('/login', [AuthController::class, 'login'])->name('login');
-
 Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('registerForm');
 Route::post('/register', [AuthController::class, 'register'])->name('register');
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+
+Route::get('/auth/google', [AuthController::class, 'redirectToGoogle'])->name('auth.google');
+Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback'])->name('auth.google.callback');
+
+
+Route::middleware(['auth'])->group(function () {
+
+
+
+    Route::prefix('admin')->name('admin.')->middleware(['admin'])->group(function () {
+        Route::get('/dashboard', function () {
+            return view('admin.dashboard');
+        })->name('admin.dashboard');
+    });
+
+    Route::prefix('user')->name('user.')->group(function () {
+        Route::get('/dashboard', function () {
+            return view('user.dashboard');
+        })->name('user.dashboard');
+    });
+
+});
+
+
+    Route::middleware(['admin'])->prefix('admin')->name('admin.')->group(function () {
+   
+        Route::get('/users', [DashboardController::class, 'users'])->name('users');
+        Route::get('/logs', [DashboardController::class, 'logs'])->name('logs');
+        Route::get('/dashboard/stats', [DashboardController::class, 'getDashboardStats'])->name('dashboard.stats');
+    });
+
+
+
 
 Route::get('/verify-email/{token}', [EmailVerificationController::class, 'verifyEmail'])->name('verify.email');
 
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
 
 Route::get('/2fa/form', [TwoFactorAuthController::class, 'twoFactorForm'])->name('2fa-form');
 Route::post('/2fa/authenticate', [TwoFactorAuthController::class, 'authenticate'])->name('2fa-authenticate');
@@ -35,46 +69,23 @@ Route::get('/user/dashboard', function () {
     return view('user.dashboard');
 })->name('user.dashboard');
 
-// Route::middleware(['auth', 'admin'])->group(function () {
-    
-//     // Main Admin Dashboard
-//     Route::get('/admin/dashboard', [DashboardController::class, 'viewAdminDashboard'])
-//         ->name('admin.dashboard');
-    
-//     // Users Management
-//     Route::get('/admin/users', [DashboardController::class, 'users'])
-//         ->name('admin.users');
-    
-//     // Logs Management
-//     Route::get('/admin/logs', [DashboardController::class, 'logs'])
-//         ->name('admin.logs');
-    
-//     // Dashboard Stats API (for AJAX requests)
-//     Route::get('/admin/dashboard/stats', [DashboardController::class, 'getDashboardStats'])
-//         ->name('admin.dashboard.stats');
-// });
-
-
 Route::middleware(['auth'])->group(function () {
     
-    // Main Admin Dashboard
-    Route::get('/admin/dashboard', [DashboardController::class, 'viewAdminDashboard'])
-        ->name('admin.dashboard');
+
+
     
-    // Users Management
+ 
     Route::get('/admin/users', [DashboardController::class, 'users'])
         ->name('admin.users');
     
-    // Logs Management
+
     Route::get('/admin/logs', [DashboardController::class, 'logs'])
         ->name('admin.logs');
     
-    // Dashboard Stats API
-    Route::get('/admin/dashboard/stats', [DashboardController::class, 'getDashboardStats'])
-        ->name('admin.dashboard.stats');
+
 });
 
-// For authenticated users
+
 Route::middleware(['auth'])->group(function () {
     Route::get('/map', [MapsController::class, 'show'])->name('map.show');
     Route::get('/weather_reports', [WeatherReportsController::class, 'viewWeatherReports'])->name('weather_reports.show');
@@ -137,4 +148,24 @@ Route::get('/api/weather/point', [WeatherController::class, 'point'])
 Route::get('/weather/current-weather', [WeatherController::class, 'getCurrentWeatherData']);
 Route::get('/weather/full-day-forecast', [WeatherController::class, 'getFullDayForecastData']);
 Route::post('/weather/store-forecast-snapshots', [WeatherController::class, 'storeForecastSnapshots']);
-Route::get('/weather/todays-forecast-snapshots', [WeatherController::class, 'getTodaysForecastSnapshots']);
+Route::get('/weather/todays-forecast-snapshots', [WeatherController::class, 'getTodaysForecastSnapshots']);  Route::prefix('weather')->name('weather.')->group(function () {
+        // NEW: Enhanced forecast snapshot endpoints with JSON structure
+        Route::post('/store-forecast-snapshots', [WeatherController::class, 'storeForecastSnapshots'])
+            ->name('store-forecast-snapshots');
+        
+        Route::get('/todays-forecast-snapshots', [WeatherController::class, 'getTodaysForecastSnapshots'])
+            ->name('todays-forecast-snapshots');
+
+        // Legacy endpoints (maintained for backward compatibility)
+        Route::post('/store-full-day-snapshots', [WeatherController::class, 'storeFullDayForecastSnapshots'])
+            ->name('store-full-day-snapshots');
+
+        Route::get('/todays-snapshots', [WeatherController::class, 'getTodaysWeatherSnapshots'])
+            ->name('todays-snapshots');
+
+        Route::get('/map-display-snapshots', [WeatherController::class, 'getSnapshotsForMapDisplay'])
+            ->name('map-display-snapshots');
+
+        Route::get('/location-history/{locID}', [WeatherController::class, 'getLocationWeatherHistory'])
+            ->name('location-history');
+    });

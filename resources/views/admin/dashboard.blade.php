@@ -5,7 +5,7 @@
 
 @section('content')
     <div class="max-w-8xl mx-auto">
-        <!-- Header Section - Compressed -->
+
         <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-4 space-y-3 lg:space-y-0">
             <div class="flex-1">
                 <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-gray-800 mb-1">
@@ -15,18 +15,18 @@
 
             <div class="flex items-center space-x-2 sm:space-x-3 w-full lg:w-auto">
                 <div class="relative flex-1 lg:flex-initial">
-                    <!-- Add any search or controls here if needed -->
+
                 </div>
 
                 <button
                     class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-                    <!-- Add any button content here -->
+             
                 </button>
             </div>
         </div>
 
         <div id="weatherDashboard">
-            <!-- Loading State -->
+       
             <div id="loadingState" class="text-center py-12">
                 <div
                     class="inline-block animate-spin rounded-full h-8 w-8 sm:h-10 sm:w-10 border-4 border-gray-300 dark:border-gray-600 border-t-blue-600 dark:border-t-blue-400 mb-3">
@@ -34,15 +34,15 @@
                 <p class="text-gray-600 dark:text-gray-400 text-sm sm:text-base">Loading weather data...</p>
             </div>
 
-            <!-- Main Weather Content (Hidden Initially) -->
+         
             <div id="weatherContent" class="hidden space-y-3 sm:space-y-4">
-                <!-- First Row: Combined Weather & Precipitation + User Data -->
+
                 <div class="grid grid-cols-1 xl:grid-cols-2 gap-3 sm:gap-4">
-                    <!-- Combined Weather + Precipitation Card -->
+      
                     <div
                         class="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300">
 
-                        <!-- Location and Date Header -->
+           
                         <div
                             class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 pb-3 border-b border-gray-200 dark:border-gray-600">
                             <div class="mb-2 sm:mb-0">
@@ -62,7 +62,7 @@
                             </div>
                         </div>
 
-                        <!-- Main Weather Info -->
+          
                         <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-4 sm:space-y-0 mb-4">
                             <div class="flex items-center space-x-3 sm:space-x-4">
                                 <div class="text-3xl sm:text-4xl lg:text-5xl" id="mainWeatherIcon">
@@ -85,7 +85,7 @@
                             </div>
                         </div>
 
-                        <!-- Precipitation Details -->
+           
                         <div class="grid grid-cols-3 gap-3">
                             <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
                                 <div class="flex items-center justify-between mb-2">
@@ -119,7 +119,7 @@
                         </div>
                     </div>
 
-                    <!-- User Data Card -->
+              
                     <div
                         class="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300">
                         <div class="flex items-center justify-between mb-4">
@@ -128,7 +128,7 @@
                         </div>
                         
                         <div class="space-y-4">
-                            <!-- Total Users -->
+                    
                             <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
                                 <div class="flex items-center justify-between mb-2">
                                     <span class="text-gray-700 dark:text-gray-300 text-sm font-medium">Total Users</span>
@@ -141,7 +141,7 @@
                             </div>
 
                             <div class="grid grid-cols-2 gap-3">
-                                <!-- Active Users -->
+                            
                                 <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
                                     <div class="flex items-center justify-between mb-2">
                                         <span class="text-gray-700 dark:text-gray-300 text-xs font-medium">Active</span>
@@ -152,7 +152,7 @@
                                     </div>
                                 </div>
 
-                                <!-- Verified Users -->
+                           
                                 <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
                                     <div class="flex items-center justify-between mb-2">
                                         <span class="text-gray-700 dark:text-gray-300 text-xs font-medium">Verified</span>
@@ -167,7 +167,7 @@
                     </div>
                 </div>
 
-                <!-- Second Row: Recent Logs -->
+            
                 <div
                     class="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200 dark:border-gray-700 shadow-lg">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
@@ -185,7 +185,7 @@
             <div class="flex items-start justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
                 <div class="flex items-start space-x-3 flex-1">
                     
-                    <!-- Icon -->
+              
                     <div class="flex-shrink-0 mt-1">
                         @if($log->fname === 'error')
                             <i class="fas fa-exclamation-circle text-red-500 text-sm"></i>
@@ -198,7 +198,7 @@
                         @endif
                     </div>
 
-                    <!-- Log details -->
+               
                     <div class="flex-1 min-w-0">
                         <p class="text-sm text-gray-900 dark:text-white font-medium truncate">
                             {{ $log->action ?? 'No message' }}

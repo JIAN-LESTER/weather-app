@@ -80,9 +80,6 @@ class WeatherController extends Controller
         }
     }
 
-    /**
-     * Get full day forecast data for all time periods
-     */
     public function getFullDayForecastData(Request $request)
     {
         $request->validate([
@@ -114,7 +111,6 @@ class WeatherController extends Controller
                 return $response->json();
             });
 
-            // Process the forecast data to extract all time periods
             $processedData = $this->processFullDayForecastData($data);
 
             return response()->json($processedData);
@@ -132,18 +128,13 @@ class WeatherController extends Controller
         }
     }
 
-    /**
-     * Store forecast snapshots only (4 time periods)
-     * Stores forecast data as shown on the map without current weather
-     */
+ 
     public function storeForecastSnapshots(Request $request)
     {
         $request->validate([
             'latitude' => 'required|numeric|between:-90,90',
             'longitude' => 'required|numeric|between:-180,180',
             'location_name' => 'nullable|string|max:255',
-            
-            // Forecast data for 4 periods (what's shown in forecast cards)
             'time_slots' => 'required|array',
             'time_slots.morning' => 'nullable|array',
             'time_slots.noon' => 'nullable|array', 
@@ -155,17 +146,16 @@ class WeatherController extends Controller
         ]);
 
         try {
-            // Find or create location
+    
             $location = $this->findOrCreateLocation(
                 $request->latitude,
                 $request->longitude,
                 $request->location_name
             );
 
-            // Get or create today's weather report
+     
             $weatherReport = $this->getOrCreateTodaysReport($location->locID);
 
-            // Process forecast data for 4 periods
             $processedTimeSlots = [];
             $timePeriods = ['morning', 'noon', 'afternoon', 'evening'];
 
@@ -203,25 +193,51 @@ class WeatherController extends Controller
                 ], 400);
             }
 
-            // Store forecast snapshots only
-            $forecastSnapshot = [
+      
+            $snapshotData = [
+                'type' => 'forecast',
+                'snapshot_type' => 'forecast_periods',
+                'snapshot_identifier' => 'forecast_' . now()->format('His'),
+                'location' => [
+                    'name' => $location->name,
+                    'latitude' => $location->latitude,
+                    'longitude' => $location->longitude,
+                ],
                 'time_slots' => $processedTimeSlots,
-                'snapshot_type' => 'forecast_only',
-                'display_format' => 'forecast_cards',
+                'metadata' => [
+                    'saved_at' => now()->toISOString(),
+                    'periods_count' => count($processedTimeSlots),
+                    'source' => 'map_interface',
+                    'available_periods' => array_keys($processedTimeSlots)
+                ]
             ];
 
-            // Store forecast snapshot
-            $snapshotRow = Snapshot::updateOrCreate(
-                [
+  
+            $existingSnapshot = Snapshot::where('wrID', $weatherReport->wrID)->first();
+
+            if ($existingSnapshot) {
+        
+                $existingData = $existingSnapshot->snapshots ?? [];
+                
+          
+                $forecastKey = 'forecast_' . now()->format('His');
+                $existingData[$forecastKey] = $snapshotData;
+                
+                $existingSnapshot->update([
+                    'snapshots' => $existingData
+                ]);
+                
+                $snapshotRow = $existingSnapshot;
+            } else {
+         
+                $forecastKey = 'forecast_' . now()->format('His');
+                $snapshotRow = Snapshot::create([
                     'wrID' => $weatherReport->wrID,
-                    'snapshot_time' => 'forecast_' . now()->format('Hi') // e.g., forecast_1430
-                ],
-                [
-                    'snapshots' => $forecastSnapshot,
-                    'temperature' => $processedTimeSlots[array_key_first($processedTimeSlots)]['temperature'], // Use first available for querying
-                    'storm_status' => $processedTimeSlots[array_key_first($processedTimeSlots)]['storm_status'],
-                ]
-            );
+                    'snapshots' => [
+                        $forecastKey => $snapshotData
+                    ]
+                ]);
+            }
 
             return response()->json([
                 'success' => true,
@@ -237,7 +253,8 @@ class WeatherController extends Controller
                     'snapshot_id' => $snapshotRow->snapshotID,
                     'forecast_periods_saved' => array_keys($processedTimeSlots),
                     'total_periods' => count($processedTimeSlots),
-                    'snapshot_time' => $snapshotRow->snapshot_time,
+                    'snapshot_key' => $forecastKey,
+                    'structure' => 'json_only_schema'
                 ]
             ]);
 
@@ -255,116 +272,7 @@ class WeatherController extends Controller
         }
     }
 
-    /**
-     * Store full day forecast snapshots (legacy method - kept for compatibility)
-     */
-    public function storeFullDayForecastSnapshots(Request $request)
-    {
-        $request->validate([
-            'latitude' => 'required|numeric|between:-90,90',
-            'longitude' => 'required|numeric|between:-180,180',
-            'location_name' => 'nullable|string|max:255',
-            'time_slots' => 'required|array',
-            'time_slots.morning' => 'nullable|array',
-            'time_slots.noon' => 'nullable|array',
-            'time_slots.afternoon' => 'nullable|array',
-            'time_slots.evening' => 'nullable|array',
-            'time_slots.*.temperature' => 'nullable|numeric|between:-50,60',
-            'time_slots.*.feels_like' => 'nullable|numeric|between:-50,60',
-            'time_slots.*.precipitation' => 'nullable|numeric|min:0',
-            'time_slots.*.weather_main' => 'nullable|string|max:50',
-            'time_slots.*.weather_desc' => 'nullable|string|max:255',
-            'time_slots.*.weather_icon' => 'nullable|string|max:10',
-        ]);
 
-        try {
-            // Find or create location
-            $location = $this->findOrCreateLocation(
-                $request->latitude,
-                $request->longitude,
-                $request->location_name
-            );
-
-            // Get or create today's weather report
-            $weatherReport = $this->getOrCreateTodaysReport($location->locID);
-
-            $processedSnapshots = [];
-            $timePeriods = ['morning', 'noon', 'afternoon', 'evening'];
-
-            foreach ($timePeriods as $timeSlot) {
-                $data = $request->time_slots[$timeSlot] ?? null;
-
-                if ($data && isset($data['temperature'])) {
-                    $precipitation_mm = $data['precipitation_mm'] ?? 0;
-                    $precipitation_chance = $data['precipitation_chance'] ?? 0;
-
-                    $processedSnapshots[$timeSlot] = [
-                        'temperature' => round($data['temperature'], 1),
-                        'feels_like' => round($data['feels_like'] ?? $data['temperature'], 1),
-                        'precipitation_mm' => round($precipitation_mm, 2),
-                        'precipitation_chance' => $precipitation_chance,
-                        'storm_status' => $this->calculateStormStatus($precipitation_mm),
-                        'weather_main' => $data['weather_main'] ?? '',
-                        'weather_desc' => $data['weather_desc'] ?? '',
-                        'weather_icon' => $data['weather_icon'] ?? '',
-                        'humidity' => $data['humidity'] ?? 0,
-                        'pressure' => $data['pressure'] ?? 0,
-                        'wind_speed' => round($data['wind_speed'] ?? 0, 1),
-                        'wind_direction' => $data['wind_direction'] ?? '0',
-                        'cloudiness' => $data['cloudiness'] ?? 0,
-                        'forecast_time' => $data['forecast_time'] ?? null,
-                        'recorded_at' => now()->toISOString(),
-                    ];
-                }
-            }
-
-            if (empty($processedSnapshots)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'No valid weather data provided for any time period'
-                ], 400);
-            }
-
-            // Store all snapshots in the JSON column
-            $snapshotRow = Snapshot::updateOrCreate(
-                ['wrID' => $weatherReport->wrID],
-                ['snapshots' => $processedSnapshots]
-            );
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Full day weather snapshots saved successfully',
-                'data' => [
-                    'location' => [
-                        'id' => $location->locID,
-                        'name' => $location->name,
-                        'latitude' => $location->latitude,
-                        'longitude' => $location->longitude,
-                    ],
-                    'weather_report_id' => $weatherReport->wrID,
-                    'snapshot_id' => $snapshotRow->snapshotID,
-                    'time_periods_saved' => array_keys($processedSnapshots),
-                    'total_periods' => count($processedSnapshots)
-                ]
-            ]);
-
-        } catch (\Exception $e) {
-            \Log::error('Full day snapshot storage error: ' . $e->getMessage(), [
-                'latitude' => $request->latitude,
-                'longitude' => $request->longitude,
-                'trace' => $e->getTraceAsString()
-            ]);
-
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to save full day snapshots: ' . $e->getMessage()
-            ], 500);
-        }
-    }
-
-    /**
-     * Get today's forecast snapshots
-     */
     public function getTodaysForecastSnapshots()
     {
         try {
@@ -375,7 +283,6 @@ class WeatherController extends Controller
                     $query->where('report_date', $today);
                 })
                 ->whereNotNull('snapshots')
-                ->where('snapshot_time', 'like', 'forecast_%')
                 ->orderBy('created_at', 'desc')
                 ->get();
 
@@ -385,32 +292,66 @@ class WeatherController extends Controller
                 $location = $snapshot->weatherReport->location;
                 $snapshotData = $snapshot->snapshots;
 
-                if (!$snapshotData || !is_array($snapshotData) || !isset($snapshotData['time_slots'])) {
+                if (!$snapshotData || !is_array($snapshotData)) {
                     continue;
                 }
 
-                $timeSlots = $snapshotData['time_slots'];
-
-                $formattedSnapshots[] = [
-                    'snapshot_id' => $snapshot->snapshotID,
-                    'location' => $location->name,
-                    'latitude' => $location->latitude,
-                    'longitude' => $location->longitude,
-                    'snapshot_time' => $snapshot->snapshot_time,
-                    'snapshot_type' => 'forecast_only',
+                foreach ($snapshotData as $key => $data) {
+             
+                    if (strpos($key, 'forecast_') === 0 && is_array($data)) {
+                        
                     
-                    // Forecast periods (forecast cards)
-                    'forecast_periods' => $timeSlots,
-                    
-                    'created_at' => $snapshot->created_at,
-                    'recorded_at' => $snapshot->created_at,
-                ];
+                        if (isset($data['type']) && $data['type'] === 'forecast' && isset($data['time_slots'])) {
+                            $timeSlots = $data['time_slots'];
+                            $metadata = $data['metadata'] ?? [];
+                            
+                            $formattedSnapshots[] = [
+                                'snapshot_id' => $snapshot->snapshotID,
+                                'location' => $location->name,
+                                'latitude' => $location->latitude,
+                                'longitude' => $location->longitude,
+                                'snapshot_time' => $key,
+                                'snapshot_type' => 'forecast_periods',
+                                'structure_type' => 'structured_json',
+                                
+                        
+                                'forecast_periods' => $timeSlots,
+                                'periods_count' => count($timeSlots),
+                                'available_periods' => array_keys($timeSlots),
+                                
+                                'metadata' => $metadata,
+                                'created_at' => $snapshot->created_at,
+                                'recorded_at' => $metadata['saved_at'] ?? $snapshot->created_at,
+                            ];
+                        }
+                     
+                        elseif (isset($data['morning']) || isset($data['noon']) || isset($data['afternoon']) || isset($data['evening'])) {
+                            $formattedSnapshots[] = [
+                                'snapshot_id' => $snapshot->snapshotID,
+                                'location' => $location->name,
+                                'latitude' => $location->latitude,
+                                'longitude' => $location->longitude,
+                                'snapshot_time' => $key,
+                                'snapshot_type' => 'forecast_periods',
+                                'structure_type' => 'direct_periods',
+                     
+                                'forecast_periods' => $data,
+                                'periods_count' => count($data),
+                                'available_periods' => array_keys($data),
+                                
+                                'created_at' => $snapshot->created_at,
+                                'recorded_at' => $snapshot->created_at,
+                            ];
+                        }
+                    }
+                }
             }
 
             return response()->json([
                 'success' => true,
                 'snapshots' => $formattedSnapshots,
-                'total_count' => count($formattedSnapshots)
+                'total_count' => count($formattedSnapshots),
+                'schema_info' => 'JSON-only schema with nested forecast data'
             ]);
 
         } catch (\Exception $e) {
@@ -423,9 +364,7 @@ class WeatherController extends Controller
         }
     }
 
-    /**
-     * Get today's weather snapshots with proper JSON handling (legacy method)
-     */
+
     public function getTodaysWeatherSnapshots()
     {
         try {
@@ -449,59 +388,45 @@ class WeatherController extends Controller
                     continue;
                 }
 
-                // Handle complete snapshots
-                if (isset($snapshotData['current_weather'])) {
-                    $currentWeather = $snapshotData['current_weather'];
-                    $formattedSnapshots[] = [
-                        'snapshot_id' => $snapshot->snapshotID,
-                        'location' => $location->name,
-                        'latitude' => $location->latitude,
-                        'longitude' => $location->longitude,
-                        'snapshot_time' => 'current',
-                        'temperature' => $currentWeather['temperature'] ?? 0,
-                        'feels_like' => $currentWeather['feels_like'] ?? 0,
-                        'humidity' => $currentWeather['humidity'] ?? 0,
-                        'precipitation' => $currentWeather['rain_amount'] ?? 0,
-                        'storm_status' => $currentWeather['storm_status'] ?? 'none',
-                        'weather_desc' => $currentWeather['weather_desc'] ?? '',
-                        'weather_icon' => $currentWeather['weather_icon'] ?? '',
-                        'created_at' => $snapshot->created_at,
-                        'recorded_at' => $currentWeather['recorded_at'] ?? $snapshot->created_at,
-                    ];
-                    
-                    // Add forecast periods
-                    $timeSlots = $snapshotData['time_slots'] ?? [];
-                    foreach ($timeSlots as $timeSlot => $data) {
-                        $formattedSnapshots[] = [
-                            'snapshot_id' => $snapshot->snapshotID,
-                            'location' => $location->name,
-                            'latitude' => $location->latitude,
-                            'longitude' => $location->longitude,
-                            'snapshot_time' => $timeSlot,
-                            'temperature' => $data['temperature'] ?? 0,
-                            'feels_like' => $data['feels_like'] ?? 0,
-                            'humidity' => $data['humidity'] ?? 0,
-                            'precipitation' => $data['rain_amount'] ?? 0,
-                            'storm_status' => $data['storm_status'] ?? 'none',
-                            'weather_desc' => $data['weather_desc'] ?? '',
-                            'weather_icon' => $data['weather_icon'] ?? '',
-                            'created_at' => $snapshot->created_at,
-                            'recorded_at' => $data['recorded_at'] ?? $snapshot->created_at,
-                        ];
+          
+                foreach ($snapshotData as $key => $data) {
+                    if (!is_array($data)) continue;
+
+         
+                    if (isset($data['type']) && $data['type'] === 'forecast' && isset($data['time_slots'])) {
+                        $timeSlots = $data['time_slots'];
+                        
+                        foreach ($timeSlots as $timeSlot => $periodData) {
+                            $formattedSnapshots[] = [
+                                'snapshot_id' => $snapshot->snapshotID,
+                                'location' => $location->name,
+                                'latitude' => $location->latitude,
+                                'longitude' => $location->longitude,
+                                'snapshot_time' => $timeSlot,
+                                'temperature' => $periodData['temperature'] ?? 0,
+                                'feels_like' => $periodData['feels_like'] ?? 0,
+                                'humidity' => $periodData['humidity'] ?? 0,
+                                'precipitation' => $periodData['rain_amount'] ?? 0,
+                                'storm_status' => $periodData['storm_status'] ?? 'none',
+                                'weather_desc' => $periodData['weather_desc'] ?? '',
+                                'weather_icon' => $periodData['weather_icon'] ?? '',
+                                'created_at' => $snapshot->created_at,
+                                'recorded_at' => $periodData['recorded_at'] ?? $snapshot->created_at,
+                            ];
+                        }
                     }
-                } else {
-                    // Handle legacy time slot snapshots
-                    foreach ($snapshotData as $timeSlot => $data) {
+            
+                    elseif (in_array($key, ['morning', 'noon', 'afternoon', 'evening'])) {
                         $formattedSnapshots[] = [
                             'snapshot_id' => $snapshot->snapshotID,
                             'location' => $location->name,
                             'latitude' => $location->latitude,
                             'longitude' => $location->longitude,
-                            'snapshot_time' => $timeSlot,
+                            'snapshot_time' => $key,
                             'temperature' => $data['temperature'] ?? 0,
                             'feels_like' => $data['feels_like'] ?? 0,
                             'humidity' => $data['humidity'] ?? 0,
-                            'precipitation' => $data['precipitation'] ?? 0,
+                            'precipitation' => $data['precipitation'] ?? ($data['rain_amount'] ?? 0),
                             'storm_status' => $data['storm_status'] ?? 'none',
                             'weather_desc' => $data['weather_desc'] ?? '',
                             'weather_icon' => $data['weather_icon'] ?? '',
@@ -527,9 +452,6 @@ class WeatherController extends Controller
         }
     }
 
-    /**
-     * Get weather snapshots for map display
-     */
     public function getSnapshotsForMapDisplay()
     {
         try {
@@ -551,41 +473,48 @@ class WeatherController extends Controller
 
                 if (!$snapshotData || !is_array($snapshotData)) continue;
 
-                // Handle both complete snapshots and time-slot only snapshots
-                if (isset($snapshotData['current_weather'])) {
-                    // Complete snapshot - use current weather
-                    $weatherData = $snapshotData['current_weather'];
-                    $markerType = 'current';
-                } else {
-                    // Time-slot snapshot - use most recent time slot
-                    $timeSlots = ['evening', 'afternoon', 'noon', 'morning'];
+                // Look through all entries for the most recent forecast data
+                foreach ($snapshotData as $key => $data) {
+                    if (!is_array($data)) continue;
+
                     $weatherData = null;
                     $markerType = 'forecast';
-                    
-                    foreach ($timeSlots as $slot) {
-                        if (isset($snapshotData[$slot])) {
-                            $weatherData = $snapshotData[$slot];
-                            break;
+
+                    // Handle structured forecast format
+                    if (isset($data['type']) && $data['type'] === 'forecast' && isset($data['time_slots'])) {
+                        $timeSlots = $data['time_slots'];
+                        $periods = ['evening', 'afternoon', 'noon', 'morning'];
+                        
+                        foreach ($periods as $slot) {
+                            if (isset($timeSlots[$slot])) {
+                                $weatherData = $timeSlots[$slot];
+                                break;
+                            }
                         }
                     }
-                    
-                    if (!$weatherData) continue;
-                }
+                    // Handle direct time period data
+                    elseif (in_array($key, ['evening', 'afternoon', 'noon', 'morning'])) {
+                        $weatherData = $data;
+                    }
 
-                $mapMarkers[] = [
-                    'snapshot_id' => $snapshot->snapshotID,
-                    'location' => $location->name,
-                    'latitude' => $location->latitude,
-                    'longitude' => $location->longitude,
-                    'marker_type' => $markerType,
-                    'temperature' => $weatherData['temperature'] ?? 0,
-                    'storm_status' => $weatherData['storm_status'] ?? 'clear',
-                    'rain_chance' => $weatherData['rain_chance'] ?? ($weatherData['precipitation_chance'] ?? 0),
-                    'weather_icon' => $weatherData['weather_icon'] ?? '',
-                    'weather_desc' => $weatherData['weather_desc'] ?? '',
-                    'recorded_at' => $weatherData['recorded_at'] ?? $snapshot->created_at,
-                    'created_at' => $snapshot->created_at,
-                ];
+                    if ($weatherData) {
+                        $mapMarkers[] = [
+                            'snapshot_id' => $snapshot->snapshotID,
+                            'location' => $location->name,
+                            'latitude' => $location->latitude,
+                            'longitude' => $location->longitude,
+                            'marker_type' => $markerType,
+                            'temperature' => $weatherData['temperature'] ?? 0,
+                            'storm_status' => $weatherData['storm_status'] ?? 'clear',
+                            'rain_chance' => $weatherData['rain_chance'] ?? ($weatherData['precipitation_chance'] ?? 0),
+                            'weather_icon' => $weatherData['weather_icon'] ?? '',
+                            'weather_desc' => $weatherData['weather_desc'] ?? '',
+                            'recorded_at' => $weatherData['recorded_at'] ?? $snapshot->created_at,
+                            'created_at' => $snapshot->created_at,
+                        ];
+                        break; // Only need one marker per location
+                    }
+                }
             }
 
             return response()->json([
@@ -629,9 +558,6 @@ class WeatherController extends Controller
         }
     }
 
-    /**
-     * Process forecast data to extract weather for all time periods
-     */
     private function processFullDayForecastData($forecastData)
     {
         if (!isset($forecastData['list']) || empty($forecastData['list'])) {
@@ -661,7 +587,7 @@ class WeatherController extends Controller
 
             if ($timeSlot) {
                 $rain = $forecast['rain']['1h'] ?? 0;
-                $precipitation_mm = $rain; // removed snow
+                $precipitation_mm = $rain; 
 
                 $precipitation_chance = isset($forecast['pop'])
                     ? round($forecast['pop'] * 100, 1)
@@ -699,7 +625,6 @@ class WeatherController extends Controller
 
     private function findOrCreateLocation($latitude, $longitude, $locationName = null)
     {
-        // Check for existing location within a small radius (about 1km)
         $existingLocation = Location::where('latitude', '>=', $latitude - 0.01)
             ->where('latitude', '<=', $latitude + 0.01)
             ->where('longitude', '>=', $longitude - 0.01)
@@ -729,12 +654,9 @@ class WeatherController extends Controller
         );
     }
 
-    /**
-     * Enhanced storm status calculation matching frontend logic
-     */
     private function calculateStormStatus($rain_amount, $rain_chance = null)
     {
-        // Use rain chance as primary indicator (matches frontend logic)
+
         if ($rain_chance !== null) {
             if ($rain_chance > 80) return 'heavy_rain';
             if ($rain_chance > 60) return 'moderate_rain';
@@ -743,94 +665,11 @@ class WeatherController extends Controller
             return 'clear';
         }
 
-        // Fallback to rain amount
+    
         if ($rain_amount > 10) return 'heavy_rain';
         if ($rain_amount > 3) return 'moderate_rain';
         if ($rain_amount > 0.5) return 'light_rain';
         if ($rain_amount > 0) return 'possible_rain';
         return 'clear';
-    }
-
-    // Legacy methods for compatibility
-    private function determineSnapshotTime()
-    {
-        $hour = now()->hour;
-
-        if ($hour >= 5 && $hour < 11) {
-            return 'morning';
-        } elseif ($hour >= 11 && $hour < 14) {
-            return 'noon';
-        } elseif ($hour >= 14 && $hour < 18) {
-            return 'afternoon';
-        } else {
-            return 'evening';
-        }
-    }
-
-    private function processDailyForecast($locID, $lat, $lon)
-    {
-        $apiKey = env('OPENWEATHER_API_KEY');
-        $url = "https://api.openweathermap.org/data/3.0/onecall?lat={$lat}&lon={$lon}&exclude=minutely,hourly,alerts&units=metric&appid={$apiKey}";
-        $response = Http::get($url);
-
-        if ($response->failed()) {
-            throw new \Exception("Failed to fetch daily forecast data");
-        }
-
-        $data = $response->json();
-
-        $today = now()->toDateString();
-        $weatherReport = WeatherReport::firstOrCreate([
-            'locID' => $locID,
-            'report_date' => $today,
-        ]);
-
-        $daily = $data['daily'][0];
-
-        $snapshots = [
-            'morning' => $daily['temp']['morn'],
-            'noon' => $daily['temp']['day'],
-            'afternoon' => $daily['temp']['eve'],
-            'evening' => $daily['temp']['night'],
-        ];
-
-        foreach ($snapshots as $time => $temp) {
-            Snapshot::updateOrCreate(
-                [
-                    'wrID' => $weatherReport->wrID,
-                    'snapshot_time' => $time,
-                ],
-                [
-                    'temperature' => $temp,
-                    'feels_like' => $daily['feels_like'][$this->mapSnapshotKey($time)],
-                    'humidity' => $daily['humidity'],
-                    'pressure' => $daily['pressure'],
-                    'wind_speed' => $daily['wind_speed'],
-                    'wind_direction' => $daily['wind_deg'],
-                    'cloudiness' => $daily['clouds'],
-                    'precipitation' => $daily['pop'] ?? 0,
-                    'weather_main' => $daily['weather'][0]['main'] ?? '',
-                    'weather_desc' => $daily['weather'][0]['description'] ?? '',
-                    'weather_icon' => $daily['weather'][0]['icon'] ?? '',
-                ]
-            );
-        }
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Daily forecast stored successfully'
-        ]);
-    }
-
-    private function mapSnapshotKey($time)
-    {
-        $mapping = [
-            'morning' => 'morn',
-            'noon' => 'day',
-            'afternoon' => 'eve',
-            'evening' => 'night'
-        ];
-
-        return $mapping[$time] ?? 'day';
     }
 }
