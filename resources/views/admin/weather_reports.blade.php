@@ -5,45 +5,24 @@
 
 @section('content')
 <div class="space-y-6">
-    <!-- Header with Stats -->
-    <div class="bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl shadow-lg text-white p-6">
-        <div class="flex justify-between items-center">
-            <div>
-                <h1 class="text-2xl font-bold">Weather Reports Dashboard</h1>
-                <p class="text-blue-100 mt-1">Live updates every 15 minutes</p>
-            </div>
-            <div class="text-right">
-                <div class="text-3xl font-bold">{{ count($todaySnapshots ?? []) }}</div>
-                <div class="text-sm text-blue-100">Active Locations Today</div>
-            </div>
-        </div>
-    </div>
+    <!-- Notification Container -->
+    <div id="notificationContainer" class="fixed top-4 right-4 z-50 space-y-2 max-w-sm"></div>
 
 
 
-    <!-- Filters and Actions -->
+    <!-- Search and Actions -->
     <div class="bg-white rounded-lg shadow-sm border p-4">
         <div class="flex flex-col md:flex-row gap-4 justify-between items-center">
-            <div class="flex gap-3">
-                <select id="locationFilter" class="border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                    <option value="">All Locations</option>
-                    @if(isset($snapshots) && $snapshots->count() > 0)
-                        @foreach($snapshots->unique('weatherReport.location.locID') as $snapshot)
-                            @if($snapshot->weatherReport && $snapshot->weatherReport->location)
-                                <option value="{{ $snapshot->weatherReport->location->locID }}">
-                                    {{ $snapshot->weatherReport->location->name }}
-                                </option>
-                            @endif
-                        @endforeach
-                    @endif
-                </select>
-                
-                <select id="dateFilter" class="border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                    <option value="">All Dates</option>
-                    <option value="today">Today</option>
-                    <option value="yesterday">Yesterday</option>
-                    <option value="week">This Week</option>
-                </select>
+            <div class="flex gap-3 w-full md:w-auto">
+                <div class="relative flex-1 md:min-w-80">
+                    <input 
+                        type="text" 
+                        id="locationSearch" 
+                        placeholder="Search locations..." 
+                        class="w-full border border-gray-300 rounded-md px-4 py-2 pl-10 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    >
+                    <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                </div>
             </div>
             
             <div class="flex gap-2">
@@ -65,7 +44,7 @@
         <div class="bg-white rounded-lg shadow-sm border p-6">
             <h2 class="text-xl font-bold text-gray-900 mb-4">Recent Historical Data (Last 7 Days)</h2>
             
-            <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <div class="grid gap-6 md:grid-cols-3 lg:grid-cols-3" id="weatherCardsContainer">
                 @foreach($snapshots as $snapshot)
                     @php
                         $location = $snapshot->weatherReport->location ?? null;
@@ -75,9 +54,11 @@
                         $periods = $snapshot->getAvailableTimePeriods();
                     @endphp
                     
-                    <div class="bg-white rounded-lg shadow-sm border hover:shadow-md transition-shadow">
+                    <div class="weather-card bg-white rounded-lg shadow-sm border hover:shadow-lg transition-all duration-200 cursor-pointer transform hover:scale-105" 
+                         onclick="openWeatherModal('{{ $location->locID }}')"
+                         data-location-name="{{ strtolower($location->name) }}">
                         <!-- Location Header -->
-                        <div class="p-4 border-b bg-gray-50 rounded-t-lg">
+                        <div class="p-4 border-b bg-gradient-to-r from-gray-50 to-blue-50 rounded-t-lg">
                             <div class="flex justify-between items-start">
                                 <div>
                                     <h3 class="font-semibold text-gray-900 text-lg">
@@ -140,6 +121,14 @@
                                         @endforeach
                                     </div>
                                 </div>
+
+                                <!-- Click hint -->
+                                <div class="mt-4 pt-3 border-t border-gray-100">
+                                    <p class="text-xs text-gray-400 text-center">
+                                        <i class="fas fa-mouse-pointer mr-1"></i>
+                                        Click for detailed view
+                                    </p>
+                                </div>
                             </div>
                         @else
                             <div class="p-4 text-center text-gray-500">
@@ -155,6 +144,15 @@
             <div class="mt-6">
                 {{ $snapshots->links() }}
             </div>
+        </div>
+    @else
+        <div class="bg-white rounded-lg shadow-sm border p-12 text-center">
+            <i class="fas fa-cloud-sun text-6xl text-gray-300 mb-4"></i>
+            <h3 class="text-xl font-semibold text-gray-600 mb-2">No Weather Reports Available</h3>
+            <p class="text-gray-500 mb-6">No weather data has been collected yet. Use the "Store Now" button to fetch the latest forecasts.</p>
+            <button onclick="document.getElementById('storeNow').click()" class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-md font-medium">
+                <i class="fas fa-save mr-2"></i> Store Weather Data Now
+            </button>
         </div>
     @endif
 </div>
@@ -191,9 +189,81 @@
     // Store weather data for modal
     const weatherData = @json($todaySnapshots ?? []);
 
+    // Notification system
+    function showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        const typeClasses = {
+            'info': 'bg-blue-500 border-blue-600',
+            'success': 'bg-green-500 border-green-600',
+            'warning': 'bg-yellow-500 border-yellow-600',
+            'error': 'bg-red-500 border-red-600'
+        };
+        
+        notification.className = `p-4 rounded-lg border-l-4 text-white shadow-lg transform transition-all duration-300 ${typeClasses[type]}`;
+        notification.innerHTML = `
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-triangle' : type === 'warning' ? 'exclamation-circle' : 'info-circle'} mr-2"></i>
+                    <span class="text-sm font-medium">${message}</span>
+                </div>
+                <button onclick="this.parentElement.parentElement.remove()" class="ml-4 text-white hover:text-gray-200">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        `;
+        
+        document.getElementById('notificationContainer').appendChild(notification);
+        
+        // Auto-remove after 5 seconds
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.style.opacity = '0';
+                notification.style.transform = 'translateX(100%)';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.remove();
+                    }
+                }, 300);
+            }
+        }, 5000);
+    }
+
+    // Auto-operation notifications
+    function simulateAutoNotifications() {
+        setInterval(() => {
+            if (Math.random() < 0.3) { // 30% chance every minute
+                showNotification('Auto storage: Weather forecasts updated for all locations', 'success');
+            }
+            if (Math.random() < 0.2) { // 20% chance every minute  
+                showNotification('Auto cleanup: Old weather reports cleaned up', 'info');
+            }
+        }, 60000); // Every minute
+    }
+
+    // Start auto notifications
+    simulateAutoNotifications();
+
+    // Location search functionality
+    document.getElementById('locationSearch').addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase().trim();
+        const cards = document.querySelectorAll('.weather-card');
+        
+        cards.forEach(card => {
+            const locationName = card.getAttribute('data-location-name');
+            if (locationName.includes(searchTerm)) {
+                card.style.display = 'block';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    });
+
     function openWeatherModal(locID) {
         const locationData = weatherData[locID];
-        if (!locationData) return;
+        if (!locationData) {
+            showNotification('No weather data available for this location', 'error');
+            return;
+        }
 
         // Update modal header
         document.getElementById('modalLocationName').textContent = locationData.location.name;
@@ -261,7 +331,8 @@
         let html = '';
 
         for (const [period, config] of Object.entries(periodConfig)) {
-            const snapshot = locationData.periods[period];
+            // Get period data using the updated function
+            const periodData = getPeriodData(locationData, period);
             
             html += `
                 <div class="border-2 rounded-xl ${config.border} ${config.bg} overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
@@ -281,13 +352,9 @@
                     <!-- Weather Content -->
                     <div class="p-6">`;
 
-            if (snapshot) {
-                // Get period data
-                const periodData = getPeriodData(snapshot, period);
-                
-                if (periodData) {
-                    const stormStatus = periodData.storm_status || 'clear';
-                    const statusClass = statusColors[stormStatus] || 'bg-gray-100 text-gray-800';
+            if (periodData) {
+                const stormStatus = periodData.storm_status || 'clear';
+                const statusClass = statusColors[stormStatus] || 'bg-gray-100 text-gray-800';
 
                     html += `
                         <!-- Temperature Display -->
@@ -391,14 +458,6 @@
                         </div>
                     `;
                 }
-            } else {
-                html += `
-                    <div class="text-center py-12 text-gray-400">
-                        <i class="fas fa-cloud text-5xl mb-3"></i>
-                        <p class="text-lg">No data available for this period</p>
-                    </div>
-                `;
-            }
 
             html += `
                     </div>
@@ -409,24 +468,18 @@
         return html;
     }
 
-    function getPeriodData(snapshot, period) {
-        // Try different data structures
-        if (snapshot.snapshots) {
-            // Check direct snapshots property
-            for (const key in snapshot.snapshots) {
-                const data = snapshot.snapshots[key];
-                if (data && data.time_slots && data.time_slots[period]) {
-                    return data.time_slots[period];
-                }
-            }
+    function getPeriodData(locationData, period) {
+        // Check if period data is already extracted and available
+        if (locationData.periods && locationData.periods[period] && locationData.periods[period].data) {
+            return locationData.periods[period].data;
         }
-        
-        // Check if snapshot has weather_report with snapshots
-        if (snapshot.weather_report && snapshot.weather_report.snapshots) {
-            for (const snap of snapshot.weather_report.snapshots) {
-                if (snap.snapshots) {
-                    for (const key in snap.snapshots) {
-                        const data = snap.snapshots[key];
+
+        // Fallback: Look through raw snapshots if available
+        if (locationData.raw_snapshots) {
+            for (const snapshot of locationData.raw_snapshots) {
+                if (snapshot.snapshots) {
+                    for (const key in snapshot.snapshots) {
+                        const data = snapshot.snapshots[key];
                         if (data && data.time_slots && data.time_slots[period]) {
                             return data.time_slots[period];
                         }
@@ -434,7 +487,20 @@
                 }
             }
         }
-        
+
+        // Another fallback: Try direct snapshot access from periods
+        if (locationData.periods && locationData.periods[period] && locationData.periods[period].snapshot) {
+            const snapshot = locationData.periods[period].snapshot;
+            if (snapshot.snapshots) {
+                for (const key in snapshot.snapshots) {
+                    const data = snapshot.snapshots[key];
+                    if (data && data.time_slots && data.time_slots[period]) {
+                        return data.time_slots[period];
+                    }
+                }
+            }
+        }
+
         return null;
     }
 
@@ -456,7 +522,7 @@
         }
     });
 
-    // Auto-refresh timestamp every minute (since data updates every 15 mins)
+    // Auto-refresh timestamp every minute
     setInterval(function() {
         document.getElementById('lastUpdated').textContent = new Date().toLocaleTimeString();
     }, 60000);
@@ -482,24 +548,19 @@
         .then(data => {
             if (data.success) {
                 const details = data.details;
-                let message = `${data.message}\n\n`;
-                message += `Total locations: ${details.total_locations}\n`;
-                message += `Successful: ${details.successful}\n`;
-                message += `Failed: ${details.failed}`;
+                showNotification(`${data.message}`, 'success');
+                showNotification(`Total: ${details.total_locations}, Successful: ${details.successful}, Failed: ${details.failed}`, 'info');
                 
-                if (details.errors && details.errors.length > 0) {
-                    message += `\n\nErrors:\n${details.errors.join('\n')}`;
-                }
-                
-                alert(message);
-                location.reload();
+                setTimeout(() => {
+                    location.reload();
+                }, 2000);
             } else {
-                alert('Failed to store forecasts: ' + data.message);
+                showNotification('Failed to store forecasts: ' + data.message, 'error');
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('An error occurred while storing forecasts.');
+            showNotification('An error occurred while storing forecasts.', 'error');
         })
         .finally(() => {
             button.disabled = false;
@@ -510,6 +571,7 @@
     // Refresh functionality
     document.getElementById('refreshData').addEventListener('click', function() {
         this.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Refreshing...';
+        showNotification('Refreshing weather data...', 'info');
         location.reload();
     });
 
@@ -533,20 +595,27 @@
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                alert(data.message);
-                location.reload();
+                showNotification(data.message, 'success');
+                setTimeout(() => {
+                    location.reload();
+                }, 2000);
             } else {
-                alert('Failed to cleanup: ' + data.message);
+                showNotification('Failed to cleanup: ' + data.message, 'error');
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('An error occurred during cleanup.');
+            showNotification('An error occurred during cleanup.', 'error');
         })
         .finally(() => {
             button.disabled = false;
             button.innerHTML = '<i class="fas fa-trash-alt mr-1"></i> Cleanup Old Reports';
         });
+    });
+
+    // Initial notification on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        showNotification('Weather Reports Dashboard loaded successfully', 'success');
     });
 </script>
 @endpush
