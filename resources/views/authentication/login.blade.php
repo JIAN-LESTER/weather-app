@@ -10,7 +10,7 @@
 
     <main class="w-full max-w-md bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 sm:p-8">
 
-        <h1 class="text-2xl font-bold text-center mb-6">Login to WeathR<    /h1>
+        <h1 class="text-2xl font-bold text-center mb-6">Login to WeathR</h1>
 
 
         <form action="{{ route('login') }}" method="POST" class="space-y-5">
