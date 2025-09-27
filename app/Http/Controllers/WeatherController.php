@@ -129,7 +129,7 @@ class WeatherController extends Controller
     }
 
  
-    public function storeForecastSnapshots(Request $request)
+      public function storeForecastSnapshots(Request $request)
     {
         $request->validate([
             'latitude' => 'required|numeric|between:-90,90',
@@ -146,14 +146,13 @@ class WeatherController extends Controller
         ]);
 
         try {
-    
+            // Use improved location finding
             $location = $this->findOrCreateLocation(
                 $request->latitude,
                 $request->longitude,
                 $request->location_name
             );
 
-     
             $weatherReport = $this->getOrCreateTodaysReport($location->locID);
 
             $processedTimeSlots = [];
@@ -193,7 +192,6 @@ class WeatherController extends Controller
                 ], 400);
             }
 
-      
             $snapshotData = [
                 'type' => 'forecast',
                 'snapshot_type' => 'forecast_periods',
@@ -212,14 +210,11 @@ class WeatherController extends Controller
                 ]
             ];
 
-  
+            // Check for existing snapshot for today
             $existingSnapshot = Snapshot::where('wrID', $weatherReport->wrID)->first();
 
             if ($existingSnapshot) {
-        
                 $existingData = $existingSnapshot->snapshots ?? [];
-                
-          
                 $forecastKey = 'forecast_' . now()->format('His');
                 $existingData[$forecastKey] = $snapshotData;
                 
@@ -229,7 +224,6 @@ class WeatherController extends Controller
                 
                 $snapshotRow = $existingSnapshot;
             } else {
-         
                 $forecastKey = 'forecast_' . now()->format('His');
                 $snapshotRow = Snapshot::create([
                     'wrID' => $weatherReport->wrID,
@@ -625,21 +619,67 @@ class WeatherController extends Controller
 
     private function findOrCreateLocation($latitude, $longitude, $locationName = null)
     {
-        $existingLocation = Location::where('latitude', '>=', $latitude - 0.01)
-            ->where('latitude', '<=', $latitude + 0.01)
-            ->where('longitude', '>=', $longitude - 0.01)
-            ->where('longitude', '<=', $longitude + 0.01)
-            ->first();
+        return Location::findOrCreateByCoordinates(
+            $latitude, 
+            $longitude, 
+            $locationName, 
+            0.01 // Tolerance of ~1km
+        );
+    }
 
-        if ($existingLocation) {
-            return $existingLocation;
+
+      
+    public function getMapLocations(Request $request)
+    {
+        try {
+            $bounds = $request->only(['north', 'south', 'east', 'west']);
+            
+            $query = Location::withRecentWeather(1); // Locations with weather data from last 24 hours
+            
+            // Apply bounding box filter if provided
+            if (count($bounds) === 4) {
+                $query->withinBounds(
+                    $bounds['north'],
+                    $bounds['south'], 
+                    $bounds['east'],
+                    $bounds['west']
+                );
+            }
+            
+            $locations = $query->with(['snapshots' => function($query) {
+                    $query->whereHas('weatherReport', function($subQuery) {
+                        $subQuery->where('report_date', now()->toDateString());
+                    })->latest();
+                }])
+                ->get()
+                ->map(function($location) {
+                    $summary = $location->getLatestWeatherSummary();
+                    return [
+                        'location_id' => $location->locID,
+                        'name' => $location->name,
+                        'latitude' => $location->latitude,
+                        'longitude' => $location->longitude,
+                        'weather_summary' => $summary
+                    ];
+                })
+                ->filter(function($location) {
+                    return $location['weather_summary'] !== null;
+                });
+
+            return response()->json([
+                'success' => true,
+                'locations' => $locations->values(),
+                'total_count' => $locations->count()
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error('Error fetching map locations: ' . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to fetch map locations: ' . $e->getMessage()
+            ], 500);
         }
-
-        return Location::create([
-            'name' => $locationName ?: "Location ({$latitude}, {$longitude})",
-            'latitude' => round($latitude, 6),
-            'longitude' => round($longitude, 6)
-        ]);
     }
 
     private function getOrCreateTodaysReport($locID)

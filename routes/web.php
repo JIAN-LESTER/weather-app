@@ -48,7 +48,6 @@ Route::middleware(['auth'])->group(function () {
    
         Route::get('/users', [DashboardController::class, 'users'])->name('users');
         Route::get('/logs', [DashboardController::class, 'logs'])->name('logs');
-        Route::get('/dashboard/stats', [DashboardController::class, 'getDashboardStats'])->name('dashboard.stats');
     });
 
 
@@ -61,9 +60,7 @@ Route::get('/verify-email/{token}', [EmailVerificationController::class, 'verify
 Route::get('/2fa/form', [TwoFactorAuthController::class, 'twoFactorForm'])->name('2fa-form');
 Route::post('/2fa/authenticate', [TwoFactorAuthController::class, 'authenticate'])->name('2fa-authenticate');
 
-Route::get('/admin/dashboard', function () {
-    return view('admin.dashboard');
-})->name('admin.dashboard');
+Route::get('/admin/dashboard', [DashboardController::class, 'viewAdminDashboard'])->name('admin.dashboard');
 
 Route::get('/user/dashboard', function () {
     return view('user.dashboard');
@@ -89,13 +86,11 @@ Route::middleware(['auth'])->group(function () {
 Route::middleware(['auth'])->group(function () {
     Route::get('/map', [MapsController::class, 'show'])->name('map.show');
     Route::get('/weather_reports', [WeatherReportsController::class, 'viewWeatherReports'])->name('weather_reports.show');
-    Route::get('/snapshots', [SnapshotsController::class, 'viewSnapshots'])->name('snapshots.show');
     Route::get('/logs', [LogsController::class, 'viewLogs'])->name('logs.show');
     Route::get('/user-management', [UserManagementController::class, 'viewUsers'])->name('admin.user_management');
 
     Route::get('/user/map', [MapsController::class, 'viewMaps'])->name('user.map.show');
     Route::get('/user/weather_reports', [WeatherReportsController::class, 'viewUserWeatherReports'])->name('user.weather_reports.show');
-    Route::get('/user/snapshots', [SnapshotsController::class, 'viewUserSnapshots'])->name('user.snapshots.show');
 });
 
 Route::prefix('admin/user_crud')->name('admin.')->group(function () {
@@ -145,27 +140,85 @@ Route::get('/api/weather/point', [WeatherController::class, 'point'])
 
     Route::get('/weather/full-day-forecast', [WeatherController::class, 'getFullDayForecastData']);
 
-Route::get('/weather/current-weather', [WeatherController::class, 'getCurrentWeatherData']);
-Route::get('/weather/full-day-forecast', [WeatherController::class, 'getFullDayForecastData']);
-Route::post('/weather/store-forecast-snapshots', [WeatherController::class, 'storeForecastSnapshots']);
-Route::get('/weather/todays-forecast-snapshots', [WeatherController::class, 'getTodaysForecastSnapshots']);  Route::prefix('weather')->name('weather.')->group(function () {
-        // NEW: Enhanced forecast snapshot endpoints with JSON structure
-        Route::post('/store-forecast-snapshots', [WeatherController::class, 'storeForecastSnapshots'])
-            ->name('store-forecast-snapshots');
-        
-        Route::get('/todays-forecast-snapshots', [WeatherController::class, 'getTodaysForecastSnapshots'])
-            ->name('todays-forecast-snapshots');
-
-        // Legacy endpoints (maintained for backward compatibility)
-        Route::post('/store-full-day-snapshots', [WeatherController::class, 'storeFullDayForecastSnapshots'])
-            ->name('store-full-day-snapshots');
-
-        Route::get('/todays-snapshots', [WeatherController::class, 'getTodaysWeatherSnapshots'])
-            ->name('todays-snapshots');
-
-        Route::get('/map-display-snapshots', [WeatherController::class, 'getSnapshotsForMapDisplay'])
-            ->name('map-display-snapshots');
-
-        Route::get('/location-history/{locID}', [WeatherController::class, 'getLocationWeatherHistory'])
-            ->name('location-history');
+Route::middleware(['auth'])->group(function () {
+    // Admin weather reports routes
+    Route::middleware(['admin'])->prefix('admin')->group(function () {
+        Route::get('/weather-reports', [WeatherReportsController::class, 'viewWeatherReports'])
+            ->name('weather_reports.show');
+        Route::delete('/weather-reports/snapshots/{snapshotID}', [WeatherReportsController::class, 'deleteSnapshot'])
+            ->name('weather_reports.delete_snapshot');
     });
+
+    // User weather reports routes
+    Route::prefix('user')->group(function () {
+        Route::get('/weather-reports/{locID?}', [WeatherReportsController::class, 'viewUserWeatherReports'])
+            ->name('user.weather_reports.show');
+    });
+
+    // Common weather reports routes
+    Route::get('/reports/{wrID}', [WeatherReportsController::class, 'showReport'])
+        ->name('reports.show');
+    Route::get('/reports/snapshots/{snapshotID}', [WeatherReportsController::class, 'showSnapshot'])
+        ->name('reports.snapshot.show');
+});
+
+// Weather API Routes
+Route::prefix('api/weather')->group(function () {
+    Route::get('/point', [WeatherController::class, 'point']);
+    Route::get('/current', [WeatherController::class, 'getCurrentWeatherData']);
+    Route::get('/forecast', [WeatherController::class, 'getFullDayForecastData']);
+    Route::post('/forecast/save', [WeatherController::class, 'storeForecastSnapshots']);
+    Route::get('/snapshots/today', [WeatherController::class, 'getTodaysWeatherSnapshots']);
+    Route::get('/snapshots/forecast', [WeatherController::class, 'getTodaysForecastSnapshots']);
+    Route::get('/snapshots/map', [WeatherController::class, 'getSnapshotsForMapDisplay']);
+    Route::get('/locations/map', [WeatherController::class, 'getMapLocations']);
+    Route::get('/reports/data', [WeatherReportsController::class, 'getWeatherReportsData']);
+    Route::get('/location/{locID}/history/{days?}', [WeatherController::class, 'getLocationWeatherHistory']);
+});
+
+
+// Route::middleware(['auth'])->group(function () {
+//     // Weather Reports routes (no admin prefix)
+//     Route::get('/weather-reports', [WeatherReportsController::class, 'viewWeatherReports'])
+//         ->name('weather_reports.show');
+    
+//     // Manual cleanup endpoint
+//     Route::post('/weather-reports/cleanup', [WeatherReportsController::class, 'triggerCleanup'])
+//         ->name('weather_reports.cleanup');
+    
+//     // Delete specific snapshot
+//     Route::delete('/weather-reports/snapshots/{snapshotID}', [WeatherReportsController::class, 'deleteSnapshot'])
+//         ->name('weather_reports.delete_snapshot');
+// });
+
+// // API endpoints for real-time data
+// Route::prefix('api/weather')->group(function () {
+//     Route::get('/location/{locID}/current/{period?}', [WeatherReportsController::class, 'getRealTimeWeather'])
+//         ->name('api.weather.current_period');
+// });
+
+// Add these routes to your web.php file:
+
+Route::middleware(['auth'])->group(function () {
+    // Weather Reports routes (no admin prefix)
+    Route::get('/weather-reports', [WeatherReportsController::class, 'viewWeatherReports'])
+        ->name('weather_reports.show');
+    
+    // Store forecasts NOW (instant storage)
+    Route::post('/weather-reports/store-now', [WeatherReportsController::class, 'storeNow'])
+        ->name('weather_reports.store_now');
+    
+    // Manual cleanup endpoint
+    Route::post('/weather-reports/cleanup', [WeatherReportsController::class, 'triggerCleanup'])
+        ->name('weather_reports.cleanup');
+    
+    // Delete specific snapshot
+    Route::delete('/weather-reports/snapshots/{snapshotID}', [WeatherReportsController::class, 'deleteSnapshot'])
+        ->name('weather_reports.delete_snapshot');
+});
+
+// API endpoints for real-time data
+Route::prefix('api/weather')->group(function () {
+    Route::get('/location/{locID}/current/{period?}', [WeatherReportsController::class, 'getRealTimeWeather'])
+        ->name('api.weather.current_period');
+});

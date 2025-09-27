@@ -3,9 +3,13 @@
 @section('title', 'Maps')
 @section('header', 'Maps')
 
-@section('content')
+{{-- These sections make the layout fullscreen for maps --}}
+@section('fullscreen', 'relative')
+@section('header-class', 'absolute top-0 left-0 right-0')
+@section('main-class', 'h-full pt-20 relative')
 
-<div class="relative bg-white rounded-lg shadow-lg border overflow-hidden">
+@section('content')
+<div class="h-full relative">
     <!-- Map Loading Indicator -->
     <div id="mapLoader" class="absolute inset-0 bg-gray-50 flex items-center justify-center z-20">
         <div class="flex items-center gap-3">
@@ -14,9 +18,10 @@
         </div>
     </div>
 
-    <!-- Map -->
-    <div id="map" class="h-[80vh] w-full z-0"></div>
+    <!-- Map - Full height -->
+    <div id="map" class="h-full w-full z-0"></div>
 
+    <!-- Weather Panel -->
     <div id="weatherPanel"
         class="absolute top-4 left-4 bg-white/90 backdrop-blur-sm rounded-lg shadow-lg border p-4 max-w-sm z-20 hidden">
         <!-- Content will be injected dynamically -->
@@ -90,7 +95,6 @@
         </div>
     </div>
 </div>
-
 @endsection
 
 @push('scripts')
@@ -721,12 +725,6 @@
                     </div>
                 </div>
 
-             <div class="space-y-2">
-            <button id="saveFullDayBtn" onclick="saveCompleteWeatherSnapshot('${lat}', '${lng}')" 
-                    class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg flex items-center justify-center gap-2">
-                Save Weather Data
-            </button>
-        </div>
 
                 <!-- Footer -->
                 <div class="pt-3 border-t border-gray-200 text-xs text-gray-500">
@@ -748,197 +746,197 @@
         });
     }
 
-   async function saveCompleteWeatherSnapshot(lat, lng) {
-    const saveBtn = document.getElementById('saveFullDayBtn');
-    const originalContent = saveBtn.innerHTML;
+//    async function saveCompleteWeatherSnapshot(lat, lng) {
+//     const saveBtn = document.getElementById('saveFullDayBtn');
+//     const originalContent = saveBtn.innerHTML;
 
-    // Show loading state
-    saveBtn.disabled = true;
-    saveBtn.innerHTML = `
-        <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-        Saving Forecast Data...
-    `;
+//     // Show loading state
+//     saveBtn.disabled = true;
+//     saveBtn.innerHTML = `
+//         <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+//         Saving Forecast Data...
+//     `;
 
-    try {
-        // Get forecast data from the display
-        const fullDayData = window.fullDayForecastData;
+//     try {
+//         // Get forecast data from the display
+//         const fullDayData = window.fullDayForecastData;
 
-        if (!fullDayData) {
-            throw new Error('Forecast data not available. Please refresh the weather display.');
-        }
+//         if (!fullDayData) {
+//             throw new Error('Forecast data not available. Please refresh the weather display.');
+//         }
 
-        // Get CSRF token
-        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-        if (!csrfToken) {
-            throw new Error('CSRF token not found. Please refresh the page.');
-        }
+//         // Get CSRF token
+//         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+//         if (!csrfToken) {
+//             throw new Error('CSRF token not found. Please refresh the page.');
+//         }
 
-        // Prepare forecast time slots payload with consistent structure
-        const timeSlots = {};
-        const periods = ['morning', 'noon', 'afternoon', 'evening'];
+//         // Prepare forecast time slots payload with consistent structure
+//         const timeSlots = {};
+//         const periods = ['morning', 'noon', 'afternoon', 'evening'];
 
-        for (const period of periods) {
-            const periodData = fullDayData.time_slots[period];
+//         for (const period of periods) {
+//             const periodData = fullDayData.time_slots[period];
             
-            if (periodData && periodData.temperature !== undefined) {
-                const periodTemp = Math.round(periodData.temperature);
+//             if (periodData && periodData.temperature !== undefined) {
+//                 const periodTemp = Math.round(periodData.temperature);
                 
-                // Calculate period rain amount (matching your display logic)
-                let periodRainAmount = periodData.precipitation_mm ?? (periodData.rain?.['1h'] ?? 0);
+//                 // Calculate period rain amount (matching your display logic)
+//                 let periodRainAmount = periodData.precipitation_mm ?? (periodData.rain?.['1h'] ?? 0);
                 
-                if (periodRainAmount === 0) {
-                    const periodWeatherMain = (periodData.weather_main || '').toLowerCase();
-                    const periodWeatherDesc = (periodData.weather_desc || '').toLowerCase();
-                    const periodCloudiness = periodData.cloudiness ?? 0;
-                    const periodHumidity = periodData.humidity ?? 50;
+//                 if (periodRainAmount === 0) {
+//                     const periodWeatherMain = (periodData.weather_main || '').toLowerCase();
+//                     const periodWeatherDesc = (periodData.weather_desc || '').toLowerCase();
+//                     const periodCloudiness = periodData.cloudiness ?? 0;
+//                     const periodHumidity = periodData.humidity ?? 50;
                     
-                    if (periodWeatherMain.includes('rain') || periodWeatherDesc.includes('rain')) {
-                        if (periodWeatherDesc.includes('heavy')) periodRainAmount = 5.0;
-                        else if (periodWeatherDesc.includes('moderate')) periodRainAmount = 2.0;
-                        else if (periodWeatherDesc.includes('light')) periodRainAmount = 0.5;
-                        else periodRainAmount = 1.0;
-                    } else if (periodWeatherMain.includes('drizzle')) {
-                        periodRainAmount = 0.2;
-                    } else if (periodWeatherMain.includes('thunderstorm')) {
-                        periodRainAmount = 8.0;
-                    } else if (periodHumidity > 90 && periodCloudiness > 80) {
-                        periodRainAmount = 0.1;
-                    }
-                }
+//                     if (periodWeatherMain.includes('rain') || periodWeatherDesc.includes('rain')) {
+//                         if (periodWeatherDesc.includes('heavy')) periodRainAmount = 5.0;
+//                         else if (periodWeatherDesc.includes('moderate')) periodRainAmount = 2.0;
+//                         else if (periodWeatherDesc.includes('light')) periodRainAmount = 0.5;
+//                         else periodRainAmount = 1.0;
+//                     } else if (periodWeatherMain.includes('drizzle')) {
+//                         periodRainAmount = 0.2;
+//                     } else if (periodWeatherMain.includes('thunderstorm')) {
+//                         periodRainAmount = 8.0;
+//                     } else if (periodHumidity > 90 && periodCloudiness > 80) {
+//                         periodRainAmount = 0.1;
+//                     }
+//                 }
 
-                // Calculate period rain chance (matching your display logic)
-                let periodRainChance;
-                if (periodData.precipitation_chance !== undefined) {
-                    periodRainChance = Math.round(periodData.precipitation_chance);
-                } else if (periodData.pop !== undefined) {
-                    periodRainChance = Math.round(periodData.pop * 100);
-                } else if (periodRainAmount > 0) {
-                    periodRainChance = 100;
-                } else {
-                    const periodWeatherMain = (periodData.weather_main || '').toLowerCase();
-                    const periodCloudiness = periodData.cloudiness ?? 0;
-                    const periodHumidity = periodData.humidity ?? 50;
+//                 // Calculate period rain chance (matching your display logic)
+//                 let periodRainChance;
+//                 if (periodData.precipitation_chance !== undefined) {
+//                     periodRainChance = Math.round(periodData.precipitation_chance);
+//                 } else if (periodData.pop !== undefined) {
+//                     periodRainChance = Math.round(periodData.pop * 100);
+//                 } else if (periodRainAmount > 0) {
+//                     periodRainChance = 100;
+//                 } else {
+//                     const periodWeatherMain = (periodData.weather_main || '').toLowerCase();
+//                     const periodCloudiness = periodData.cloudiness ?? 0;
+//                     const periodHumidity = periodData.humidity ?? 50;
                     
-                    if (periodWeatherMain.includes('rain') || periodWeatherMain.includes('thunderstorm')) {
-                        periodRainChance = Math.max(80, Math.min(100, periodHumidity + periodCloudiness / 2));
-                    } else if (periodWeatherMain.includes('drizzle')) {
-                        periodRainChance = Math.max(60, Math.min(90, periodHumidity));
-                    } else if (periodWeatherMain.includes('cloud')) {
-                        if (periodHumidity > 85) periodRainChance = Math.round(periodHumidity * 0.8);
-                        else if (periodHumidity > 70) periodRainChance = Math.round(periodHumidity * 0.6);
-                        else periodRainChance = Math.round(periodHumidity * 0.4);
-                    } else {
-                        if (periodHumidity > 85) periodRainChance = Math.round(periodHumidity * 0.4);
-                        else if (periodHumidity > 70) periodRainChance = Math.round(periodHumidity * 0.2);
-                        else periodRainChance = Math.round(periodHumidity * 0.1);
-                    }
+//                     if (periodWeatherMain.includes('rain') || periodWeatherMain.includes('thunderstorm')) {
+//                         periodRainChance = Math.max(80, Math.min(100, periodHumidity + periodCloudiness / 2));
+//                     } else if (periodWeatherMain.includes('drizzle')) {
+//                         periodRainChance = Math.max(60, Math.min(90, periodHumidity));
+//                     } else if (periodWeatherMain.includes('cloud')) {
+//                         if (periodHumidity > 85) periodRainChance = Math.round(periodHumidity * 0.8);
+//                         else if (periodHumidity > 70) periodRainChance = Math.round(periodHumidity * 0.6);
+//                         else periodRainChance = Math.round(periodHumidity * 0.4);
+//                     } else {
+//                         if (periodHumidity > 85) periodRainChance = Math.round(periodHumidity * 0.4);
+//                         else if (periodHumidity > 70) periodRainChance = Math.round(periodHumidity * 0.2);
+//                         else periodRainChance = Math.round(periodHumidity * 0.1);
+//                     }
                     
-                    periodRainChance = Math.max(0, Math.min(100, periodRainChance));
-                }
+//                     periodRainChance = Math.max(0, Math.min(100, periodRainChance));
+//                 }
 
-                // Build structured time slot data
-                timeSlots[period] = {
-                    temperature: periodTemp,
-                    feels_like: Math.round(periodData.feels_like || periodTemp),
-                    rain_amount: periodRainAmount,
-                    rain_chance: periodRainChance,
-                    weather_main: periodData.weather_main || '',
-                    weather_desc: periodData.weather_desc || '',
-                    weather_icon: periodData.weather_icon || '',
-                    humidity: periodData.humidity ?? 0,
-                    pressure: periodData.pressure ?? 0,
-                    wind_speed: periodData.wind_speed ?? 0,
-                    wind_direction: periodData.wind_direction ?? 0,
-                    cloudiness: periodData.cloudiness ?? 0,
-                    forecast_time: periodData.forecast_time || null
-                };
-            }
-        }
+//                 // Build structured time slot data
+//                 timeSlots[period] = {
+//                     temperature: periodTemp,
+//                     feels_like: Math.round(periodData.feels_like || periodTemp),
+//                     rain_amount: periodRainAmount,
+//                     rain_chance: periodRainChance,
+//                     weather_main: periodData.weather_main || '',
+//                     weather_desc: periodData.weather_desc || '',
+//                     weather_icon: periodData.weather_icon || '',
+//                     humidity: periodData.humidity ?? 0,
+//                     pressure: periodData.pressure ?? 0,
+//                     wind_speed: periodData.wind_speed ?? 0,
+//                     wind_direction: periodData.wind_direction ?? 0,
+//                     cloudiness: periodData.cloudiness ?? 0,
+//                     forecast_time: periodData.forecast_time || null
+//                 };
+//             }
+//         }
 
-        if (Object.keys(timeSlots).length === 0) {
-            throw new Error('No valid forecast data available for any time period');
-        }
+//         if (Object.keys(timeSlots).length === 0) {
+//             throw new Error('No valid forecast data available for any time period');
+//         }
 
-        // Prepare structured payload with new JSON format
-        const postData = {
-            latitude: parseFloat(lat),
-            longitude: parseFloat(lng),
-            location_name: fullDayData.location.name || `Location (${lat}, ${lng})`,
-            time_slots: timeSlots,
-            _token: csrfToken
-        };
+//         // Prepare structured payload with new JSON format
+//         const postData = {
+//             latitude: parseFloat(lat),
+//             longitude: parseFloat(lng),
+//             location_name: fullDayData.location.name || `Location (${lat}, ${lng})`,
+//             time_slots: timeSlots,
+//             _token: csrfToken
+//         };
 
-        console.log('Sending structured forecast snapshots:', postData);
+//         console.log('Sending structured forecast snapshots:', postData);
 
-        const response = await fetch('/weather/store-forecast-snapshots', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRF-TOKEN': csrfToken
-            },
-            body: JSON.stringify(postData)
-        });
+//         const response = await fetch('/weather/store-forecast-snapshots', {
+//             method: 'POST',
+//             headers: {
+//                 'Content-Type': 'application/json',
+//                 'Accept': 'application/json',
+//                 'X-Requested-With': 'XMLHttpRequest',
+//                 'X-CSRF-TOKEN': csrfToken
+//             },
+//             body: JSON.stringify(postData)
+//         });
 
-        let result;
-        try {
-            result = await response.json();
-        } catch (parseError) {
-            console.error('Failed to parse response:', parseError);
-            throw new Error('Server returned invalid response');
-        }
+//         let result;
+//         try {
+//             result = await response.json();
+//         } catch (parseError) {
+//             console.error('Failed to parse response:', parseError);
+//             throw new Error('Server returned invalid response');
+//         }
 
-        if (!response.ok) {
-            throw new Error(result.message || `HTTP ${response.status}: Failed to save forecast data`);
-        }
+//         if (!response.ok) {
+//             throw new Error(result.message || `HTTP ${response.status}: Failed to save forecast data`);
+//         }
 
-        if (result.success) {
-            saveBtn.className = 'w-full bg-emerald-600 text-white font-medium py-2 px-4 rounded-lg flex items-center justify-center gap-2';
-            saveBtn.innerHTML = `
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                </svg>
-                Weather Data Saved 
-            `;
+//         if (result.success) {
+//             saveBtn.className = 'w-full bg-emerald-600 text-white font-medium py-2 px-4 rounded-lg flex items-center justify-center gap-2';
+//             saveBtn.innerHTML = `
+//                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+//                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+//                 </svg>
+//                 Weather Data Saved 
+//             `;
 
-            showNotification(
-                `Weather Data saved successfully.`,
-                'success'
-            );
+//             showNotification(
+//                 `Weather Data saved successfully.`,
+//                 'success'
+//             );
 
-            // Log the successful save structure
-            console.log('Successfully saved with new JSON structure:', result.data);
+//             // Log the successful save structure
+//             console.log('Successfully saved with new JSON structure:', result.data);
 
-            // Refresh the snapshots display if the function exists
-            if (typeof loadTodaysSnapshots === 'function') {
-                setTimeout(loadTodaysSnapshots, 1000);
-            }
-        } else {
-            throw new Error(result.message || 'Unknown error occurred');
-        }
+//             // Refresh the snapshots display if the function exists
+//             if (typeof loadTodaysSnapshots === 'function') {
+//                 setTimeout(loadTodaysSnapshots, 1000);
+//             }
+//         } else {
+//             throw new Error(result.message || 'Unknown error occurred');
+//         }
 
-    } catch (error) {
-        console.error('Error saving forecast snapshots:', error);
+//     } catch (error) {
+//         console.error('Error saving forecast snapshots:', error);
 
-        saveBtn.innerHTML = `
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-            </svg>
-            Save Failed
-        `;
-        saveBtn.className = 'w-full bg-red-600 text-white font-medium py-2 px-4 rounded-lg flex items-center justify-center gap-2';
+//         saveBtn.innerHTML = `
+//             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+//                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+//             </svg>
+//             Save Failed
+//         `;
+//         saveBtn.className = 'w-full bg-red-600 text-white font-medium py-2 px-4 rounded-lg flex items-center justify-center gap-2';
 
-        showNotification(error.message || 'Failed to save forecast snapshots.', 'error');
-    } finally {
-        // Reset button after delay
-        setTimeout(() => {
-            saveBtn.innerHTML = originalContent;
-            saveBtn.className = 'w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2';
-            saveBtn.disabled = false;
-        }, 3000);
-    }
-}
+//         showNotification(error.message || 'Failed to save forecast snapshots.', 'error');
+//     } finally {
+//         // Reset button after delay
+//         setTimeout(() => {
+//             saveBtn.innerHTML = originalContent;
+//             saveBtn.className = 'w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2';
+//             saveBtn.disabled = false;
+//         }, 3000);
+//     }
+// }
 
     // Notification system
     function showNotification(message, type = 'info') {
