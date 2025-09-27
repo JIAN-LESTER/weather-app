@@ -25,7 +25,7 @@
             <form method="GET" action="{{ route('admin.user_management') }}" class="flex gap-2 items-center" role="search">
                 <label for="search" class="sr-only">Search by name</label>
                 <input type="text" id="search" name="search" value="{{ request('search') }}" placeholder="Search by name..."
-                    class="border rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-gray-500">
+                    class="border-gray-200 border rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-gray-500">
                 <button type="submit" class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">
                     Search
                 </button>

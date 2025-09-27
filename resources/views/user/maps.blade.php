@@ -3,10 +3,13 @@
 @section('title', 'Maps')
 @section('header', 'Maps')
 
+{{-- These sections make the layout fullscreen for maps --}}
+@section('fullscreen', 'relative')
+@section('header-class', 'absolute top-0 left-0 right-0')
+@section('main-class', 'h-full pt-20 relative')
+
 @section('content')
-
-
-    <div class="relative bg-white rounded-lg shadow-lg border overflow-hidden">
+    <div class="h-full relative">
         <!-- Map Loading Indicator -->
         <div id="mapLoader" class="absolute inset-0 bg-gray-50 flex items-center justify-center z-20">
             <div class="flex items-center gap-3">
@@ -15,86 +18,115 @@
             </div>
         </div>
 
-        <!-- Map -->
-        <div id="map" class="h-[80vh] w-full z-0"></div>
+        <!-- Map - Full height -->
+        <div id="map" class="h-full w-full z-0"></div>
 
+        <!-- Weather Panel - Now positioned on the left -->
         <div id="weatherPanel"
-            class="absolute top-4 left-4 bg-white/90 backdrop-blur-sm rounded-lg shadow-lg border p-4 max-w-sm z-20 hidden">
+            class="absolute top-4 left-4 bg-white/95 backdrop-blur-sm rounded-lg shadow-xl  max-w-md z-20 hidden max-h-[80vh] overflow-y-auto">
             <!-- Content will be injected dynamically -->
         </div>
 
-
-        <!-- Collapsible Header Controls -->
-        <details class="absolute bottom-4 right-4 z-10 max-w-xs">
-            <summary
-                class="cursor-pointer bg-white/90 backdrop-blur-sm rounded-lg shadow-lg border px-4 py-2 text-gray-700 font-medium hover:bg-white">
-                ⚙️ Map Controls
-            </summary>
-
-            <div
-                class="bg-white/90 backdrop-blur-sm rounded-lg shadow-lg border p-4 flex flex-col gap-4 max-h-[60vh] overflow-y-auto mt-2">
-                <!-- Map Scope -->
-                <div class="flex flex-col gap-2">
-                    <label for="mapScope" class="text-sm font-medium text-gray-700">Map Scope:</label>
-                    <select id="mapScope"
-                        class="border border-gray-300 rounded-md px-3 py-2 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
-                        <option value="bukidnon" selected>Bukidnon</option>
-                        <option value="all">Philippines</option>
-                    </select>
+        <!-- Weather Layer Info Modal -->
+        <div id="weatherLayerModal"
+            class="fixed inset-0 bg-black/75 backdrop-blur-sm z-30 hidden flex items-center justify-center">
+            <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full mx-4 max-h-[90vh] overflow-y-auto">
+                <!-- Header with gray-800 background -->
+                <div class="p-4 bg-gray-800 rounded-t-2xl">
+                    <div class="flex justify-between items-center">
+                        <h3 id="modalTitle" class="text-xl font-bold text-white"></h3>
+                        <button onclick="closeWeatherModal()"
+                            class="text-white/80 hover:text-white text-2xl">&times;</button>
+                    </div>
                 </div>
 
-                <!-- Map Style -->
-                <div class="flex flex-col gap-2">
-                    <label for="mapStyle" class="text-sm font-medium text-gray-700">Map Style:</label>
-                    <select id="mapStyle"
-                        class="border border-gray-300 rounded-md px-3 py-2 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
-                        <option value="light" selected>Light Mode</option>
-                        <option value="dark">Dark Mode</option>
-                        <option value="satellite">Satellite</option>
-                    </select>
-                </div>
-
-                <!-- Weather Layers -->
-                <div class="flex flex-col gap-2">
-                    <span class="text-sm font-medium text-gray-700">Weather Layers:</span>
-                    <div class="flex flex-wrap gap-2">
-                        <button
-                            class="weather-radio flex items-center gap-2 px-4 py-2 rounded-full border border-orange-200 text-orange-700 bg-orange-50 hover:bg-orange-100 transition-all duration-200 active:bg-orange-200"
-                            data-layer="temp">
-                            🌡️ Temperature
-                        </button>
-
-                        <button
-                            class="weather-radio flex items-center gap-2 px-4 py-2 rounded-full border border-blue-200 text-blue-700 bg-blue-50 hover:bg-blue-100 transition-all duration-200 active:bg-blue-200"
-                            data-layer="precipitation">
-                            🌧️ Rain
-                        </button>
+                <!-- Content with white background -->
+                <div class="p-6 bg-white rounded-b-2xl">
+                    <div id="modalContent" class="space-y-4">
+                        <!-- Modal content will be injected here -->
                     </div>
                 </div>
             </div>
-        </details>
+        </div>
 
+        <!-- All Controls - Bottom Right -->
+        <div class="absolute bottom-4 right-4 z-10">
+            <div class="bg-white/95 backdrop-blur-sm rounded-lg shadow-lg p-3 space-y-3">
+                <!-- Map Style -->
+                <select id="mapStyle"
+                    class="w-full border border-gray-300 rounded-md px-3 py-2 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                    <option value="landscape" selected>Landscape</option>
+                    <option value="outdoors">Outdoors</option>
+                    <option value="transport">Transport</option>
+                    <option value="transportDark">Transport Dark</option>
+                    <option value="spinalMap">Spinal Map</option>
+                    <option value="pioneer">Pioneer</option>
+                    <option value="mobileAtlas">Mobile Atlas</option>
+                    <option value="neighbourhood">Neighbourhood</option>
+                </select>
 
+                <!-- Weather Layers -->
+                <div class="flex items-center gap-4">
+                    <!-- Temperature -->
+                    <label class="flex items-center gap-2 cursor-pointer group" title="Temperature">
+                        <span class="text-base">🌡️Temperature</span>
+                        <input type="checkbox" class="sr-only peer weather-switch" data-layer="temp">
+                        <div
+                            class="w-10 h-5 bg-gray-200 rounded-full peer peer-checked:after:translate-x-5 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600 relative">
+                        </div>
+                    </label>
 
+                    <!-- Precipitation -->
+                    <label class="flex items-center gap-2 cursor-pointer group" title="Rain & Clouds">
+                        <span class="text-base">🌧️Precipitation</span>
+                        <input type="checkbox" class="sr-only peer weather-switch" data-layer="precipitation">
+                        <div
+                            class="w-10 h-5 bg-gray-200 rounded-full peer peer-checked:after:translate-x-5 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600 relative">
+                        </div>
+                    </label>
 
+                    <!-- Wind -->
+                    <label class="flex items-center gap-2 cursor-pointer group" title="Wind">
+                        <span class="text-base">💨Wind</span>
+                        <input type="checkbox" class="sr-only peer weather-switch" data-layer="wind">
+                        <div
+                            class="w-10 h-5 bg-gray-200 rounded-full peer peer-checked:after:translate-x-5 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600 relative">
+                        </div>
+                    </label>
 
-        <!-- Map Legend -->
-        <div class="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm rounded-lg shadow-lg border p-4 max-w-xs z-10">
-            <h3 class="text-lg font-semibold text-gray-800 mb-3">🗺️ Map Legend</h3>
-            <div class="space-y-2 text-sm text-gray-600">
-                <div class="flex items-center gap-2">
-                    <div class="w-4 h-3 bg-gradient-to-r from-blue-500 to-red-500 rounded opacity-50"></div>
-                    <span>Temperature (°C)</span>
-                </div>
-                <div class="flex items-center gap-2">
-                    <div class="w-4 h-3 bg-purple-400 rounded opacity-60"></div>
-                    <span>Rain</span>
+                    <!-- Humidity -->
+
                 </div>
             </div>
         </div>
+        <!-- Enhanced Map Legend -->
+        <div class="absolute bottom-4 left-4 bg-gray-100 backdrop-blur-sm rounded-lg shadow-lg p-4 max-w-lg z-10">
+
+
+            <!-- Inline Legend -->
+            <div id="basicLegend" class="flex flex-wrap items-center gap-4 text-sm">
+                <div class="flex items-center gap-2">
+                    <div
+                        class="w-6 h-4 bg-gradient-to-r from-blue-400 via-green-400 via-yellow-400 to-red-400 rounded opacity-70">
+                    </div>
+                    <span class="text-gray-700">Temperature</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div class="w-6 h-4 bg-gradient-to-r from-transparent via-blue-300 to-purple-600 rounded opacity-60">
+                    </div>
+                    <span class="text-gray-700">Precipitation</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div class="w-6 h-4 bg-gradient-to-r from-green-300 to-red-400 rounded opacity-60"></div>
+                    <span class="text-gray-700">Wind Speed</span>
+                </div>
+
+            </div>
+
+
+        </div>
+
     </div>
-
-
 @endsection
 
 @push('scripts')
@@ -102,19 +134,7 @@
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
     <style>
-        .weather-btn {
-            @apply px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 cursor-pointer select-none;
-        }
-
-        .weather-btn.active {
-            @apply shadow-md transform scale-105;
-        }
-
-        .weather-btn:hover {
-            @apply shadow-sm transform translate-y-[-1px];
-        }
-
-        /* Custom map controls styling */
+        /* Enhanced map controls styling */
         .leaflet-control-layers {
             background: rgba(255, 255, 255, 0.95) !important;
             backdrop-filter: blur(10px);
@@ -144,51 +164,21 @@
 
         /* Map popup styling */
         .leaflet-popup-content-wrapper {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 12px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(15px);
+            border-radius: 16px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
             border: 1px solid rgba(229, 231, 235, 0.8);
+            padding: 0;
         }
 
         .leaflet-popup-tip {
-            background: rgba(255, 255, 255, 0.95);
+            background: rgba(255, 255, 255, 0.98);
         }
 
         .weather-popup .leaflet-popup-content {
             margin: 0 !important;
-        }
-
-        .custom-loading-marker,
-        .custom-weather-marker,
-        .custom-error-marker {
-            background: transparent !important;
-            border: none !important;
-        }
-
-        .custom-loading-marker div,
-        .custom-weather-marker div,
-        .custom-error-marker div {
-            animation: bounce 2s infinite;
-        }
-
-        @keyframes bounce {
-
-            0%,
-            20%,
-            50%,
-            80%,
-            100% {
-                transform: translateY(0);
-            }
-
-            40% {
-                transform: translateY(-10px);
-            }
-
-            60% {
-                transform: translateY(-5px);
-            }
+            width: auto !important;
         }
 
         /* Loading animation */
@@ -207,116 +197,179 @@
         .animate-pulse-dot {
             animation: pulse-dot 2s infinite;
         }
+
+        /* Weather switch animation */
+        .weather-switch:checked+div {
+            animation: switchOn 0.3s ease-in-out;
+        }
+
+        @keyframes switchOn {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        /* Loading indicator for switches */
+        .switch-loading {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .switch-loading::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.3), transparent);
+            animation: loading-shimmer 1s infinite;
+        }
+
+        @keyframes loading-shimmer {
+            0% {
+                left: -100%;
+            }
+
+            100% {
+                left: 100%;
+            }
+        }
     </style>
 
     <script>
         const openWeatherKey = "{{ env('OPENWEATHER_API_KEY') }}";
+        const thunderforestKey = "{{ env('THUNDERFOREST_MAPS_API_KEY') }}";
 
-        // Enhanced boundaries with buffer for better UX
-        const bukidnonBounds = L.latLngBounds([7.2, 124.2], [8.6, 125.9]);
-        const philippinesBounds = L.latLngBounds([4.0, 115.5], [21.5, 128.0]);
-
-        // Initialize map with loading state
+        // Initialize map focused on Bukidnon but without restrictive bounds
         const map = L.map('map', {
             zoomControl: false,
             attributionControl: false
         }).setView([7.9, 125.1], 10);
 
         // Add custom zoom control
-        L.control.zoom({
-            position: 'topright'
-        }).addTo(map);
 
-        // Enhanced base layers
+        // Enhanced base layers with Thunderforest maps
         const baseLayers = {
-            light: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; OpenStreetMap contributors',
-                maxZoom: 18
+            landscape: L.tileLayer(`https://tile.thunderforest.com/landscape/{z}/{x}/{y}.png?apikey=${thunderforestKey}`, {
+                attribution: '&copy; <a href="https://www.thunderforest.com/">Thunderforest</a>, &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+                maxZoom: 22
             }),
-            dark: L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-                attribution: '&copy; OSM &copy; CARTO',
-                maxZoom: 18
+            outdoors: L.tileLayer(`https://tile.thunderforest.com/outdoors/{z}/{x}/{y}.png?apikey=${thunderforestKey}`, {
+                attribution: '&copy; Thunderforest, &copy; OpenStreetMap contributors',
+                maxZoom: 22
             }),
-            satellite: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-                attribution: '&copy; Esri &copy; DigitalGlobe',
-                maxZoom: 18
+            transport: L.tileLayer(`https://tile.thunderforest.com/transport/{z}/{x}/{y}.png?apikey=${thunderforestKey}`, {
+                attribution: '&copy; Thunderforest, &copy; OpenStreetMap contributors',
+                maxZoom: 22
+            }),
+            transportDark: L.tileLayer(`https://tile.thunderforest.com/transport-dark/{z}/{x}/{y}.png?apikey=${thunderforestKey}`, {
+                attribution: '&copy; Thunderforest, &copy; OpenStreetMap contributors',
+                maxZoom: 22
+            }),
+            spinalMap: L.tileLayer(`https://tile.thunderforest.com/spinal-map/{z}/{x}/{y}.png?apikey=${thunderforestKey}`, {
+                attribution: '&copy; Thunderforest, &copy; OpenStreetMap contributors',
+                maxZoom: 22
+            }),
+            pioneer: L.tileLayer(`https://tile.thunderforest.com/pioneer/{z}/{x}/{y}.png?apikey=${thunderforestKey}`, {
+                attribution: '&copy; Thunderforest, &copy; OpenStreetMap contributors',
+                maxZoom: 22
+            }),
+            mobileAtlas: L.tileLayer(`https://tile.thunderforest.com/mobile-atlas/{z}/{x}/{y}.png?apikey=${thunderforestKey}`, {
+                attribution: '&copy; Thunderforest, &copy; OpenStreetMap contributors',
+                maxZoom: 22
+            }),
+            neighbourhood: L.tileLayer(`https://tile.thunderforest.com/neighbourhood/{z}/{x}/{y}.png?apikey=${thunderforestKey}`, {
+                attribution: '&copy; Thunderforest, &copy; OpenStreetMap contributors',
+                maxZoom: 22
             })
         };
 
-        // Start with light theme
-        let currentBaseLayer = baseLayers.light;
+        // Start with Thunderforest Landscape
+        let currentBaseLayer = baseLayers.landscape;
         currentBaseLayer.addTo(map);
 
-        // Weather overlay layers with enhanced styling
+        // Enhanced weather overlay layers
         const weatherLayers = {
-            clouds: L.tileLayer(`https://tile.openweathermap.org/map/clouds_new/{z}/{x}/{y}.png?appid=${openWeatherKey}`, {
-                opacity: 0.4,
-                attribution: 'Weather data © OpenWeatherMap'
-            }),
             temp: L.tileLayer(`https://tile.openweathermap.org/map/temp_new/{z}/{x}/{y}.png?appid=${openWeatherKey}`, {
-                opacity: 1,
+                opacity: 1.0,
                 attribution: 'Weather data © OpenWeatherMap'
             }),
-            precipitation: L.tileLayer(`https://tile.openweathermap.org/map/precipitation_new/{z}/{x}/{y}.png?appid=${openWeatherKey}`, {
-                opacity: 1,
-                attribution: 'Weather data © OpenWeatherMap'
-            }),
+            precipitation: L.layerGroup([
+                L.tileLayer(`https://tile.openweathermap.org/map/precipitation_new/{z}/{x}/{y}.png?appid=${openWeatherKey}`, {
+                    opacity: 1.0,
+                    attribution: 'Weather data © OpenWeatherMap'
+                }),
+                L.tileLayer(`https://tile.openweathermap.org/map/clouds_new/{z}/{x}/{y}.png?appid=${openWeatherKey}`, {
+                    opacity: 1.0,
+                    attribution: 'Weather data © OpenWeatherMap'
+                })
+            ]),
             wind: L.tileLayer(`https://tile.openweathermap.org/map/wind_new/{z}/{x}/{y}.png?appid=${openWeatherKey}`, {
-                opacity: 1,
+                opacity: 1.0,
                 attribution: 'Weather data © OpenWeatherMap'
-            })
-        };
+            }),
 
-        // Storm layer group
-        const precipitationLayer = L.layerGroup([weatherLayers.precipitation, weatherLayers.wind]);
+        };
 
         // Track active weather layers
         let activeWeatherLayers = new Set();
 
-        // Set initial bounds
-        map.setMaxBounds(bukidnonBounds);
-        map.on('drag', function () {
-            map.panInsideBounds(map.getBounds(), { animate: false });
-        });
+        // Weather layer information
+   const weatherLayerInfo = {
+    temp: {
+        title: "Temperature",
+        description: "Shows real-time air temperature across the map, helping identify hot and cold zones at a glance. Useful for tracking heatwaves, cooler spots, or sudden temperature shifts.",
+        details: [
+            "Displays temperature in Celsius",
+            "Color scale: Blue (cold) → Red (hot)",
+            "Updates every 10 minutes",
+            "Range: -10°C to 40°C"
+        ],
+        tips: "Redder shades mean hotter areas, while blue indicates cooler regions."
+    },
+    precipitation: {
+        title: "Precipitation & Clouds",
+        description: "Displays current rainfall intensity and cloud coverage. This helps you see where rain is falling and how thick the surrounding clouds are.",
+        details: [
+            "Shows rainfall in mm/hour",
+            "Includes cloud density overlay",
+            "Purple/Blue = rainfall intensity",
+            "White/Gray = cloud cover"
+        ],
+        tips: "Dark purple means heavy rain, light blue suggests drizzle, and gray patches show cloudy skies."
+    },
+    wind: {
+        title: "Wind Speed ",
+        description: "Visualizes wind speed and direction, showing how air masses move across the region. Helpful for spotting strong gusts or calm areas.",
+        details: [
+            "Wind speed in meters/second",
+            "Streamlines = wind direction",
+            "Color strength = wind speed",
+            "Updates from weather stations"
+        ],
+        tips: "Red/orange shows strong winds, green means calmer zones."
+    }
+};
+
+
 
         // Hide loader when map is ready
         map.whenReady(function () {
             setTimeout(() => {
                 document.getElementById('mapLoader').style.display = 'none';
                 updateLastUpdated();
+                loadTodaysSnapshots();
             }, 1000);
         });
-
-        document.getElementById('mapScope').addEventListener('change', function () {
-            const scope = this.value;
-            const scopeDisplay = document.getElementById('currentScope');
-
-            if (scope === 'bukidnon') {
-                // Temporarily remove bounds to allow full zoom/fly
-                map.setMaxBounds(null);
-                map.flyTo([7.9, 125.1], 10, { duration: 1.5 });
-
-                // Restore bounds after animation
-                setTimeout(() => {
-                    map.setMaxBounds(bukidnonBounds);
-                }, 1600); // slightly longer than duration
-
-                scopeDisplay.textContent = 'Bukidnon Province';
-            } else {
-                map.setMaxBounds(null);
-                map.flyTo([12.5, 122.5], 5, { duration: 1.5 });
-                setTimeout(() => {
-                    map.setMaxBounds(philippinesBounds);
-                }, 1600);
-
-                scopeDisplay.textContent = 'All Philippines';
-            }
-
-            updateLastUpdated();
-        });
-
-
-
 
         // Map style switcher
         document.getElementById('mapStyle').addEventListener('change', function () {
@@ -332,36 +385,111 @@
             updateLastUpdated();
         });
 
-        // Weather layer toggle functionality
-        document.querySelectorAll('.weather-btn').forEach(btn => {
-            btn.addEventListener('click', function () {
-                const layerType = this.dataset.layer;
+        // Weather layer switch functionality
+        const weatherSwitches = document.querySelectorAll('.weather-switch');
 
-                if (this.classList.contains('active')) {
-                    // Remove layer
-                    this.classList.remove('active');
-                    activeWeatherLayers.delete(layerType);
+        weatherSwitches.forEach(switchElement => {
+            switchElement.addEventListener('change', () => {
+                const layerType = switchElement.dataset.layer;
+                const switchContainer = switchElement.nextElementSibling;
 
-                    if (layerType === 'precipitation') {
-                        map.removeLayer(precipitationLayer);
-                    } else {
-                        map.removeLayer(weatherLayers[layerType]);
-                    }
-                } else {
-                    // Add layer
-                    this.classList.add('active');
-                    activeWeatherLayers.add(layerType);
+                if (switchElement.checked) {
+                    // Show layer info modal first
+                    showWeatherLayerModal(layerType);
 
-                    if (layerType === 'precipitation') {
-                        precipitationLayer.addTo(map);
-                    } else {
+                    // Add layer with loading effect
+                    switchContainer.classList.add('switch-loading');
+
+                    setTimeout(() => {
+                        switchContainer.classList.remove('switch-loading');
+                        activeWeatherLayers.add(layerType);
                         weatherLayers[layerType].addTo(map);
-                    }
+                        updateActiveLayerCount();
+                    }, 800);
+                } else {
+                    // Remove layer
+                    switchContainer.classList.add('switch-loading');
+
+                    setTimeout(() => {
+                        switchContainer.classList.remove('switch-loading');
+                        activeWeatherLayers.delete(layerType);
+                        map.removeLayer(weatherLayers[layerType]);
+                        updateActiveLayerCount();
+                    }, 500);
                 }
 
                 updateLastUpdated();
             });
         });
+
+        // Weather layer modal functions
+ function showWeatherLayerModal(layerType) {
+    const modal = document.getElementById('weatherLayerModal');
+    const title = document.getElementById('modalTitle');
+    const content = document.getElementById('modalContent');
+
+    const info = weatherLayerInfo[layerType];
+
+    title.textContent = info.title;
+    content.innerHTML = `
+        <div class="space-y-4 text-center">
+            <p class="text-gray-700 leading-relaxed text-lg">${info.description}</p>
+
+            <div class="flex justify-center mt-4">
+                <button onclick="closeWeatherModal()" 
+                        class="px-8 py-3 bg-gray-800 text-white font-semibold rounded-full hover:scale-105 hover:shadow-lg transition-all">
+                    OK
+                </button>
+            </div>
+        </div>
+    `;
+
+    modal.classList.remove('hidden');
+}
+
+        function closeWeatherModal() {
+            document.getElementById('weatherLayerModal').classList.add('hidden');
+        }
+
+        // Click outside modal to close
+        document.getElementById('weatherLayerModal').addEventListener('click', function (e) {
+            if (e.target === this) {
+                closeWeatherModal();
+            }
+        });
+
+        // Legend toggle functionality
+        function toggleLegendDetails() {
+            const basicLegend = document.getElementById('basicLegend');
+            const detailedLegend = document.getElementById('detailedLegend');
+            const toggleText = document.getElementById('legendToggle');
+
+            if (detailedLegend.classList.contains('hidden')) {
+                basicLegend.classList.add('hidden');
+                detailedLegend.classList.remove('hidden');
+                toggleText.textContent = 'Show Less';
+            } else {
+                detailedLegend.classList.add('hidden');
+                basicLegend.classList.remove('hidden');
+                toggleText.textContent = 'Show Details';
+            }
+        }
+
+        // Close weather panel function
+        function closeWeatherPanel() {
+            document.getElementById('weatherPanel').classList.add('hidden');
+
+            // Remove click marker
+            if (clickMarker) {
+                map.removeLayer(clickMarker);
+                clickMarker = null;
+            }
+        }
+
+        // Update active layer count
+        function updateActiveLayerCount() {
+            document.getElementById('activeLayerCount').textContent = activeWeatherLayers.size;
+        }
 
         // Update timestamp
         function updateLastUpdated() {
@@ -372,47 +500,6 @@
                 second: '2-digit'
             });
             document.getElementById('lastUpdate').textContent = timeString;
-        }
-
-        // Add sample markers with enhanced popups
-        function addSampleMarkers() {
-            const bukidnonCities = [
-
-            ];
-
-            bukidnonCities.forEach(city => {
-                const marker = L.marker(city.coords).addTo(map);
-                marker.bindPopup(`
-                            <div class="p-2">
-                                <h3 class="font-bold text-gray-800 mb-2">${city.name}</h3>
-                                <div class="space-y-1 text-sm">
-                                    <div class="flex justify-between">
-                                        <span class="text-gray-600">Temperature:</span>
-                                        <span class="font-medium text-orange-600">${city.temp}</span>
-                                    </div>
-                                    <div class="flex justify-between">
-                                        <span class="text-gray-600">Conditions:</span>
-                                        <span class="font-medium text-blue-600">${city.weather}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        `);
-            });
-        }
-
-        // Load sample markers
-        addSampleMarkers();
-
-        // Optional: Load markers dynamically from Laravel backend
-        function loadMarkers(scope) {
-            // Enhanced API call with loading states
-            // fetch(`/api/locations?scope=${scope}`)
-            //     .then(response => response.json())
-            //     .then(data => {
-            //         // Process and display markers
-            //         updateLastUpdated();
-            //     })
-            //     .catch(error => console.error('Error loading markers:', error));
         }
 
         // Click handler for weather data
@@ -431,24 +518,54 @@
             clickMarker = L.marker([lat, lng], {
                 icon: L.divIcon({
                     html: `
-                                <div class="flex flex-col items-center">
-                                    <div class="w-4 h-4 bg-blue-500 rounded-full border-2 border-white"></div>
-                                    <div class="w-0 h-0 border-l-4 border-r-4 border-t-6 border-l-transparent border-r-transparent border-t-blue-500"></div>
-                                </div>
-                            `,
+                                    <div class="flex flex-col items-center">
+                                        <div class="w-4 h-4 bg-blue-500 rounded-full border-2 border-white animate-pulse"></div>
+                                        <div class="w-0 h-0 border-l-4 border-r-4 border-t-6 border-l-transparent border-r-transparent border-t-blue-500"></div>
+                                    </div>
+                                `,
                     className: '',
                     iconSize: [16, 24],
                     iconAnchor: [8, 24]
                 })
             }).addTo(map);
 
+            // Calculate optimal view for popup visibility
+            const mapSize = map.getSize();
+            const popupWidth = 320; // Approximate popup width
+            const popupHeight = 600; // Approximate popup height
+            const padding = 20;
+
+            // Get the pixel position of the clicked point
+            const clickPixel = map.latLngToContainerPoint([lat, lng]);
+
+            // Check if we need to pan to show popup on the left
+            let needsPan = false;
+
+            // If popup would be cut off on the left side
+            if (clickPixel.x < popupWidth + padding) {
+                // Pan right to make room
+                const pixelOffset = (popupWidth + padding) - clickPixel.x;
+                const latLngOffset = map.containerPointToLatLng([clickPixel.x + pixelOffset, clickPixel.y]);
+                needsPan = true;
+
+                setTimeout(() => {
+                    map.panTo(latLngOffset, { animate: true, duration: 0.5 });
+                }, 100);
+            }
+
             const weatherPanel = document.getElementById('weatherPanel');
             weatherPanel.innerHTML = `
-                        <div class="flex justify-center items-center p-4">
-                            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                            <span class="ml-2 text-gray-600 font-medium">Loading weather...</span>
-                        </div>
-                    `;
+                            <div class="flex justify-between items-center p-4 border-b border-gray-200">
+                                <div class="flex items-center gap-3">
+                                    <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                                    <span class="text-gray-600 font-medium">Loading weather data...</span>
+                                </div>
+                                <button onclick="closeWeatherPanel()" class="text-gray-500 hover:text-gray-700 text-xl font-bold">&times;</button>
+                            </div>
+                            <div class="p-4">
+                                <div class="text-center text-gray-500">Please wait...</div>
+                            </div>
+                        `;
             weatherPanel.classList.remove('hidden');
 
             try {
@@ -462,632 +579,312 @@
                 window.currentWeatherData = currentWeather;
                 window.fullDayForecastData = fullDayForecast;
 
-                // Render panel
-                weatherPanel.innerHTML = createFullDayWeatherPopup(currentWeather, fullDayForecast, lat, lng);
+                // Render enhanced panel
+                weatherPanel.innerHTML = createEnhancedWeatherPopup(currentWeather, fullDayForecast, lat, lng);
 
             } catch (error) {
                 console.error('Error fetching weather data:', error);
                 weatherPanel.innerHTML = `
-                            <div class="p-3">
-                                <h3 class="font-bold text-gray-800 mb-2 flex items-center gap-2">
-                                    <span class="text-red-500">⚠️</span>
-                                    Weather Data Unavailable
-                                </h3>
-                                <div class="space-y-2 text-sm">
-                                    <div class="flex justify-between items-center">
-                                        <span class="text-gray-600">Latitude:</span>
-                                        <span class="font-mono font-medium">${lat}°</span>
-                                    </div>
-                                    <div class="flex justify-between items-center">
-                                        <span class="text-gray-600">Longitude:</span>
-                                        <span class="font-mono font-medium">${lng}°</span>
-                                    </div>
-                                    <div class="text-xs text-gray-500 mt-2 p-2 bg-gray-50 rounded">
-                                        Unable to fetch weather data.
+                                <div class="flex justify-between items-center p-4 border-b border-gray-200">
+                                    <h3 class="font-bold text-gray-800 flex items-center gap-2">
+                                        <span class="text-red-500">⚠️</span>
+                                        Weather Data Unavailable
+                                    </h3>
+                                    <button onclick="closeWeatherPanel()" class="text-gray-500 hover:text-gray-700 text-xl font-bold">&times;</button>
+                                </div>
+                                <div class="p-4">
+                                    <div class="space-y-2 text-sm">
+                                        <div class="flex justify-between items-center">
+                                            <span class="text-gray-600">Latitude:</span>
+                                            <span class="font-mono font-medium">${lat}°</span>
+                                        </div>
+                                        <div class="flex justify-between items-center">
+                                            <span class="text-gray-600">Longitude:</span>
+                                            <span class="font-mono font-medium">${lng}°</span>
+                                        </div>
+                                        <div class="text-xs text-gray-500 mt-3 p-3 bg-gray-50 rounded-lg">
+                                            Unable to fetch weather data. Please try another location.
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        `;
-            }
-        });
-
-
-        // Fetch current weather (single point)
-        async function fetchCurrentWeatherData(lat, lng) {
-            try {
-                const response = await fetch(`/weather/current-weather?lat=${lat}&lon=${lng}`, {
-                    method: 'GET',
-                    headers: {
-                        'Accept': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
-                });
-
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                const data = await response.json();
-                if (data.error) throw new Error('Failed to fetch current weather data');
-                return data;
-            } catch (error) {
-                console.error('Error fetching current weather data:', error);
-                throw error;
-            }
-        }
-
-        // Fetch full day forecast for all time slots
-        async function fetchFullDayForecastData(lat, lng) {
-            try {
-                const response = await fetch(`/weather/full-day-forecast?lat=${lat}&lon=${lng}`, {
-                    method: 'GET',
-                    headers: {
-                        'Accept': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
-                });
-
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                const data = await response.json();
-                if (data.error) throw new Error('Failed to fetch full day forecast');
-                return data;
-            } catch (error) {
-                console.error('Error fetching full day forecast data:', error);
-                throw error;
-            }
-        }
-
-        // Optional: reverse geocoding to get location name
-        async function fetchLocationName(lat, lng) {
-            try {
-                const response = await fetch(
-                    `https://api.openweathermap.org/geo/1.0/reverse?lat=${lat}&lon=${lng}&limit=1&appid=${openWeatherKey}`
-                );
-                if (!response.ok) return null;
-
-                const data = await response.json();
-                if (data && data.length > 0) {
-                    const location = data[0];
-                    return `${location.name}${location.state ? ', ' + location.state : ''}, ${location.country}`;
-                }
-            } catch (error) {
-                console.warn('Reverse geocoding failed:', error);
-            }
-            return null;
-        }
-
-
-  
-function createFullDayWeatherPopup(currentWeather, fullDayForecast, lat, lng) {
-    const temp = Math.round(currentWeather.main.temp);
-    const feelsLike = Math.round(currentWeather.main.feels_like);
-
-    // Fixed rain amount handling
-    const rainAmount = currentWeather.precipitation_mm ?? 
-                      (currentWeather.rain?.['1h'] ?? 0);
-
-    // Enhanced rain chance calculation - consistent with dashboard logic
-    let rainChance;
-    if (currentWeather.precipitation_chance !== undefined) {
-        rainChance = Math.round(currentWeather.precipitation_chance);
-    } else if (currentWeather.pop !== undefined) {
-        rainChance = Math.round(currentWeather.pop * 100);
-    } else if (rainAmount > 0) {
-        rainChance = 100; // If there's actual rain, chance is 100%
-    } else {
-        // Enhanced fallback logic matching dashboard
-        const weatherMain = currentWeather.weather?.[0]?.main?.toLowerCase() || '';
-        const weatherDesc = currentWeather.weather?.[0]?.description?.toLowerCase() || '';
-        const cloudiness = currentWeather.clouds?.all ?? 0;
-        const humidity = currentWeather.main?.humidity ?? 0;
-        
-        if (weatherMain.includes('rain') || weatherMain.includes('thunderstorm')) {
-            rainChance = Math.max(80, Math.min(100, humidity + cloudiness / 2));
-        } else if (weatherMain.includes('drizzle')) {
-            rainChance = Math.max(60, Math.min(90, humidity));
-        } else if (weatherMain.includes('cloud')) {
-            if (humidity > 85) rainChance = Math.round(humidity * 0.8);
-            else if (humidity > 70) rainChance = Math.round(humidity * 0.6);
-            else rainChance = Math.round(humidity * 0.4);
-        } else {
-            // Clear conditions
-            if (humidity > 85) rainChance = Math.round(humidity * 0.4);
-            else if (humidity > 70) rainChance = Math.round(humidity * 0.2);
-            else rainChance = Math.round(humidity * 0.1);
-        }
-    }
-    
-    // Ensure rain chance is within bounds
-    rainChance = Math.max(0, Math.min(100, rainChance));
-
-    const locationName = currentWeather.name || fullDayForecast.location.name || 'Unknown Location';
-    const country = currentWeather.sys?.country || fullDayForecast.location.country || '';
-    const rawDesc = currentWeather.weather?.[0]?.description || 'No data';
-    const weatherDesc = toTitleCase(rawDesc);
-    const weatherIcon = currentWeather.weather?.[0]?.icon || '01d';
-
-    // Enhanced storm status with better thresholds
-    let currentStormStatus = 'Clear';
-    let currentStormColor = 'text-green-600';
-    let currentStormBg = 'bg-green-50';
-    
-    if (rainChance > 80) {
-        currentStormStatus = 'Heavy Rain';
-        currentStormColor = 'text-red-600';
-        currentStormBg = 'bg-red-50';
-    } else if (rainChance > 60) {
-        currentStormStatus = 'Moderate Rain';
-        currentStormColor = 'text-orange-600';
-        currentStormBg = 'bg-orange-50';
-    } else if (rainChance > 30) {
-        currentStormStatus = 'Light Rain';
-        currentStormColor = 'text-yellow-600';
-        currentStormBg = 'bg-yellow-50';
-    } else if (rainChance > 10) {
-        currentStormStatus = 'Possible Rain';
-        currentStormColor = 'text-blue-600';
-        currentStormBg = 'bg-blue-50';
-    }
-
-    // Fixed forecast cards with better data handling
-    const timeSlots = fullDayForecast.time_slots;
-    const periods = [
-        { key: 'morning', label: 'MORNING', short: 'MORN' },
-        { key: 'noon', label: 'NOON', short: 'NOON' },
-        { key: 'afternoon', label: 'AFTERNOON', short: 'AFT' },
-        { key: 'evening', label: 'EVENING', short: 'EVE' }
-    ];
-    
-    const forecastCards = periods.map(period => {
-        const data = timeSlots[period.key];
-        
-        if (!data || data.temperature === undefined) {
-            return `
-                <div class="bg-gray-100 p-2 rounded text-center min-h-[80px] flex flex-col justify-center">
-                    <div class="text-xs text-gray-500 font-medium mb-1">${period.short}</div>
-                    <div class="text-sm text-gray-400">No data</div>
-                </div>
-            `;
-        }
-
-        const periodTemp = Math.round(data.temperature);
-        // Enhanced rain amount calculation for periods
-        let periodRainAmount = data.precipitation_mm ?? (data.rain?.['1h'] ?? 0);
-        
-        // Enhanced estimation for periods if no direct rain data
-        if (periodRainAmount === 0) {
-            const periodWeatherMain = (data.weather_main || '').toLowerCase();
-            const periodWeatherDesc = (data.weather_desc || '').toLowerCase();
-            const periodCloudiness = data.cloudiness ?? 0;
-            const periodHumidity = data.humidity ?? 50;
-            
-            if (periodWeatherMain.includes('rain') || periodWeatherDesc.includes('rain')) {
-                if (periodWeatherDesc.includes('heavy')) periodRainAmount = 5.0;
-                else if (periodWeatherDesc.includes('moderate')) periodRainAmount = 2.0;
-                else if (periodWeatherDesc.includes('light')) periodRainAmount = 0.5;
-                else periodRainAmount = 1.0; // general rain
-            } else if (periodWeatherMain.includes('drizzle')) {
-                periodRainAmount = 0.2;
-            } else if (periodWeatherMain.includes('thunderstorm')) {
-                periodRainAmount = 8.0;
-            } else if (periodHumidity > 90 && periodCloudiness > 80) {
-                periodRainAmount = 0.1; // Very likely to rain soon
-            }
-        }
-
-        // Enhanced rain chance calculation for periods
-        let periodRainChance;
-        if (data.precipitation_chance !== undefined) {
-            periodRainChance = Math.round(data.precipitation_chance);
-        } else if (data.pop !== undefined) {
-            periodRainChance = Math.round(data.pop * 100);
-        } else if (periodRainAmount > 0) {
-            periodRainChance = 100;
-        } else {
-            // Enhanced calculation matching dashboard logic
-            const periodWeatherMain = (data.weather_main || '').toLowerCase();
-            const periodWeatherDesc = (data.weather_desc || '').toLowerCase();
-            const periodCloudiness = data.cloudiness ?? 0;
-            const periodHumidity = data.humidity ?? 50;
-            
-            if (periodWeatherMain.includes('rain') || periodWeatherMain.includes('thunderstorm')) {
-                periodRainChance = Math.max(80, Math.min(100, periodHumidity + periodCloudiness / 2));
-            } else if (periodWeatherMain.includes('drizzle')) {
-                periodRainChance = Math.max(60, Math.min(90, periodHumidity));
-            } else if (periodWeatherMain.includes('cloud')) {
-                if (periodHumidity > 85) periodRainChance = Math.round(periodHumidity * 0.8);
-                else if (periodHumidity > 70) periodRainChance = Math.round(periodHumidity * 0.6);
-                else periodRainChance = Math.round(periodHumidity * 0.4);
-            } else {
-                // Clear conditions
-                if (periodHumidity > 85) periodRainChance = Math.round(periodHumidity * 0.4);
-                else if (periodHumidity > 70) periodRainChance = Math.round(periodHumidity * 0.2);
-                else periodRainChance = Math.round(periodHumidity * 0.1);
-            }
-            
-            // Ensure within bounds
-            periodRainChance = Math.max(0, Math.min(100, periodRainChance));
-        }
-
-        // Color coding for period rain chance
-        let periodStormColor = 'text-green-600';
-        if (periodRainChance > 80) periodStormColor = 'text-red-600';
-        else if (periodRainChance > 60) periodStormColor = 'text-orange-600';
-        else if (periodRainChance > 30) periodStormColor = 'text-yellow-600';
-        else if (periodRainChance > 10) periodStormColor = 'text-blue-600';
-
-        return `
-            <div class="bg-blue-50 p-2 rounded text-center min-h-[80px] border border-blue-200 flex flex-col justify-center">
-                <div class="text-xs text-blue-600 font-medium mb-1">${period.short}</div>
-                <div class="text-base font-bold text-blue-700 mb-1">${periodTemp}°</div>
-                <div class="text-xs ${periodStormColor} font-medium">${periodRainChance}%</div>
-                <div class="text-xs ${periodStormColor}">${periodRainAmount.toFixed(1)}mm</div>
-            </div>
-        `;
-    }).join('');
-
-    // Format coordinates properly
-    const formattedLat = parseFloat(lat).toFixed(4);
-    const formattedLng = parseFloat(lng).toFixed(4);
-
-    return `
-        <div class="p-4 max-w-lg w-full overflow-hidden rounded-lg">
-            <!-- Header Section -->
-            <div class="flex items-start justify-between mb-4 gap-3">
-                <div class="min-w-0 flex-1">
-                    <h3 class="font-bold text-gray-800 text-lg truncate" title="${locationName}">
-                        ${locationName}
-                    </h3>
-                    ${country ? `<p class="text-xs text-gray-500 truncate">${country}</p>` : ''}
-                    <p class="text-xs text-green-600 font-medium">Current Weather</p>
-                </div>
-                <div class="flex-shrink-0">
-                    <img src="https://openweathermap.org/img/wn/${weatherIcon}@2x.png" 
-                         alt="${rawDesc}" class="w-12 h-12" />
-                </div>
-            </div>
-
-            <!-- Current Weather Grid -->
-            <div class="grid grid-cols-2 gap-3 mb-4">
-                <div class="bg-orange-50 p-3 rounded-lg border border-orange-200">
-                    <div class="text-xs text-orange-600 font-medium mb-1">TEMPERATURE</div>
-                    <div class="text-xl font-bold text-orange-700">${temp}°C</div>
-                    <div class="text-sm text-orange-500">Feels ${feelsLike}°C</div>
-                </div>
-                 <div class="bg-blue-50 p-3 rounded-lg border border-blue-200">
-                    <div class="text-xs  font-medium mb-1 text-blue-600">PRECIPITATION</div>
-                    <div class="text-xl font-bold text-blue-700">${rainChance}%</div>
-                    <div class="text-sm text-blue-500">
-                        ${rainAmount > 0 ? rainAmount.toFixed(1) + ' mm/h' : '0 mm/h'}
-                    </div>
-                </div>
-            </div>
-
-
-            <!-- Today's Forecast -->
-            <div class="mb-4">
-                <h4 class="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-                    🌦️ Today's Forecast
-                </h4>
-                <div class="grid grid-cols-4 gap-2">
-                    ${forecastCards}
-                </div>
-            </div>
-
-         
-
-            <!-- Footer -->
-            <div class="pt-3 border-t border-gray-200 text-xs text-gray-500">
-                <div class="flex justify-between items-center mb-2">
-                    <span class="text-gray-600">📍 Location:</span>
-                    <span class="font-mono">${formattedLat}°, ${formattedLng}°</span>
-                </div>
-                <div class="text-center text-blue-600 font-medium">
-                    Weather data updates every 10 minutes
-                </div>
-            </div>
-        </div>
-    `;
-}
-
-// Helper function for title case conversion
-function toTitleCase(str) {
-    if (!str) return '';
-    return str.replace(/\w\S*/g, function(txt) {
-        return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
-    });
-}
-
-
-        // Function to save full day forecast
-        async function saveFullDayForecast(lat, lng) {
-            const saveBtn = document.getElementById('saveFullDayBtn');
-            const originalContent = saveBtn.innerHTML;
-
-            // Show loading state
-            saveBtn.disabled = true;
-            saveBtn.innerHTML = `
-                        <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                        Saving Full Day...
-                    `;
-
-            try {
-                const fullDayData = window.fullDayForecastData;
-
-                if (!fullDayData || !fullDayData.time_slots) {
-                    throw new Error('Full day forecast data not available');
-                }
-
-                // Get CSRF token
-                const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-                if (!csrfToken) {
-                    throw new Error('CSRF token not found. Please refresh the page.');
-                }
-
-                // Prepare payload with proper structure for JSON storage
-                const postData = {
-                    latitude: parseFloat(lat),
-                    longitude: parseFloat(lng),
-                    location_name: fullDayData.location.name || `Location (${lat}, ${lng})`,
-                    time_slots: {},
-                    _token: csrfToken
-                };
-
-                // Process each time slot from the forecast data
-                const timePeriods = ['morning', 'noon', 'afternoon', 'evening'];
-
-                for (const period of timePeriods) {
-                    const periodData = fullDayData.time_slots[period];
-
-                    if (periodData && periodData.temperature !== undefined) {
-                        postData.time_slots[period] = {
-                            temperature: parseFloat(periodData.temperature),
-                            feels_like: parseFloat(periodData.feels_like || periodData.temperature),
-                            precipitation_mm: parseFloat(periodData.precipitation_mm || 0),
-                            precipitation_chance: parseInt(periodData.precipitation_chance || 0),
-                            weather_main: periodData.weather_main || '',
-                            weather_desc: periodData.weather_desc || '',
-                            weather_icon: periodData.weather_icon || '',
-                            humidity: parseInt(periodData.humidity || 0),
-                            pressure: parseInt(periodData.pressure || 0),
-                            wind_speed: parseFloat(periodData.wind_speed || 0),
-                            wind_direction: periodData.wind_direction || '0',
-                            cloudiness: parseInt(periodData.cloudiness || 0),
-                            forecast_time: periodData.forecast_time || null
-                        };
-
-                    }
-                }
-
-                // Check if we have at least one valid time slot
-                if (Object.keys(postData.time_slots).length === 0) {
-                    throw new Error('No valid weather data available for any time period');
-                }
-
-                console.log('Sending JSON payload:', postData); // Debug logging
-
-                const response = await fetch('/weather/store-full-day-snapshots', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'X-CSRF-TOKEN': csrfToken
-                    },
-                    body: JSON.stringify(postData)
-                });
-
-                let result;
-                try {
-                    result = await response.json();
-                } catch (parseError) {
-                    console.error('Failed to parse response:', parseError);
-                    throw new Error('Server returned invalid response');
-                }
-
-                if (!response.ok) {
-                    throw new Error(result.message || `HTTP ${response.status}: Failed to save forecast`);
-                }
-
-                if (result.success) {
-                    saveBtn.innerHTML = `
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                                </svg>
-                                Full Day Saved! (${result.data.total_periods} periods)
                             `;
-                    saveBtn.className = 'w-full bg-emerald-600 text-white font-medium py-2 px-4 rounded-lg flex items-center justify-center gap-2';
+            }
+        });
 
-                    showNotification(
-                        `Full day weather data saved for ${result.data.total_periods} time periods: ${result.data.time_periods_saved.join(', ')}`,
-                        'success'
-                    );
+        // Fetch current weather data
+        async function fetchCurrentWeatherData(lat, lng) {
+            const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lng}&appid=${openWeatherKey}&units=metric`);
+            if (!response.ok) throw new Error('Weather API request failed');
+            return await response.json();
+        }
 
-                    // Refresh the snapshots display if the function exists
-                    if (typeof loadTodaysSnapshots === 'function') {
-                        setTimeout(loadTodaysSnapshots, 1000);
-                    }
-                } else {
-                    throw new Error(result.message || 'Unknown error occurred');
+        // Fetch full day forecast data
+        async function fetchFullDayForecastData(lat, lng) {
+            const response = await fetch(`https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lng}&appid=${openWeatherKey}&units=metric`);
+            if (!response.ok) throw new Error('Forecast API request failed');
+            return await response.json();
+        }
+
+        // Create enhanced weather popup
+        function createEnhancedWeatherPopup(currentData, forecastData, lat, lng) {
+            const current = currentData;
+            const location = current.name || `${lat}°, ${lng}°`;
+            const temp = Math.round(current.main.temp);
+            const feelsLike = Math.round(current.main.feels_like);
+            const description = current.weather[0].description;
+            const icon = current.weather[0].icon;
+            const humidity = current.main.humidity;
+            const pressure = current.main.pressure;
+            const windSpeed = current.wind?.speed || 0;
+            const windDir = current.wind?.deg || 0;
+
+            // Process hourly forecast (next 24 hours)
+            const now = new Date();
+            const next24Hours = forecastData.list.slice(0, 6).map(item => ({
+                time: new Date(item.dt * 1000),
+                temp: Math.round(item.main.temp),
+                icon: item.weather[0].icon,
+                description: item.weather[0].description,
+                humidity: item.main.humidity,
+                windSpeed: item.wind?.speed || 0,
+                rainAmount: item.rain?.["3h"] || 0,
+                rainChance: Math.round((item.pop || 0) * 100)
+            }));
+
+            // Process daily forecast (next 5 days)
+            const dailyForecast = [];
+            const seenDates = new Set();
+
+            forecastData.list.forEach(item => {
+                const date = new Date(item.dt * 1000);
+                const dateKey = date.toDateString();
+
+                if (!seenDates.has(dateKey) && dailyForecast.length < 5) {
+                    seenDates.add(dateKey);
+                    dailyForecast.push({
+                        date: date,
+                        temp: Math.round(item.main.temp),
+                        icon: item.weather[0].icon,
+                        description: item.weather[0].description,
+                        humidity: item.main.humidity,
+                        rainAmount: item.rain?.["3h"] || 0,
+                        rainChance: Math.round((item.pop || 0) * 100)
+                    });
                 }
+            });
 
-            } catch (error) {
-                console.error('Error saving full day forecast:', error);
+            return `
+                    <div class="bg-white rounded-lg overflow-hidden" style="width: 320px;">
+                        <!-- Header -->
+                        <div class="flex justify-between items-center p-2 bg-gray-800 text-white">
+                            <div class="flex items-center gap-2">
+                                <img src="https://openweathermap.org/img/wn/${icon}.png" 
+                                    alt="${description}" 
+                                    class="w-8 h-8">
+                                <div>
+                                    <h3 class="font-bold text-lg">${location}</h3>
 
-                saveBtn.innerHTML = `
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                            </svg>
-                            Save Failed
-                        `;
-                saveBtn.className = 'w-full bg-red-600 text-white font-medium py-2 px-4 rounded-lg flex items-center justify-center gap-2';
-
-                showNotification(error.message || 'Failed to save full day forecast.', 'error');
-            } finally {
-                // Reset button after delay
-                setTimeout(() => {
-                    saveBtn.innerHTML = originalContent;
-                    saveBtn.className = 'w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2';
-                    saveBtn.disabled = false;
-                }, 3000);
-            }
-        }
-
-        // Notification system
-        function showNotification(message, type = 'info') {
-            // Remove existing notifications
-            const existingNotifications = document.querySelectorAll('.weather-notification');
-            existingNotifications.forEach(notif => notif.remove());
-
-            const notification = document.createElement('div');
-            notification.className = `weather-notification fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg max-w-sm transform transition-all duration-300 translate-x-full`;
-
-            // Set colors based on type
-            if (type === 'success') {
-                notification.className += ' bg-green-100 border border-green-400 text-green-700';
-            } else if (type === 'error') {
-                notification.className += ' bg-red-100 border border-red-400 text-red-700';
-            } else {
-                notification.className += ' bg-blue-100 border border-blue-400 text-blue-700';
-            }
-
-            notification.innerHTML = `
-                        <div class="flex items-center">
-                            <div class="flex-1">${message}</div>
-                            <button onclick="this.parentElement.parentElement.remove()" class="ml-2 text-lg">&times;</button>
+                                </div>
+                            </div>
+                            <button onclick="closeWeatherPanel()" 
+                                    class="text-white/80 hover:text-white text-xl font-bold">&times;</button>
                         </div>
-                    `;
 
-            document.body.appendChild(notification);
+                        <!-- Stats Grid -->
+                        <div class="p-2 border-b border-gray-100">
+                            <div class="grid grid-cols-2 gap-2">
+                                <div class="bg-gradient-to-br from-orange-50 to-red-50 rounded p-2 border border-orange-200">
+                                    <div class="text-xs font-medium text-orange-700">🌡️ TEMP</div>
+                                    <div class="text-xl font-bold text-orange-900">${temp}°C</div>
+                                    <div class="text-xs text-orange-600">Feels ${feelsLike}°</div>
+                                </div>
 
-            // Animate in
-            setTimeout(() => {
-                notification.classList.remove('translate-x-full');
-            }, 100);
+                                <div class="bg-gradient-to-br from-blue-50 to-cyan-50 rounded p-2 border border-blue-200">
+                                    <div class="text-xs font-medium text-blue-700">🌧️ RAIN</div>
+                                    <div class="text-xl font-bold text-blue-900">${next24Hours[0]?.rainChance || 0}%</div>
+                                    <div class="text-xs text-blue-600">${next24Hours[0]?.rainAmount || 0} mm</div>
+                                </div>
 
-            // Auto remove after 5 seconds
-            setTimeout(() => {
-                notification.classList.add('translate-x-full');
-                setTimeout(() => notification.remove(), 300);
-            }, 5000);
+                                <div class="bg-gradient-to-br from-teal-50 to-emerald-50 rounded p-2 border border-teal-200">
+                                    <div class="text-xs font-medium text-teal-700">🌪️ WIND</div>
+                                    <div class="text-xl font-bold text-teal-900">${windSpeed}</div>
+                                    <div class="text-xs text-teal-600">m/s · ${windDir}°</div>
+                                </div>
+
+                                <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded p-2 border border-purple-200">
+                                    <div class="text-xs font-medium text-purple-700">💧 HUMID</div>
+                                    <div class="text-xl font-bold text-purple-900">${humidity}%</div>
+                                    <div class="text-xs text-purple-600">${pressure} hPa</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tabs -->
+                        <div class="flex border-b border-gray-200">
+                            <button onclick="showWeatherTab('hourly')" 
+                                    id="hourlyTab"
+                                    class="flex-1 px-2 py-2 text-xs font-medium border-b-2 border-blue-500 text-blue-600 bg-blue-50">
+                                Hourly
+                            </button>
+                            <button onclick="showWeatherTab('daily')" 
+                                    id="dailyTab"
+                                    class="flex-1 px-2 py-2 text-xs font-medium border-b-2 border-transparent text-gray-600 hover:bg-gray-50">
+                                5-Day
+                            </button>
+                        </div>
+
+                        <!-- Tab Content -->
+                        <div class="max-h-48 overflow-y-auto">
+                            <!-- Hourly -->
+                            <div id="hourlyContent" class="p-2">
+                                <div class="space-y-1">
+                                    ${next24Hours.map(hour => `
+                                        <div class="flex items-center justify-between p-1.5 rounded bg-gray-50 hover:bg-gray-100">
+                                            <div class="flex items-center gap-2">
+                                                <img src="https://openweathermap.org/img/wn/${hour.icon}.png" 
+                                                    alt="${hour.description}" 
+                                                    class="w-6 h-6">
+                                                <div class="text-xs font-medium">${hour.time.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</div>
+                                            </div>
+                                            <div class="flex items-center gap-2">
+                                                <span class="text-xs text-gray-500">🌧️${hour.rainChance}%</span>
+                                                <span class="font-bold text-sm">${hour.temp}°</span>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+
+                            <!-- Daily -->
+                            <div id="dailyContent" class="p-2 hidden">
+                                <div class="space-y-1">
+                                    ${dailyForecast.map((day, index) => `
+                                        <div class="flex items-center justify-between p-1.5 rounded ${index === 0 ? 'bg-blue-50' : 'bg-gray-50'} hover:bg-gray-100">
+                                            <div class="flex items-center gap-2">
+                                                <img src="https://openweathermap.org/img/wn/${day.icon}.png" 
+                                                    alt="${day.description}" 
+                                                    class="w-6 h-6">
+                                                <div class="text-xs font-medium">${index === 0 ? 'Today' : day.date.toLocaleDateString('en-US', { weekday: 'short' })}</div>
+                                            </div>
+                                            <div class="flex items-center gap-2">
+                                                <span class="text-xs text-gray-500">🌧️${day.rainChance}%</span>
+                                                <span class="font-bold text-sm">${day.temp}°</span>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Footer -->
+                        <div class="p-2 bg-gray-50 border-t border-gray-200">
+                            <div class="text-xs text-gray-500 text-center">
+                                Updated: ${new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                            </div>
+                        </div>
+                    </div>
+                `;
+        }
+        // Weather tab functionality
+        function showWeatherTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('#weatherPanel button[id$="Tab"]').forEach(btn => {
+                btn.classList.remove('border-blue-500', 'text-blue-600', 'bg-blue-50');
+                btn.classList.add('border-transparent', 'text-gray-600');
+            });
+
+            document.getElementById(`${tabName}Tab`).classList.remove('border-transparent', 'text-gray-600');
+            document.getElementById(`${tabName}Tab`).classList.add('border-blue-500', 'text-blue-600', 'bg-blue-50');
+
+            // Update content
+            document.querySelectorAll('#weatherPanel div[id$="Content"]').forEach(content => {
+                content.classList.add('hidden');
+            });
+
+            document.getElementById(`${tabName}Content`).classList.remove('hidden');
+
+            // Setup layer panel switches if on map tab
+            if (tabName === 'map') {
+                setTimeout(setupLayerPanelSwitches, 100);
+            }
         }
 
-        // Function to load today's weather snapshots (for dashboard)
-        async function loadTodaysSnapshots() {
-            try {
-                const response = await fetch('/weather/todays-snapshots', {
-                    method: 'GET',
-                    headers: {
-                        'Accept': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest'
+        // Setup layer panel switches
+        function setupLayerPanelSwitches() {
+            const layerSwitches = document.querySelectorAll('.layer-panel-switch');
+
+            layerSwitches.forEach(switchElement => {
+                switchElement.addEventListener('change', () => {
+                    const layerType = switchElement.dataset.layer;
+                    const correspondingSwitch = document.querySelector(`.weather-switch[data-layer="${layerType}"]`);
+
+                    if (correspondingSwitch) {
+                        correspondingSwitch.checked = switchElement.checked;
+                        correspondingSwitch.dispatchEvent(new Event('change'));
                     }
                 });
-
-                const result = await response.json();
-
-                if (result.success) {
-                    displaySnapshotsOnMap(result.snapshots);
-                } else {
-                    console.error('Failed to load snapshots:', result.message);
-                }
-
-            } catch (error) {
-                console.error('Error loading snapshots:', error);
-            }
+            });
         }
 
 
-        // Load existing snapshots when map is ready
-        map.whenReady(function () {
-            setTimeout(() => {
-                document.getElementById('mapLoader').style.display = 'none';
-                updateLastUpdated();
-                loadTodaysSnapshots(); // Load existing snapshots
-            }, 1000);
-        });
-
-
-        // Auto-refresh weather data every 5 minutes
+        // Auto-refresh weather layers every 10 minutes
         setInterval(() => {
-            // Refresh active weather layers
-            activeWeatherLayers.forEach(layerType => {
-                if (layerType === 'precipitation') {
-                    map.removeLayer(precipitationLayer);
-                    precipitationLayer.addTo(map);
-                } else {
+            if (activeWeatherLayers.size > 0) {
+                console.log('Refreshing weather layers...');
+
+                // Remove and re-add active layers to refresh them
+                activeWeatherLayers.forEach(layerType => {
                     map.removeLayer(weatherLayers[layerType]);
-                    weatherLayers[layerType].addTo(map);
-                }
-            });
-            updateLastUpdated();
-        }, 300000);// 5 minutes
 
-
-        console.log('🗺️ Enhanced Maps Management loaded successfully!');
-
-
-    </script>
-
-    <script>
-        const radios = document.querySelectorAll('.weather-radio');
-
-        radios.forEach(btn => {
-            btn.addEventListener('click', () => {
-                const layerType = btn.dataset.layer;
-
-                if (btn.classList.contains('bg-orange-200') || btn.classList.contains('bg-blue-200')) {
-                    // Remove layer
-                    btn.classList.remove('bg-orange-200', 'bg-blue-200', 'text-white');
-                    if (btn.dataset.layer === 'temp') {
-                        btn.classList.add('text-orange-700', 'bg-orange-50');
-                    } else {
-                        btn.classList.add('text-blue-700', 'bg-blue-50');
-                    }
-                    activeWeatherLayers.delete(layerType);
-
-                    if (layerType === 'precipitation') {
-                        map.removeLayer(precipitationLayer);
-                    } else {
-                        map.removeLayer(weatherLayers[layerType]);
-                    }
-                } else {
-                    // Remove active from all first
-                    radios.forEach(b => {
-                        b.classList.remove('bg-orange-200', 'bg-blue-200', 'text-white');
-                        if (b.dataset.layer === 'temp') {
-                            b.classList.add('text-orange-700', 'bg-orange-50');
-                        } else {
-                            b.classList.add('text-blue-700', 'bg-blue-50');
-                        }
-                    });
-
-                    // Add active to clicked
-                    if (layerType === 'temp') {
-                        btn.classList.remove('text-orange-700', 'bg-orange-50');
-                        btn.classList.add('bg-orange-200', 'text-white');
-                    } else if (layerType === 'precipitation') {
-                        btn.classList.remove('text-blue-700', 'bg-blue-50');
-                        btn.classList.add('bg-blue-200', 'text-white');
-                    }
-
-                    // Clear all active layers first
-                    activeWeatherLayers.forEach(layer => {
-                        if (layer === 'precipitation') {
-                            map.removeLayer(precipitationLayer);
-                        } else {
-                            map.removeLayer(weatherLayers[layer]);
-                        }
-                    });
-                    activeWeatherLayers.clear();
-
-                    // Add the selected layer
-                    activeWeatherLayers.add(layerType);
-                    if (layerType === 'precipitation') {
-                        precipitationLayer.addTo(map);
-                    } else {
+                    setTimeout(() => {
                         weatherLayers[layerType].addTo(map);
-                    }
-                }
+                    }, 1000);
+                });
 
                 updateLastUpdated();
-            });
+            }
+        }, 600000); // 10 minutes
+
+
+
+        // Add keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            // Escape key to close weather panel
+            if (e.key === 'Escape') {
+                const weatherPanel = document.getElementById('weatherPanel');
+                if (!weatherPanel.classList.contains('hidden')) {
+                    closeWeatherPanel();
+                }
+            }
+
+            // F11 for fullscreen
+            if (e.key === 'F11') {
+                e.preventDefault();
+                toggleFullscreen();
+            }
+
+            // Number keys for quick layer toggles
+            if (e.key >= '1' && e.key <= '4') {
+                const layerKeys = ['temp', 'precipitation', 'wind'];
+                const layerIndex = parseInt(e.key) - 1;
+
+                if (layerIndex < layerKeys.length) {
+                    const layerType = layerKeys[layerIndex];
+                    const switchElement = document.querySelector(`.weather-switch[data-layer="${layerType}"]`);
+
+                    if (switchElement) {
+                        switchElement.checked = !switchElement.checked;
+                        switchElement.dispatchEvent(new Event('change'));
+                    }
+                }
+            }
         });
+
+        // Initialize timestamp on load
+        updateLastUpdated();
+
+        console.log('🗺️ Enhanced Weather Map initialized successfully!');
+        console.log('💡 Tip: Click anywhere on the map to get detailed weather information');
+        console.log('⌨️ Keyboard shortcuts: 1-4 (toggle layers), Esc (close panel), F11 (fullscreen)');
     </script>
 @endpush

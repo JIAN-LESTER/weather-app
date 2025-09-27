@@ -222,3 +222,7 @@
         Route::get('/location/{locID}/current/{period?}', [WeatherReportsController::class, 'getRealTimeWeather'])
             ->name('api.weather.current_period');
     });
+
+    // Add this route to your routes/web.php
+Route::post('/weather-reports/refresh-all', [WeatherReportsController::class, 'refreshAll'])
+    ->name('weather.refresh.all');

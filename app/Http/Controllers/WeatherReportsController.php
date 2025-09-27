@@ -16,7 +16,7 @@ class WeatherReportsController extends Controller
     {
         // Paginate snapshots, 9 per page
         $snapshots = Snapshot::with(['weatherReport.location'])
-            ->orderBy('created_at', 'desc')
+            ->orderBy('created_at', 'asc')
             ->paginate(9);
 
         // Get today's snapshots for modal functionality
@@ -38,7 +38,7 @@ class WeatherReportsController extends Controller
                 $q->where('locID', $locID);
             })
                 ->with(['weatherReport.location'])
-                ->orderBy('created_at', 'desc')
+                ->orderBy('created_at', 'asc')
                 ->paginate(9);
 
             $todaySnapshots = $this->getTodaySnapshotsByPeriod();
@@ -50,7 +50,7 @@ class WeatherReportsController extends Controller
         }
 
         $snapshots = Snapshot::with(['weatherReport.location'])
-            ->orderBy('created_at', 'desc')
+            ->orderBy('created_at', 'asc')
             ->paginate(9);
 
         $todaySnapshots = $this->getTodaySnapshotsByPeriod();
@@ -471,4 +471,107 @@ class WeatherReportsController extends Controller
             ], 500);
         }
     }
+
+    // Add this method to your WeatherReportsController
+
+/**
+ * Delete all existing data and fetch fresh weather forecasts
+ */
+// Add this method to your WeatherReportsController
+
+/**
+ * Delete all existing data and fetch fresh weather forecasts
+ */
+public function refreshAll(Request $request)
+{
+    try {
+        \Log::info('Refresh all data triggered');
+        
+        // Step 1: Count existing data before deletion
+        $deletedSnapshots = Snapshot::count();
+        $deletedReports = WeatherReport::count();
+        
+        // Delete with foreign key constraints handled properly
+        \DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        Snapshot::truncate();
+        WeatherReport::truncate();
+        \DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+        
+        \Log::info("Deleted {$deletedReports} weather reports and {$deletedSnapshots} snapshots");
+        
+        // Step 2: Get all locations
+        $locations = Location::all();
+        
+        if ($locations->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No locations found in database'
+            ], 404);
+        }
+
+        // Step 3: Fetch and store fresh data for all locations
+        $successCount = 0;
+        $failCount = 0;
+        $errors = [];
+
+        foreach ($locations as $location) {
+            try {
+                // Fetch forecast data
+                $forecastData = $this->fetchForecastData($location->latitude, $location->longitude);
+                
+                if (!$forecastData) {
+                    $failCount++;
+                    $errors[] = "Failed to fetch forecast for {$location->name}";
+                    continue;
+                }
+
+                // Store the forecast
+                $this->storeForecastForLocation($location, $forecastData);
+                $successCount++;
+                
+            } catch (\Exception $e) {
+                $failCount++;
+                $errors[] = "{$location->name}: {$e->getMessage()}";
+                \Log::error("Forecast storage error for location {$location->locID}", [
+                    'location' => $location->name,
+                    'error' => $e->getMessage()
+                ]);
+            }
+        }
+
+        $message = "Data refresh complete! Deleted old data and stored fresh forecasts.";
+        
+        if ($failCount > 0) {
+            $message .= " ({$failCount} locations failed)";
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => $message,
+            'details' => [
+                'deleted_reports' => $deletedReports,
+                'deleted_snapshots' => $deletedSnapshots,
+                'total_locations' => $locations->count(),
+                'successful' => $successCount,
+                'failed' => $failCount,
+                'errors' => $errors
+            ]
+        ]);
+
+    } catch (\Exception $e) {
+        \Log::error('Refresh all data error: ' . $e->getMessage());
+        
+        // Re-enable foreign key checks in case of error
+        try {
+            \DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+        } catch (\Exception $fkException) {
+            \Log::error('Failed to re-enable foreign key checks: ' . $fkException->getMessage());
+        }
+        
+        return response()->json([
+            'success' => false,
+            'message' => 'Failed to refresh data: ' . $e->getMessage()
+        ], 500);
+    }
+}
 }
