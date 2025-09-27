@@ -15,89 +15,185 @@ use Laravel\Socialite\Facades\Socialite;
 
 class AuthController extends Controller
 {
-    public function register(Request $request){
-        $validated = $request->validate([
-            'email' => 'required|string|email|max:100|unique:users,email',
-            'password' => 'required|string|min:8|confirmed'
-        ]);
+    // public function register(Request $request){
+    //     $validated = $request->validate([
+    //         'email' => 'required|string|email|max:100|unique:users,email',
+    //         'password' => 'required|string|min:8|confirmed'
+    //     ]);
 
-        $user = User::create([
-            'userID' => Str::uuid(), 
-            'email' => $validated['email'],
-            'password' => bcrypt($validated['password']),
-            'role' => 'user',
-            'user_status' => 'active',
-            'verification_token' => Str::random(64),
+    //     $user = User::create([
+    //         'userID' => Str::uuid(), 
+    //         'email' => $validated['email'],
+    //         'password' => bcrypt($validated['password']),
+    //         'role' => 'user',
+    //         'user_status' => 'active',
+    //         'verification_token' => Str::random(64),
 
-        ]);
+    //     ]);
 
-        Logs::create([
-            'userID' => $user->userID, 
-            'action' => 'Registered own account. Email verification sent to '. $user->email. ".",
-            'timestamp' => now(),
-        ]);
+    //     Logs::create([
+    //         'userID' => $user->userID, 
+    //         'action' => 'Registered own account. Email verification sent to '. $user->email. ".",
+    //         'timestamp' => now(),
+    //     ]);
 
-        Mail::to($user->email)->send(new VerifyEmail($user));
+    //     Mail::to($user->email)->send(new VerifyEmail($user));
 
-        return redirect()->route('loginForm')->with('success', 'Registration successful! Please check your email to verify your account.');
+    //     return redirect()->route('loginForm')->with('success', 'Registration successful! Please check your email to verify your account.');
     
+    // }
+
+public function register(Request $request)
+{
+    $validated = $request->validate([
+        'email' => 'required|string|email|max:100|unique:users,email',
+        'password' => 'required|string|min:8|confirmed'
+    ]);
+
+    $user = User::create([
+        'userID' => Str::uuid(), 
+        'email' => $validated['email'],
+        'password' => bcrypt($validated['password']),
+        'role' => 'user',
+        'user_status' => 'active',
+        'is_verified' => 1, 
+    ]);
+
+    Logs::create([
+        'userID' => $user->userID, 
+        'action' => 'Registered own account (auto-verified).',
+        'timestamp' => now(),
+    ]);
+
+    // No verification email sent
+
+    return redirect()->route('loginForm')->with('success', 'Registration successful! You can log in now.');
+}
+
+    //  public function login(Request $request)
+    // {
+    //     $request->validate([
+    //         'email' => 'required|email',
+    //         'password' => 'required'
+    //     ]);
+
+    //     $user = User::whereRaw('LOWER(email) = ?', [strtolower($request->email)])->first();
+    //     if (!$user) {
+    //         return back()->with('error', 'No account found')->withInput();
+    //     }
+
+    //     if ($this->isAccountLocked($user)) {
+    //         $secondsLeft = now()->diffInSeconds($user->lockout_time);
+    //         $minutesLeft = floor($secondsLeft / 60);
+    //         $secondsRemainder = $secondsLeft % 60;
+
+    //         return back()
+    //             ->with('account_locked', true)
+    //             ->with('lockout_timer', "$minutesLeft minutes and $secondsRemainder seconds")
+    //             ->withInput();
+    //     }
+
+    //     if (!Hash::check($request->password, $user->password)) {
+    //         $this->incrementFailedAttempts($user);
+    //         $remainingAttempts = 5 - $user->failed_attempts;
+
+    //         return back()
+    //             ->with('error', 'Incorrect email or password.')
+    //             ->with('failed_attempts', $user->failed_attempts)
+    //             ->with('remaining_attempts', $remainingAttempts)
+    //             ->withInput();
+    //     }
+    //     $this->resetFailedAttempts($user);
+
+    //     if ($user->is_verified == 0) {
+    //         return back()->with('not_verified', 'Your email is not yet verified. Please check your email and try again.')->withInput();
+    //     }
+
+    //     $user->two_factor_code = rand(100000, 999999);
+    //     $user->two_factor_code_expires_at = now()->addMinutes(5);
+    //     $user->save();
+
+    //     Logs::create([
+    //         'userID' => $user->userID,
+    //         'action' => 'Attempted to login. 2FA code sent.',
+    //         'timestamp' => now(),
+    //     ]);
+
+    //     Mail::to($user->email)->send(new TwoFactorCodeMail($user));
+
+    //     session(['2fa_user_id' => $user->userID]);
+
+    //     return redirect()->route('2fa-form')->with('message', 'A 2FA code has been sent to your email.');
+    // }
+
+    public function login(Request $request)
+{
+    $request->validate([
+        'email' => 'required|email',
+        'password' => 'required'
+    ]);
+
+    $user = User::whereRaw('LOWER(email) = ?', [strtolower($request->email)])->first();
+    if (!$user) {
+        return back()->with('error', 'No account found')->withInput();
     }
 
-     public function login(Request $request)
-    {
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required'
-        ]);
+    if ($this->isAccountLocked($user)) {
+        $secondsLeft = now()->diffInSeconds($user->lockout_time);
+        $minutesLeft = floor($secondsLeft / 60);
+        $secondsRemainder = $secondsLeft % 60;
 
-        $user = User::whereRaw('LOWER(email) = ?', [strtolower($request->email)])->first();
-        if (!$user) {
-            return back()->with('error', 'No account found')->withInput();
-        }
-
-        if ($this->isAccountLocked($user)) {
-            $secondsLeft = now()->diffInSeconds($user->lockout_time);
-            $minutesLeft = floor($secondsLeft / 60);
-            $secondsRemainder = $secondsLeft % 60;
-
-            return back()
-                ->with('account_locked', true)
-                ->with('lockout_timer', "$minutesLeft minutes and $secondsRemainder seconds")
-                ->withInput();
-        }
-
-        if (!Hash::check($request->password, $user->password)) {
-            $this->incrementFailedAttempts($user);
-            $remainingAttempts = 5 - $user->failed_attempts;
-
-            return back()
-                ->with('error', 'Incorrect email or password.')
-                ->with('failed_attempts', $user->failed_attempts)
-                ->with('remaining_attempts', $remainingAttempts)
-                ->withInput();
-        }
-        $this->resetFailedAttempts($user);
-
-        if ($user->is_verified == 0) {
-            return back()->with('not_verified', 'Your email is not yet verified. Please check your email and try again.')->withInput();
-        }
-
-        $user->two_factor_code = rand(100000, 999999);
-        $user->two_factor_code_expires_at = now()->addMinutes(5);
-        $user->save();
-
-        Logs::create([
-            'userID' => $user->userID,
-            'action' => 'Attempted to login. 2FA code sent.',
-            'timestamp' => now(),
-        ]);
-
-        Mail::to($user->email)->send(new TwoFactorCodeMail($user));
-
-        session(['2fa_user_id' => $user->userID]);
-
-        return redirect()->route('2fa-form')->with('message', 'A 2FA code has been sent to your email.');
+        return back()
+            ->with('account_locked', true)
+            ->with('lockout_timer', "$minutesLeft minutes and $secondsRemainder seconds")
+            ->withInput();
     }
+
+    if (!Hash::check($request->password, $user->password)) {
+        $this->incrementFailedAttempts($user);
+        $remainingAttempts = 5 - $user->failed_attempts;
+
+        return back()
+            ->with('error', 'Incorrect email or password.')
+            ->with('failed_attempts', $user->failed_attempts)
+            ->with('remaining_attempts', $remainingAttempts)
+            ->withInput();
+    }
+
+    // Reset failed attempts after successful login
+    $this->resetFailedAttempts($user);
+
+    if ($user->is_verified == 0) {
+        return back()->with('not_verified', 'Your email is not yet verified. Please check your email and try again.')->withInput();
+    }
+
+    // ✅ Actually authenticate the user
+    Auth::login($user);
+
+    Logs::create([
+        'userID' => $user->userID,
+        'action' => 'Successful login',
+        'timestamp' => now(),
+    ]);
+
+    // Check if profile is incomplete
+    if (!$user->isCompleted) {
+        return redirect()
+            ->route($user->role === 'admin' ? 'admin.dashboard' : 'user.dashboard')
+            ->with('completeProfileModal', true);
+    }
+
+    // Role-based dashboard redirection
+    if ($user->role === 'admin') {
+        return redirect()->route('admin.dashboard');
+    } elseif ($user->role === 'user') {
+        return redirect()->route('user.dashboard');
+    }
+
+    // Fallback
+    return redirect()->route('login')->with('error', 'Unable to determine dashboard.');
+}
+
 
 
     public function redirectToGoogle()
