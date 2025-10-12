@@ -1,61 +1,102 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🌤️ Bukcast: A System Integration Project of Real-Time Weather Monitoring in Bukidnon
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## 🧭 Project Overview  
+**Bukcast** is a community-centered web application that delivers accurate and localized weather information for the Province of Bukidnon.  
+Developed with a user-first mindset, it integrates reliable global weather APIs with an intuitive, minimalist interface—bridging technology, usability, and environmental awareness.  
+This project serves both as an academic prototype and a potential grassroots startup tool that empowers farmers, students, and local residents through accessible climate insights.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 🎯 Purpose & Motivation  
+Weather awareness in Bukidnon remains fragmented, with most forecasts focused on national data that miss local variations.  
+**Bukcast** addresses this gap by localizing environmental information, offering easy access to relevant weather insights through a clean, responsive, and mobile-friendly design.  
+It reflects the principle of *“Tech that serves the community,”* combining practicality with data-driven precision.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+---
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## 🎨 Design Philosophy (HCI & UX)  
+The system is designed under **Human-Computer Interaction (HCI)** principles—prioritizing clarity, consistency, and accessibility.  
+- Minimalist design inspired by Bukidnon’s earthy landscapes 🌾  
+- Neutral and calming color palette for comfortable daily use  
+- Fully responsive layout using TailwindCSS  
+- Designed for rural bandwidth conditions and community inclusivity  
 
-## Learning Laravel
+User experience decisions were informed by observation and empathy, applying the iterative design cycle:  
+**Empathize → Define → Design → Prototype → Test**
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+---
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+## 💡 Core Features  
+- 🌤 **Localized Forecasts** – Real-time weather updates specific to Bukidnon’s municipalities  
+- 🗺 **Interactive Map Display** – Explore weather layers and terrain data intuitively  
+- 📅 **7-Day Forecast** – Plan daily activities and agricultural schedules efficiently  
+- 🧭 **Weather Snapshots** – Record and review weather trends by date  
+- 👥 **Community Focus** – Designed with local users and academic integration in mind  
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+---
 
-## Laravel Sponsors
+## 🧠 Technical Foundations (APIs & System Integration)  
+Bukcast operates on a **data-driven architecture** that synchronizes multiple APIs to ensure both accuracy and reliability.  
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+**🔹 OpenWeatherMap API**  
+> Provides real-time and 7-day weather forecasts, including temperature, humidity, wind, and storm probability.
 
-### Premium Partners
+**🔹 Thunderforest Maps API**  
+> Supplies map tiles and thematic layers based on OpenStreetMap data, visualizing weather conditions over Bukidnon’s terrain.
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+**🔹 MapTiler API**  
+> Enhances geospatial rendering and performance, ensuring fast map loading and dynamic user navigation.
 
-## Contributing
+Together, these APIs enable Bukcast to deliver a cohesive, accurate, and visually engaging weather experience for both academic use and real-world application.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+---
 
-## Code of Conduct
+## 🌱 Human Impact  
+Bukcast is more than a software system—it’s a **digital bridge between technology and community life**.  
+By simplifying how residents access weather data, it fosters awareness, preparedness, and better planning for agriculture, education, and everyday decision-making.  
+It aligns with the vision of empowering local users through technology designed with empathy and relevance.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+---
 
-## Security Vulnerabilities
+## 🧩 Prototype & Demo  
+- **Figma UI/UX Design:**   
+- **Live Demo:** 
+- **Screenshots:** *(to be added in next release)*  
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Each component—from dashboard to map view—was tested for clarity, speed, and accessibility across devices.
 
-## License
+---
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## 🚀 Future Enhancements  
+- 🤖 AI-driven microforecasting for localized prediction  
+- ☎️ SMS storm alerts and push notifications  
+- 📊 Climate trend analytics dashboard  
+- 🌾 Integration with agricultural advisory systems  
+- 🧍 User accounts for personalized location tracking  
+
+---
+
+## 👩‍💻 Team & Acknowledgments  
+Developed by **SIA - Group 5**, a student research team from **Central Mindanao University**.
+
+**Core Developer:** Tabarno, J.L.
+**Documentation:** Calacala, Z.X., Nulada, K.J. , Patigdas, P.A. 
+**Additional Credit:**: Apolinares, S.A., De Vera, F.D., Redondo, J.A., 
+**Special Thanks:** OpenWeatherMap, Thunderforest, and MapTiler for their open data platforms.  
+
+---
+
+## 🌍 Ethics & Sustainability  
+This project respects **open-data principles** and adheres to ethical standards of information use.  
+All map and weather resources are credited under their respective fair-use and API license terms.  
+Bukcast promotes transparency, environmental literacy, and digital sustainability within local contexts.
+
+---
+
+## 📜 License  
+This project is licensed under the **MIT License**.  
+© 2025 SIA-Group 5. All rights reserved.
+
+---
+> *“Technology should not only inform—but also empower.”*  
+> — *Bukcast Development Team*
