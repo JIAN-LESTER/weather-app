@@ -59,13 +59,13 @@ public function register(Request $request)
         'is_verified' => 1, 
     ]);
 
-    Logs::create([
-        'userID' => $user->userID, 
-        'action' => 'Registered own account (auto-verified).',
-        'timestamp' => now(),
-    ]);
+    // Logs::create([
+    //     'userID' => $user->userID, 
+    //     'action' => 'Registered own account (auto-verified).',
+    //     'timestamp' => now(),
+    // ]);
 
-    // No verification email sent
+    
 
     return redirect()->route('loginForm')->with('success', 'Registration successful! You can log in now.');
 }

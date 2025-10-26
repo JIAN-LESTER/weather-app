@@ -1,5 +1,6 @@
     <?php
 
+    use App\Http\Controllers\AlertController;
     use App\Http\Controllers\AuthController;
     use App\Http\Controllers\DashboardController;
     use App\Http\Controllers\EmailVerificationController;
@@ -226,3 +227,35 @@
     // Add this route to your routes/web.php
 Route::post('/weather-reports/refresh-all', [WeatherReportsController::class, 'refreshAll'])
     ->name('weather.refresh.all');
+
+
+
+ Route::prefix('api/alerts')->group(function () {
+    // Dashboard alerts
+    Route::get('/dashboard', [AlertController::class, 'getDashboardAlerts'])
+        ->name('api.alerts.dashboard');
+    
+    // Map alerts
+    Route::get('/map', [AlertController::class, 'getMapAlerts'])
+        ->name('api.alerts.map');
+    
+    // Analyze and generate alerts from weather data
+    Route::post('/analyze', [AlertController::class, 'analyzeAndGenerateAlerts'])
+        ->name('api.alerts.analyze');
+    
+    // Get specific alert details
+    Route::get('/{alertId}', [AlertController::class, 'getAlertDetails'])
+        ->name('api.alerts.details');
+    
+    // Dismiss alert
+    Route::post('/{alertId}/dismiss', [AlertController::class, 'dismissAlert'])
+        ->name('api.alerts.dismiss');
+});
+
+// Web routes for alert pages (if you need them)
+Route::middleware(['auth'])->group(function () {
+    Route::get('/alerts/location/{locID}', function ($locID) {
+        $location = \App\Models\Location::findOrFail($locID);
+        return view('alerts.location', ['location' => $location]);
+    })->name('alerts.location');
+});
