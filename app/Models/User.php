@@ -13,9 +13,9 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
         protected $primaryKey = 'userID';
+        
 
     protected $fillable = [
-        'id',
         'fname',
         'lname',
         'email',
@@ -48,8 +48,8 @@ class User extends Authenticatable
         'failed_attempts' => 'integer',
     ];
 
-    public $incrementing = false;
-    protected $keyType = 'string';
+    public $incrementing = true;
+    protected $keyType = 'int';
 
     /**
      * Check if user has Google authentication

@@ -78,7 +78,7 @@
         class="fixed lg:relative inset-y-0 left-0 z-50 w-60 bg-gray-800 text-white dark:bg-white dark:text-gray-800 shadow-md flex flex-col">
 
         <div class="p-4 font-bold text-white dark:text-gray-800 text-lg">
-            <span>BukCast</span>
+            <span>BukidCast</span>
         </div>
 
         <nav class="flex-1 px-2 space-y-2 overflow-y-auto">
