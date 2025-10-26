@@ -8,15 +8,19 @@
     <!-- Notification Container -->
     <div id="notificationContainer" class="fixed top-4 right-4 z-50 space-y-2 max-w-[calc(100vw-2rem)] sm:max-w-sm"></div>
 
-    <div class="flex justify-between mt-5">
-         <h2 class="text-3xl font-bold text-gray-900 ml-2 ">Bukidnon</h2>
+<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-5 gap-3 sm:gap-0">
+    <!-- Title -->
+    <h2 class="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-gray-800 ml-2 sm:ml-0">
+        Bukidnon
+    </h2>
 
-        <button id="refreshData"
-            class="w-full sm:w-auto bg-gray-800 hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors border border-gray-600 dark:border-gray-500 flex items-center justify-center">
-            <i class="fas fa-sync-alt mr-1 sm:mr-2"></i> 
-            <span>Refresh</span>
-        </button>
-    </div>
+    <!-- Refresh Button -->
+    <button id="refreshData"
+        class="w-full sm:w-auto bg-gray-800 hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors border border-gray-600 dark:border-gray-500 flex items-center justify-center shadow-sm">
+        <i class="fas fa-sync-alt mr-2"></i> 
+        <span>Refresh</span>
+    </button>
+</div>
 
     @if(isset($snapshots) && !$snapshots->isEmpty())
         <div class="bg-gray-300 rounded-lg shadow-sm p-3 sm:p-6">
