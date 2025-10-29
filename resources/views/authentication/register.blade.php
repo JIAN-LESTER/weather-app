@@ -26,6 +26,9 @@
                        class="w-full px-4 py-2 rounded-md border border-gray-300 dark:border-gray-700 
                               bg-gray-50 dark:bg-gray-900 focus:ring-2 focus:ring-blue-500 outline-none" 
                        placeholder="you@example.com">
+                       @error('email')
+        <span class="text-red-500 text-xs mt-1">{{ $message }}</span>
+    @enderror
             </div>
 
 
@@ -35,6 +38,9 @@
                        class="w-full px-4 py-2 rounded-md border border-gray-300 dark:border-gray-700 
                               bg-gray-50 dark:bg-gray-900 focus:ring-2 focus:ring-blue-500 outline-none" 
                        placeholder="••••••••">
+                     @error('password')
+    <span class="text-red-500 text-xs mt-1">{{ $message }}</span>
+@enderror
             </div>
 
      
@@ -44,6 +50,9 @@
                        class="w-full px-4 py-2 rounded-md border border-gray-300 dark:border-gray-700 
                               bg-gray-50 dark:bg-gray-900 focus:ring-2 focus:ring-blue-500 outline-none" 
                        placeholder="••••••••">
+                     @error('password_confirmation')
+    <span class="text-red-500 text-xs mt-1">{{ $message }}</span>
+@enderror
             </div>
 
 
@@ -109,5 +118,95 @@
         }).showToast();
     @endif
     </script>
+
+
+   <script>
+const form = document.querySelector('form');
+const emailInput = document.getElementById('email');
+const passwordInput = document.getElementById('password');
+const confirmPasswordInput = document.getElementById('password_confirmation');
+
+form.addEventListener('submit', function(e) {
+    let isValid = true;
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailInput.value || !emailRegex.test(emailInput.value)) {
+        showError(emailInput, 'Please enter a valid email address');
+        isValid = false;
+    } else {
+        clearError(emailInput);
+    }
+
+
+    // Password validation
+    if (!passwordInput.value || passwordInput.value.length < 8) {
+        showError(passwordInput, 'Password must be at least 8 characters long');
+        isValid = false;
+    } else {
+        clearError(passwordInput);
+    }
+
+    // Confirm password validation
+    if (confirmPasswordInput.value !== passwordInput.value) {
+        showError(confirmPasswordInput, 'Passwords do not match');
+        isValid = false;
+    } else {
+        clearError(confirmPasswordInput);
+    }
+
+    if (!isValid) e.preventDefault();
+});
+
+// Helper functions
+function showError(input, message) {
+    input.classList.add('border-red-500');
+    input.classList.remove('border-gray-300');
+
+    let errorSpan = input.parentNode.querySelector('.error-message');
+    if (!errorSpan) {
+        errorSpan = document.createElement('span');
+        errorSpan.className = 'error-message text-red-500 text-xs mt-1 block';
+        input.parentNode.appendChild(errorSpan);
+    }
+    errorSpan.textContent = message;
+}
+
+function clearError(input) {
+    input.classList.remove('border-red-500');
+    input.classList.add('border-gray-300');
+
+    const errorSpan = input.parentNode.querySelector('.error-message');
+    if (errorSpan) errorSpan.remove();
+}
+
+// Real-time validation
+emailInput.addEventListener('blur', () => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (emailInput.value && !emailRegex.test(emailInput.value)) {
+        showError(emailInput, 'Please enter a valid email address');
+    } else {
+        clearError(emailInput);
+    }
+});
+
+passwordInput.addEventListener('blur', () => {
+    if (passwordInput.value && passwordInput.value.length < 8) {
+        showError(passwordInput, 'Password must be at least 8 characters long');
+    } else {
+        clearError(passwordInput);
+    }
+});
+
+confirmPasswordInput.addEventListener('blur', () => {
+    if (confirmPasswordInput.value && confirmPasswordInput.value !== passwordInput.value) {
+        showError(confirmPasswordInput, 'Passwords do not match');
+    } else {
+        clearError(confirmPasswordInput);
+    }
+});
+</script>
+
+
 </body>
 </html>

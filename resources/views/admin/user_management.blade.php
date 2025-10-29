@@ -212,7 +212,7 @@
         @endif
     </div>
 
-    <!-- Add User Modal (Keep your existing modal code but with enhanced styling) -->
+
     <div id="addUserModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 dark:bg-black/80 backdrop-blur-md hidden p-4">
         <div class="absolute inset-0" onclick="closeModal('addUserModal')"></div>
         <div class="relative bg-white dark:bg-gray-800 rounded-3xl shadow-2xl w-full max-w-xl overflow-hidden max-h-[90vh] overflow-y-auto transform transition-all">
@@ -226,33 +226,48 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label for="fname" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">First Name</label>
-                        <input type="text" name="fname" id="fname" required
+                        <input type="text" name="fname" id="fname" 
                             class="w-full rounded-xl border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 px-4 py-3 focus:ring-2 focus:ring-gray-500 dark:focus:ring-gray-400 focus:border-transparent transition-all">
-                    </div>
+                       @error('fname')
+                                <span class="text-red-500 text-xs mt-1">{{ $message }}</span>
+                            @enderror
+                        </div>
                     <div>
                         <label for="lname" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Last Name</label>
-                        <input type="text" name="lname" id="lname" required
+                        <input type="text" name="lname" id="lname" 
                             class="w-full rounded-xl border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 px-4 py-3 focus:ring-2 focus:ring-gray-500 dark:focus:ring-gray-400 focus:border-transparent transition-all">
-                    </div>
+                       @error('lname')
+                                <span class="text-red-500 text-xs mt-1">{{ $message }}</span>
+                            @enderror
+                        </div>
                 </div>
 
                 <div>
                     <label for="email" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Email</label>
-                    <input type="email" name="email" id="email" required
+                    <input type="email" name="email" id="email" 
                         class="w-full rounded-xl border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 px-4 py-3 focus:ring-2 focus:ring-gray-500 dark:focus:ring-gray-400 focus:border-transparent transition-all">
-                </div>
+                   @error('email')
+                                <span class="text-red-500 text-xs mt-1">{{ $message }}</span>
+                            @enderror
+                    </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label for="password" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Password</label>
-                        <input type="password" name="password" id="password" required
+                        <input type="password" name="password" id="password" 
                             class="w-full rounded-xl border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 px-4 py-3 focus:ring-2 focus:ring-gray-500 dark:focus:ring-gray-400 focus:border-transparent transition-all">
-                    </div>
+                       @error('password')
+                                <span class="text-red-500 text-xs mt-1">{{ $message }}</span>
+                            @enderror
+                        </div>
                     <div>
                         <label for="password_confirmation" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Confirm Password</label>
-                        <input type="password" name="password_confirmation" id="password_confirmation" required
+                        <input type="password" name="password_confirmation" id="password_confirmation" 
                             class="w-full rounded-xl border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 px-4 py-3 focus:ring-2 focus:ring-gray-500 dark:focus:ring-gray-400 focus:border-transparent transition-all">
-                    </div>
+                       @error('password_confirmation')
+                                <span class="text-red-500 text-xs mt-1">{{ $message }}</span>
+                            @enderror
+                        </div>
                 </div>
 
                 <div>
@@ -291,28 +306,40 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label for="edit_fname" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">First Name</label>
-                        <input type="text" name="fname" id="edit_fname" required
+                        <input type="text" name="fname" id="edit_fname" 
                             class="w-full rounded-xl border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 px-4 py-3 focus:ring-2 focus:ring-gray-500 dark:focus:ring-gray-400 focus:border-transparent transition-all">
-                    </div>
+                       @error('edit_fname')
+                                <span class="text-red-500 text-xs mt-1">{{ $message }}</span>
+                            @enderror
+                        </div>
                     <div>
                         <label for="edit_lname" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Last Name</label>
-                        <input type="text" name="lname" id="edit_lname" required
+                        <input type="text" name="lname" id="edit_lname" 
                             class="w-full rounded-xl border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 px-4 py-3 focus:ring-2 focus:ring-gray-500 dark:focus:ring-gray-400 focus:border-transparent transition-all">
-                    </div>
+                       @error('edit_lname')
+                                <span class="text-red-500 text-xs mt-1">{{ $message }}</span>
+                            @enderror
+                        </div>
                 </div>
 
                 <div>
                     <label for="edit_email" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Email</label>
-                    <input type="email" name="email" id="edit_email" required
+                    <input type="email" name="email" id="edit_email" 
                         class="w-full rounded-xl border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 px-4 py-3 focus:ring-2 focus:ring-gray-500 dark:focus:ring-gray-400 focus:border-transparent transition-all">
-                </div>
+                  @error('edit_email')
+                                <span class="text-red-500 text-xs mt-1">{{ $message }}</span>
+                            @enderror
+                    </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label for="edit_password" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">New Password <span class="text-gray-400 text-xs">(Optional)</span></label>
                         <input type="password" name="password" id="edit_password"
                             class="w-full rounded-xl border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 px-4 py-3 focus:ring-2 focus:ring-gray-500 dark:focus:ring-gray-400 focus:border-transparent transition-all">
-                    </div>
+                      @error('edit_password')
+                                <span class="text-red-500 text-xs mt-1">{{ $message }}</span>
+                            @enderror
+                        </div>
                     <div>
                         <label for="edit_role" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Role</label>
                         <select name="role" id="edit_role"
@@ -428,17 +455,7 @@
     });
 }
 
-        // Close modal when clicking outside
-        document.addEventListener('click', function(event) {
-            const modals = ['addUserModal', 'editUserModal', 'deleteConfirmModal'];
-            modals.forEach(modalId => {
-                const modal = document.getElementById(modalId);
-                if (event.target === modal) {
-                    closeModal(modalId);
-                }
-            });
-        });
-
+  
         // Prevent body scroll when modal is open
         window.addEventListener('load', function() {
             const modals = document.querySelectorAll('[id$="Modal"]');
@@ -458,5 +475,110 @@
             });
         });
     </script>
+
+    <script>
+document.addEventListener('DOMContentLoaded', () => {
+    const addForm = document.querySelector('#addUserModal form');
+    const editForm = document.getElementById('editUserForm');
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    // Show inline error
+    function showError(input, message) {
+        input.classList.add('border-red-500');
+        input.classList.remove('border-gray-200', 'dark:border-gray-600');
+
+        let errorSpan = input.nextElementSibling;
+        if (!errorSpan || !errorSpan.classList.contains('error-message')) {
+            errorSpan = document.createElement('span');
+            errorSpan.className = 'error-message text-red-500 text-xs mt-1 block';
+            input.parentNode.appendChild(errorSpan);
+        }
+        errorSpan.textContent = message;
+    }
+
+    // Clear inline error
+    function clearError(input) {
+        input.classList.remove('border-red-500');
+        input.classList.add('border-gray-200', 'dark:border-gray-600');
+        const errorSpan = input.nextElementSibling;
+        if (errorSpan && errorSpan.classList.contains('error-message')) {
+            errorSpan.remove();
+        }
+    }
+
+    // Validate individual form
+    function validateForm(form, isEdit = false) {
+        let isValid = true;
+        const fname = form.querySelector('[name="fname"]');
+        const lname = form.querySelector('[name="lname"]');
+        const email = form.querySelector('[name="email"]');
+        const password = form.querySelector('[name="password"]');
+        const confirmPassword = form.querySelector('[name="password_confirmation"]');
+
+        // First name
+        if (!fname.value.trim()) {
+            showError(fname, 'First name is required');
+            isValid = false;
+        } else clearError(fname);
+
+        // Last name
+        if (!lname.value.trim()) {
+            showError(lname, 'Last name is required');
+            isValid = false;
+        } else clearError(lname);
+
+        // Email
+        if (!email.value.trim()) {
+            showError(email, 'Email is required');
+            isValid = false;
+        } else if (!emailRegex.test(email.value)) {
+            showError(email, 'Invalid email format');
+            isValid = false;
+        } else clearError(email);
+
+    
+        if (!isEdit) {
+            if (!password.value.trim()) {
+                showError(password, 'Password is required');
+                isValid = false;
+            } else if (password.value.length < 8) {
+                showError(password, 'Password must be at least 8 characters');
+                isValid = false;
+            } else clearError(password);
+
+            // Confirm password
+            if (confirmPassword && password.value !== confirmPassword.value) {
+                showError(confirmPassword, 'Passwords do not match');
+                isValid = false;
+            } else if (confirmPassword) {
+                clearError(confirmPassword);
+            }
+        } else {
+            // Edit form: password optional but must be valid if filled
+            if (password.value) {
+                if (password.value.length < 8) {
+                    showError(password, 'Password must be at least 8 characters');
+                    isValid = false;
+                } else clearError(password);
+            } else clearError(password);
+        }
+
+        return isValid;
+    }
+
+    // Attach event listeners
+    if (addForm) {
+        addForm.addEventListener('submit', (e) => {
+            if (!validateForm(addForm, false)) e.preventDefault();
+        });
+    }
+
+    if (editForm) {
+        editForm.addEventListener('submit', (e) => {
+            if (!validateForm(editForm, true)) e.preventDefault();
+        });
+    }
+});
+</script>
 
 @endsection

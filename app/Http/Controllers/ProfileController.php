@@ -25,7 +25,16 @@ class ProfileController extends Controller
             'lname' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user->userID . ',userID',
             'old_password' => 'nullable|required_with:new_password',
-            'new_password' => 'nullable|min:6|confirmed',
+            'new_password' => 'nullable|min:8|confirmed',
+        ],[
+            'fname.required' => 'First name is required',
+            'lname.required' => 'Last name is required',
+            'email.required' => 'Email is required',
+            'email.email' => 'Please enter a valid email address',
+            'email.unique' => 'This email is already taken',
+            'old_password.required_with' => 'Current password is required to set a new password',
+            'new_password.min' => 'New password must be at least 8 characters',
+            'new_password.confirmed' => 'New password confirmation does not match',
         ]);
 
 

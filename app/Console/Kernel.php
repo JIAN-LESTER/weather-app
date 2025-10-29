@@ -10,25 +10,26 @@ class Kernel extends ConsoleKernel
     /**
      * Define the application's command schedule.
      */
-    protected function schedule(Schedule $schedule): void
-    {
-        // Test closure - should log every minute
-        $schedule->call(function () {
-            \Log::info('✓ Scheduler is working! Time: ' . now()->format('Y-m-d H:i:s'));
-        })->everyMinute();
+   protected function schedule(Schedule $schedule): void
+{
 
-        // Store forecasts every minute (for testing)
-        $schedule->command('weather:store-forecasts')
-            ->everyMinute()
-            ->timezone('Asia/Manila')
-            ->withoutOverlapping();
+    \Log::info('🔥 KERNEL SCHEDULE METHOD CALLED!');
+    // Test: Simple log every minute
+    $schedule->call(function () {
+        \Log::info('✅ SCHEDULER IS ALIVE! Time: ' . now()->format('Y-m-d H:i:s'));
+        file_put_contents(storage_path('logs/scheduler-proof.txt'), 'Last run: ' . now()->format('Y-m-d H:i:s') . PHP_EOL, FILE_APPEND);
+    })->everyMinute()->name('test-scheduler');
 
-        // Delete old reports every minute (for testing)
-        $schedule->command('weather:delete-old-reports')
-            ->everyMinute()
-            ->timezone('Asia/Manila')
-            ->withoutOverlapping();
-    }
+    // Store forecasts every minute (for testing) - REMOVED TIMEZONE
+    $schedule->command('weather:store-forecasts')
+        ->everyMinute()
+        ->name('store-forecasts');
+
+    // Delete old reports every minute (for testing) - REMOVED TIMEZONE
+    $schedule->command('weather:delete-old-reports')
+        ->everyMinute()
+        ->name('delete-old-reports');
+}
 
     /**
      * Register the commands for the application.

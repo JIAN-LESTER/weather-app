@@ -20,6 +20,14 @@ public function register(Request $request)
     $validated = $request->validate([
         'email' => 'required|string|email|max:100|unique:users,email',
         'password' => 'required|string|min:8|confirmed'
+    ],[
+        'email.required' => 'Email is required',
+        'email.email' => 'Please enter a valid email address',
+        'email.unique' => 'This email is already registered',
+        'email.max' => 'Email cannot exceed 100 characters',
+        'password.required' => 'Password is required',
+        'password.confirmed' => 'Password confirmation does not match',
+        'password.min' => 'Password must be at least 8 characters',
     ]);
 
     $user = User::create([ 
@@ -30,11 +38,11 @@ public function register(Request $request)
         'is_verified' => 1, 
     ]);
 
-    // Logs::create([
-    //     'userID' => $user->userID, 
-    //     'action' => 'Registered own account (auto-verified).',
-    //     'timestamp' => now(),
-    // ]);
+    Logs::create([
+        'userID' => $user->userID, 
+        'action' => "{$user->lname} Registered own account.",
+        'timestamp' => now(),
+    ]);
 
     
 
@@ -102,8 +110,12 @@ public function register(Request $request)
     $request->validate([
         'email' => 'required|email',
         'password' => 'required'
+    ],[
+        'email.required' => 'Email is required',
+        'email.email' => 'Please enter a valid email address',
+        'password.required' => 'Password is required',
+        'password.min' => 'Password must be at least 8 characters',
     ]);
-
     $user = User::whereRaw('LOWER(email) = ?', [strtolower($request->email)])->first();
     if (!$user) {
         return back()->with('error', 'No account found')->withInput();
@@ -141,9 +153,9 @@ public function register(Request $request)
     // ✅ Actually authenticate the user
     Auth::login($user);
 
-    Logs::create([
-        'userID' => $user->userID,
-        'action' => 'Successful login',
+        Logs::create([
+            'userID' => $user->userID,
+            'action' => "Logged in successfully.",
         'timestamp' => now(),
     ]);
 
