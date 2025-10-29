@@ -3,6 +3,7 @@
 @section('title', 'User Management')
 @section('header', 'User Management')
 
+ 
 @section('content')
     <div class="mb-4 sm:mb-6">
         <div class="flex flex-col sm:flex-row justify-between items-right sm:items-center gap-4">
@@ -94,7 +95,7 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                         </svg>
                                     </button>
-                                    <button onclick="openDeleteModal('{{ route('admin.users-destroy', $user->userID) }}')"
+                                    <button onclick="confirmDelete('{{ route('admin.users-destroy', $user->userID) }}')"
                                         class="p-2 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-all duration-200 group-hover:scale-110" 
                                         title="Delete">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-5 h-5">
@@ -157,7 +158,7 @@
                                 </svg>
                                 Edit
                             </button>
-                            <button onclick="openDeleteModal('{{ route('admin.users-destroy', $user->userID) }}')"
+                            <button onclick="confirmDelete('{{ route('admin.users-destroy', $user->userID) }}')"
                                 class="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-800/20 text-red-700 dark:text-red-400 rounded-xl hover:from-red-100 hover:to-red-200 dark:hover:from-red-900/30 dark:hover:to-red-800/30 transition-all duration-200 shadow-sm font-medium">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-4 h-4">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -343,54 +344,7 @@
 
     <!-- Delete Confirmation Modal -->
     <div id="deleteConfirmModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 dark:bg-black/80 backdrop-blur-md p-4">
-        <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all">
-            <div class="bg-gradient-to-r from-red-600 to-red-700 text-white px-6 py-5 flex justify-between items-center">
-                <div>
-                    <h2 class="text-xl font-bold">Confirm Delete</h2>
-                    <p class="text-sm text-red-100 mt-1">This action cannot be undone</p>
-                </div>
-                <button type="button" onclick="closeModal('deleteConfirmModal')"
-                    class="text-white hover:text-red-100 transition-colors">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                    </svg>
-                </button>
-            </div>
-
-            <div class="p-6">
-                <div class="flex items-start gap-4">
-                    <div class="flex-shrink-0 w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
-                        <svg class="w-6 h-6 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                        </svg>
-                    </div>
-                    <div class="flex-1">
-                        <p class="text-gray-900 dark:text-gray-100 font-medium mb-2">
-                            Are you absolutely sure?
-                        </p>
-                        <p class="text-gray-600 dark:text-gray-400 text-sm">
-                            This will permanently delete the user account and all associated data. This action cannot be undone.
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="flex flex-col sm:flex-row justify-end gap-3 px-6 py-4 bg-gray-50 dark:bg-gray-900 border-t-2 border-gray-100 dark:border-gray-700">
-                <button type="button" onclick="closeModal('deleteConfirmModal')"
-                    class="px-6 py-3 rounded-xl border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 font-semibold transition-all duration-200 w-full sm:w-auto">
-                    Cancel
-                </button>
-
-                <form id="deleteForm" method="POST" action="" class="w-full sm:w-auto">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit"
-                        class="w-full px-6 py-3 rounded-xl bg-gradient-to-r from-red-600 to-red-700 text-white hover:from-red-700 hover:to-red-800 shadow-lg hover:shadow-xl transition-all duration-200 font-semibold focus:ring-2 focus:ring-red-400">
-                        Yes, Delete User
-                    </button>
-                </form>
-            </div>
-        </div>
+        
     </div>
 
     <script>
@@ -409,20 +363,70 @@
             document.body.style.overflow = 'auto';
         }
 
-        function editUser(userId) {
-            fetch(`/admin/user_crud/edit/${userId}`)
-                .then(res => res.json())
-                .then(user => {
-                    document.getElementById('editUserId').value = user.userID;
-                    document.getElementById('edit_fname').value = user.fname;
-                    document.getElementById('edit_lname').value = user.lname;
-                    document.getElementById('edit_email').value = user.email;
-                    document.getElementById('edit_role').value = user.role;
-                    document.getElementById('edit_status').value = user.user_status;
-                    document.getElementById('editUserForm').action = `/admin/user_crud/update/${user.id}`;
-                    openModal('editUserModal');
-                });
+       function editUser(userId) {
+    fetch(`/admin/user_crud/edit/${userId}`)
+        .then(res => {
+            if (!res.ok) throw new Error('Failed to fetch user data');
+            return res.json();
+        })
+        .then(user => {
+            document.getElementById('editUserId').value = user.userID;
+            document.getElementById('edit_fname').value = user.fname;
+            document.getElementById('edit_lname').value = user.lname;
+            document.getElementById('edit_email').value = user.email;
+            document.getElementById('edit_role').value = user.role;
+            document.getElementById('edit_status').value = user.user_status;
+            document.getElementById('editUserForm').action = `/admin/user_crud/update/${user.id}`;
+            openModal('editUserModal');
+        })
+        .catch(error => {
+            Toastify({
+                text: "Failed to load user data",
+                duration: 3000,
+                gravity: "top",
+                position: "right",
+                backgroundColor: "linear-gradient(to right, #ef4444, #dc2626)",
+            }).showToast();
+        });
+}
+
+        function confirmDelete(actionUrl, userName) {
+    Swal.fire({
+        title: 'Are you sure?',
+        html: `You are about to delete <strong>${userName}</strong>.<br>This action cannot be undone.`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc2626',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Yes, delete user!',
+        cancelButtonText: 'Cancel',
+        reverseButtons: true,
+        focusCancel: true,
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Create and submit form
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = actionUrl;
+            
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+            const csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = '_token';
+            csrfInput.value = csrfToken;
+            
+            const methodInput = document.createElement('input');
+            methodInput.type = 'hidden';
+            methodInput.name = '_method';
+            methodInput.value = 'DELETE';
+            
+            form.appendChild(csrfInput);
+            form.appendChild(methodInput);
+            document.body.appendChild(form);
+            form.submit();
         }
+    });
+}
 
         // Close modal when clicking outside
         document.addEventListener('click', function(event) {

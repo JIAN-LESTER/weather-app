@@ -156,13 +156,13 @@ public function register(Request $request)
 
     // Role-based dashboard redirection
     if ($user->role === 'admin') {
-        return redirect()->route('admin.dashboard');
+        return redirect()->route('admin.dashboard')->with("success","Logged in successfully");
     } elseif ($user->role === 'user') {
-        return redirect()->route('user.dashboard');
+        return redirect()->route('user.dashboard')->with("success","Logged in successfully");
     }
 
     // Fallback
-    return redirect()->route('login')->with('error', 'Unable to determine dashboard.');
+    return redirect()->route('login')->with('error', 'Login failed.');
 }
 
 
@@ -237,10 +237,10 @@ public function register(Request $request)
     private function redirectAfterGoogleAuth($user)
     {
         if ($user->role === 'admin') {
-            return redirect()->route('admin.dashboard');
+            return redirect()->route('admin.dashboard')->with('success', 'Logged in successfully');
         }
         
-        return redirect()->intended('/dashboard'); // or wherever regular users should go
+        return redirect()->intended('user.dashboard')->with('success', 'Logged in successfully'); 
     }
 
     /**
@@ -312,7 +312,7 @@ public function register(Request $request)
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/login');
+        return redirect('/login')->with('success', 'Logged out successfully.');
     }
 
     public function showLoginForm()

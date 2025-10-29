@@ -539,7 +539,7 @@ public function refreshAll(Request $request)
             }
         }
 
-        $message = "Data refresh complete! Deleted old data and stored fresh forecasts.";
+        $message = "Data refresh complete!";
         
         if ($failCount > 0) {
             $message .= " ({$failCount} locations failed)";

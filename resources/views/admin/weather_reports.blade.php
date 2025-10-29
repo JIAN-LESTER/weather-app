@@ -531,7 +531,6 @@
         
         button.disabled = true;
         button.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Refreshing...';
-        showNotification('Starting data refresh...', 'info');
 
         fetch('/weather-reports/refresh-all', {
             method: 'POST',
@@ -545,16 +544,7 @@
             if (data.success) {
                 showNotification(data.message, 'success');
                 
-                if (data.details) {
-                    showNotification(
-                        `Deleted: ${data.details.deleted_reports} reports, ${data.details.deleted_snapshots} snapshots`, 
-                        'info'
-                    );
-                    showNotification(
-                        `Stored: ${data.details.successful} locations successfully`, 
-                        'success'
-                    );
-                }
+              
                 
                 setTimeout(() => {
                     location.reload();

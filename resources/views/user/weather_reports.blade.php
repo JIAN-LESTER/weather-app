@@ -7,7 +7,6 @@
 <div class="space-y-4 sm:space-y-6 px-3 sm:px-0">
     <!-- Notification Container -->
     <div id="notificationContainer" class="fixed top-4 right-4 z-50 space-y-2 max-w-[calc(100vw-2rem)] sm:max-w-sm"></div>
-
 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-5 gap-3 sm:gap-0">
     <!-- Title -->
     <h2 class="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-gray-800 ml-2 sm:ml-0">
@@ -532,7 +531,6 @@
         
         button.disabled = true;
         button.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Refreshing...';
-        showNotification('Starting data refresh...', 'info');
 
         fetch('/weather-reports/refresh-all', {
             method: 'POST',
@@ -546,16 +544,7 @@
             if (data.success) {
                 showNotification(data.message, 'success');
                 
-                if (data.details) {
-                    showNotification(
-                        `Deleted: ${data.details.deleted_reports} reports, ${data.details.deleted_snapshots} snapshots`, 
-                        'info'
-                    );
-                    showNotification(
-                        `Stored: ${data.details.successful} locations successfully`, 
-                        'success'
-                    );
-                }
+              
                 
                 setTimeout(() => {
                     location.reload();

@@ -78,7 +78,7 @@ class UserManagementController extends Controller
         ]);
 
 
-        return redirect()->route('admin.user_management');
+        return redirect()->route('admin.user_management')->with('success', 'User created successfully');
     }
 
        public function show(string $id)
@@ -146,7 +146,7 @@ public function edit($id)
         'timestamp' => now(),
     ]);
 
-    return redirect()->route('admin.user_management');
+    return redirect()->route('admin.user_management')->with('success', 'User updated successfully');
 }
 
 public function destroy(string $id)

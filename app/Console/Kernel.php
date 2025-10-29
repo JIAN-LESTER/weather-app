@@ -12,32 +12,22 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        // Store weather forecasts every 15 minutes
+        // Test closure - should log every minute
+        $schedule->call(function () {
+            \Log::info('✓ Scheduler is working! Time: ' . now()->format('Y-m-d H:i:s'));
+        })->everyMinute();
+
+        // Store forecasts every minute (for testing)
         $schedule->command('weather:store-forecasts')
             ->everyMinute()
             ->timezone('Asia/Manila')
-            ->withoutOverlapping()
-            ->onSuccess(function () {
-                \Log::info('Weather forecasts stored successfully - ' . now()->format('Y-m-d H:i:s'));
-            })
-            ->onFailure(function () {
-                \Log::error('Failed to store weather forecasts - ' . now()->format('Y-m-d H:i:s'));
-            });
+            ->withoutOverlapping();
 
-        // Delete old weather reports every 15 minutes
+        // Delete old reports every minute (for testing)
         $schedule->command('weather:delete-old-reports')
             ->everyMinute()
             ->timezone('Asia/Manila')
-            ->withoutOverlapping()
-            ->onSuccess(function () {
-                \Log::info('Old weather reports cleanup completed - ' . now()->format('Y-m-d H:i:s'));
-            })
-            ->onFailure(function () {
-                \Log::error('Failed to delete old weather reports - ' . now()->format('Y-m-d H:i:s'));
-            });
-
-
-        $schedule->command('schedule:list')->daily();
+            ->withoutOverlapping();
     }
 
     /**

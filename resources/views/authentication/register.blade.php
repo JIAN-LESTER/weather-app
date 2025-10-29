@@ -5,12 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 </head>
+</head>
+
 <body class="bg-gray-100 text-gray-900 dark:bg-gray-900 dark:text-gray-100 flex items-center justify-center min-h-screen">
 
     <main class="w-full max-w-md bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 sm:p-8">
 
-        <h1 class="text-2xl font-bold text-center mb-6">Create an Account</h1>
+        <h1 class="text-2xl font-bold text-center mb-6">BukCast Registration</h1>
 
 
         <form action="{{ route('register') }}" method="POST" class="space-y-5">
@@ -68,6 +72,42 @@
             <a href="{{ route('loginForm') }}" class="text-blue-600 hover:underline dark:text-blue-400">Login</a>
         </p>
     </main>
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <script>
+    @if(session('success'))
+        Toastify({
+            text: "{{ session('success') }}",
+            duration: 3000,
+            gravity: "top",
+            position: "right",
+            backgroundColor: "linear-gradient(to right, #10b981, #059669)",
+            stopOnFocus: true,
+        }).showToast();
+    @endif
 
+    @if(session('error'))
+        Toastify({
+            text: "{{ session('error') }}",
+            duration: 3000,
+            gravity: "top",
+            position: "right",
+            backgroundColor: "linear-gradient(to right, #ef4444, #dc2626)",
+            stopOnFocus: true,
+        }).showToast();
+    @endif
+
+    @if($errors->any())
+        Toastify({
+            text: "{{ $errors->first() }}",
+            duration: 4000,
+            gravity: "top",
+            position: "right",
+            backgroundColor: "linear-gradient(to right, #ef4444, #dc2626)",
+            stopOnFocus: true,
+        }).showToast();
+    @endif
+    </script>
 </body>
 </html>

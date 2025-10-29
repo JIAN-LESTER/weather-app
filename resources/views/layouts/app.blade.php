@@ -22,12 +22,16 @@
     <title>@yield('title', 'Dashboard')</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
     <style>
         [x-cloak] {
             display: none !important;
         }
     </style>
 </head>
+
 
 <body x-data="{ 
         sidebarOpen: true,
@@ -78,7 +82,7 @@
         class="fixed lg:relative inset-y-0 left-0 z-50 w-60 bg-gray-800 text-white dark:bg-white dark:text-gray-800 shadow-md flex flex-col">
 
         <div class="p-4 font-bold text-white dark:text-gray-800 text-lg">
-            <span>BukidCast</span>
+            <span>BukCast</span>
         </div>
 
         <nav class="flex-1 px-2 space-y-2 overflow-y-auto">
@@ -304,16 +308,195 @@
             @yield('content')
         </main>
     </div>
-
-    <!-- Rest of modals remain the same... -->
-    @if(!Auth::user()->isCompleted)
+ @if(!Auth::user()->isCompleted)
         <div id="completeProfileModal" class="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm">
-            <div class="absolute inset-0"></div>
+           
+            <div class="absolute inset-0 "></div>
+
+            
             <div class="relative bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden">
-                <!-- Modal content remains the same -->
+              
+                <div class="bg-red-500 text-white p-5 rounded-t-2xl">
+                    <div class="flex items-center space-x-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                        </svg>
+                        <h2 class="text-xl font-semibold">Complete Your Profile</h2>
+                    </div>
+                    <p class="text-red-100 text-sm mt-1">Your profile is incomplete. Please fill in the required
+                        information.</p>
+                </div>
+
+             
+                <form id="completeProfileForm" action="{{ route('profile.update') }}" method="POST"
+                    class="p-6 md:p-8 space-y-6 relative z-10">
+                    @csrf
+                    @method('PUT')
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="complete_fname"
+                                class="block text-sm font-medium text-gray-700  dark:text-gray-300">First Name <span
+                                    class="text-red-500">*</span></label>
+                            <input type="text" name="fname" id="complete_fname" value="{{ Auth::user()->fname }}" required
+                                class="mt-2 block w-full rounded-xl border-gray-300 bg-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 px-4 py-3 focus:ring-2 focus:ring-red-500 focus:border-red-500">
+                        </div>
+                        <div>
+                            <label for="complete_lname"
+                                class="block text-sm font-medium text-gray-700 dark:text-gray-300">Last Name <span
+                                    class="text-red-500">*</span></label>
+                            <input type="text" name="lname" id="complete_lname" value="{{ Auth::user()->lname }}" required
+                                class="mt-2 block w-full rounded-xl border-gray-300 bg-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 px-4 py-3 focus:ring-2 focus:ring-red-500 focus:border-red-500">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="complete_email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Email
+                            Address <span class="text-red-500">*</span></label>
+                        <input type="email" name="email" id="complete_email" value="{{ Auth::user()->email }}" required
+                            class="mt-2 block w-full rounded-xl border-gray-300 bg-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 px-4 py-3 focus:ring-2 focus:ring-red-500 focus:border-red-500">
+                    </div>
+
+                
+                    <div class="border-t pt-6 space-y-4">
+                        <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Update Password (Optional)
+                        </h3>
+                        <div>
+                            <label for="complete_old_password"
+                                class="block text-sm font-medium text-gray-700 dark:text-gray-300">Current Password</label>
+                            <input type="password" name="old_password" id="complete_old_password"
+                                class="mt-2 block w-full rounded-xl border-gray-300 bg-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 px-4 py-3 focus:ring-red-500 focus:border-red-500">
+                        </div>
+                        <div>
+                            <label for="complete_new_password"
+                                class="block text-sm font-medium text-gray-700 dark:text-gray-300">New Password</label>
+                            <input type="password" name="new_password" id="complete_new_password"
+                                class="mt-2 block w-full rounded-xl border-gray-300 bg-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 px-4 py-3 focus:ring-red-500 focus:border-red-500">
+                        </div>
+                        <div>
+                            <label for="complete_new_password_confirmation"
+                                class="block text-sm font-medium text-gray-700 dark:text-gray-300">Confirm New
+                                Password</label>
+                            <input type="password" name="new_password_confirmation" id="complete_new_password_confirmation"
+                                class="mt-2 block w-full rounded-xl border-gray-300 bg-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 px-4 py-3 focus:ring-red-500 focus:border-red-500">
+                        </div>
+                    </div>
+
+              
+                    <div class="flex justify-end pt-6 border-t border-gray-200 dark:border-gray-700">
+                        <button type="submit"
+                            class="px-6 py-3 rounded-xl bg-red-600 text-white hover:bg-red-700 font-medium">Complete
+                            Profile</button>
+                    </div>
+                </form>
             </div>
         </div>
     @endif
+
+ 
+    <div id="profileModal" class="hidden fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm">
+        <div class="bg-gray-100 dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden">
+          
+            <div class="flex justify-between items-center p-5 border-b border-gray-200 dark:border-gray-700">
+                <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100">Profile</h2>
+                <button onclick="closeProfileModal()"
+                    class="text-gray-500 hover:text-gray-800 dark:hover:text-gray-200">✕</button>
+            </div>
+
+         
+            <div class="p-6 space-y-5">
+                <div>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">First Name</p>
+                    <p class="text-base font-medium text-gray-800 dark:text-gray-100">{{ auth()->user()->fname }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Last Name</p>
+                    <p class="text-base font-medium text-gray-800 dark:text-gray-100">{{ auth()->user()->lname }}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Email</p>
+                    <p class="text-base font-medium text-gray-800 dark:text-gray-100">{{ auth()->user()->email }}</p>
+                </div>
+            </div>
+
+     
+            <div class="flex justify-end p-5 border-t border-gray-200 dark:border-gray-700">
+                <button onclick="closeProfileModal()"
+                    class="px-5 py-2 rounded-xl bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600">Close</button>
+            </div>
+        </div>
+    </div>
+
+   
+    <div id="editProfileModal" class="hidden fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm">
+        <div class="bg-gray-100 dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden">
+         
+            <div class="flex justify-between items-center p-5 border-b border-gray-200 dark:border-gray-700">
+                <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100">Edit Profile</h2>
+                <button onclick="closeEditProfileModal()"
+                    class="text-gray-500 hover:text-gray-800 dark:hover:text-gray-200">✕</button>
+            </div>
+
+          
+            <form action="{{ route('profile.update') }}" method="POST" class="p-6 md:p-8 space-y-5">
+                @csrf
+                @method('PUT')
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="fname" class="block text-sm font-medium text-gray-700 dark:text-gray-200">First
+                            Name</label>
+                        <input type="text" name="fname" id="fname" value="{{ auth()->user()->fname }}"
+                            class="mt-2 block w-full rounded-xl border-gray-300 bg-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 px-4 py-3 focus:ring-gray-800 focus:border-gray-800">
+                    </div>
+                    <div>
+                        <label for="lname" class="block text-sm font-medium text-gray-700 dark:text-gray-200">Last
+                            Name</label>
+                        <input type="text" name="lname" id="lname" value="{{ auth()->user()->lname }}"
+                            class="mt-2 block w-full rounded-xl border-gray-300 bg-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 px-4 py-3 focus:ring-gray-800 focus:border-gray-800">
+                    </div>
+                </div>
+
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-200">Email</label>
+                    <input type="email" name="email" id="email" value="{{ auth()->user()->email }}"
+                        class="mt-2 block w-full rounded-xl border-gray-300 bg-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 px-4 py-3 focus:ring-gray-800 focus:border-gray-800">
+                </div>
+
+                <div>
+                    <label for="old_password" class="block text-sm font-medium text-gray-700 dark:text-gray-200">Current
+                        Password</label>
+                    <input type="password" name="old_password" id="old_password"
+                        class="mt-2 block w-full rounded-xl border-gray-300 bg-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 px-4 py-3 focus:ring-gray-800 focus:border-gray-800">
+                </div>
+
+                <div>
+                    <label for="new_password" class="block text-sm font-medium text-gray-700 dark:text-gray-200">New
+                        Password</label>
+                    <input type="password" name="new_password" id="new_password"
+                        class="mt-2 block w-full rounded-xl border-gray-300 bg-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 px-4 py-3 focus:ring-gray-800 focus:border-gray-800">
+                </div>
+
+                <div>
+                    <label for="new_password_confirmation"
+                        class="block text-sm font-medium text-gray-700 dark:text-gray-200">Confirm New Password</label>
+                    <input type="password" name="new_password_confirmation" id="new_password_confirmation"
+                        class="mt-2 block w-full rounded-xl border-gray-300 bg-gray-200  dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 px-4 py-3 focus:ring-gray-800 focus:border-gray-800">
+                </div>
+
+          
+                <div class="flex justify-end gap-3 pt-6 border-t border-gray-200 dark:border-gray-700">
+                    <button type="button" onclick="closeEditProfileModal()"
+                        class="px-5 py-3 rounded-xl bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600">Cancel</button>
+                    <button type="submit" class="px-5 py-3 rounded-xl bg-gray-800 text-white hover:bg-gray-700">Save
+                        Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
 
     <script src="//unpkg.com/alpinejs" defer></script>
     <script>
@@ -379,6 +562,55 @@
     </script>
 
     @stack('scripts')
+
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+@if(session('success'))
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Toastify({
+                    text: "{{ session('success') }}",
+                    duration: 3000,
+                    gravity: "top",
+                    position: "right",
+                    backgroundColor: "linear-gradient(to right, #10b981, #059669)",
+                    stopOnFocus: true,
+                }).showToast();
+            });
+        </script>
+    @endif
+
+    @if(session('error'))
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Toastify({
+                    text: "{{ session('error') }}",
+                    duration: 3000,
+                    gravity: "top",
+                    position: "right",
+                    backgroundColor: "linear-gradient(to right, #ef4444, #dc2626)",
+                    stopOnFocus: true,
+                }).showToast();
+            });
+        </script>
+    @endif
+
+    @if($errors->any())
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Toastify({
+                    text: "{{ $errors->first() }}",
+                    duration: 4000,
+                    gravity: "top",
+                    position: "right",
+                    backgroundColor: "linear-gradient(to right, #ef4444, #dc2626)",
+                    stopOnFocus: true,
+                }).showToast();
+            });
+        </script>
+    @endif
 </body>
 
 </html>
