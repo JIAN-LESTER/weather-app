@@ -132,18 +132,5 @@ class DashboardController extends Controller
     }
 
 
-    public function getDashboardStats()
-    {
-        return response()->json([
-            'total_users' => User::count(),
-            'active_users' => User::where('last_login_at', '>=', Carbon::now()->subDays(30))->count(),
-            'verified_users' => User::whereNotNull('email_verified_at')->count(),
-            'new_users_today' => User::whereDate('created_at', Carbon::today())->count(),
-            'new_users_this_week' => User::whereBetween('created_at', [
-                Carbon::now()->startOfWeek(),
-                Carbon::now()->endOfWeek()
-            ])->count(),
-            'new_users_this_month' => User::whereMonth('created_at', Carbon::now()->month)->count(),
-        ]);
-    }
+
 }

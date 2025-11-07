@@ -4,135 +4,125 @@
 @section('header', 'Dashboard')
 
 @section('content')
-    <div class="max-w-8xl mx-auto">
+    <div class="w-full max-w-8xl mx-auto px-3 sm:px-4 lg:px-6">
 
-        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-4 space-y-3 lg:space-y-0">
-            <div class="flex-1">
-                <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-gray-800 mb-1">
-                    Welcome, {{ auth()->user()->fname ?? 'User' }}
-                </h1>
-            </div>
-
-            <div class="flex items-center space-x-2 sm:space-x-3 w-full lg:w-auto">
-                <div class="relative flex-1 lg:flex-initial">
-
+        <div class="flex flex-col space-y-3 mb-4 sm:mb-6">
+            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+                <div class="flex-1 min-w-0">
+                    <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-gray-800 truncate">
+                        Welcome, {{ auth()->user()->fname ?? 'User' }}
+                    </h1>
                 </div>
 
-                <button
-                    class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-             
-                </button>
+                <div class="flex items-center space-x-2">
+                    <div class="relative flex-1 sm:flex-initial min-w-0">
+                        <!-- Search or filters can go here -->
+                    </div>
+
+                    <button class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 flex-shrink-0">
+                        <!-- Icon button -->
+                    </button>
+                </div>
             </div>
         </div>
 
-        <div id="weatherDashboard">
-       
-            <div id="loadingState" class="text-center py-12">
-                <div
-                    class="inline-block animate-spin rounded-full h-8 w-8 sm:h-10 sm:w-10 border-4 border-gray-300 dark:border-gray-600 border-t-blue-600 dark:border-t-blue-400 mb-3">
-                </div>
+        <div id="weatherDashboard" class="w-full overflow-hidden">
+            <!-- Loading State -->
+            <div id="loadingState" class="text-center py-8 sm:py-12">
+                <div class="inline-block animate-spin rounded-full h-8 w-8 sm:h-10 sm:w-10 border-4 border-gray-300 dark:border-gray-600 border-t-blue-600 dark:border-t-blue-400 mb-3"></div>
                 <p class="text-gray-600 dark:text-gray-400 text-sm sm:text-base">Loading weather data...</p>
             </div>
 
-         
+            <!-- Weather Content -->
             <div id="weatherContent" class="hidden space-y-3 sm:space-y-4">
 
                 <div class="grid grid-cols-1 xl:grid-cols-2 gap-3 sm:gap-4">
-      
-                    <div
-                        class="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300">
+                    <!-- Current Weather Card -->
+                    <div class="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl p-3 sm:p-4 md:p-6 border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300">
 
-           
-                        <div
-                            class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 pb-3 border-b border-gray-200 dark:border-gray-600">
-                            <div class="mb-2 sm:mb-0">
-                                <div class="flex items-center text-gray-700 dark:text-gray-300 text-xs sm:text-sm mb-1">
-                                    <i class="fas fa-map-marker-alt mr-1.5 text-blue-500 dark:text-blue-400 text-xs"></i>
-                                    <span id="location" class="font-medium">Loading location...</span>
-                                </div>
-                                <div class="text-gray-600 dark:text-gray-400 text-xs">
-                                    <span id="currentDay" class="font-medium"></span>
-                                    <span class="mx-1.5 hidden sm:inline">•</span>
-                                    <span id="currentDate"></span>
-                                </div>
+                        <!-- Header -->
+                        <div class="flex flex-col space-y-2 mb-3 sm:mb-4 pb-3 border-b border-gray-200 dark:border-gray-600">
+                            <div class="flex items-center text-gray-700 dark:text-gray-300 text-xs sm:text-sm">
+                                <i class="fas fa-map-marker-alt mr-1.5 text-blue-500 dark:text-blue-400 text-xs flex-shrink-0"></i>
+                                <span id="location" class="font-medium truncate">Loading location...</span>
                             </div>
-                            <div class="flex items-center space-x-1.5 text-red-800 dark:text-gray-400 text-sm">
+                            <div class="text-gray-600 dark:text-gray-400 text-xs flex flex-wrap items-center gap-1">
+                                <span id="currentDay" class="font-medium"></span>
+                                <span class="hidden sm:inline">•</span>
+                                <span id="currentDate" class="truncate"></span>
+                            </div>
+                            <div class="flex items-center space-x-1.5 text-red-800 dark:text-gray-400 text-xs sm:text-sm">
                                 <i class="fas fa-temperature-high text-red-500 text-xs"></i>
                                 <i class="fas fa-tint text-blue-400 text-xs"></i>
                             </div>
                         </div>
 
-          
-                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-4 sm:space-y-0 mb-4">
-                            <div class="flex items-center space-x-3 sm:space-x-4">
-                                <div class="text-3xl sm:text-4xl lg:text-5xl" id="mainWeatherIcon">
+                        <!-- Main Weather Display -->
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-3 sm:space-y-0 mb-3 sm:mb-4">
+                            <div class="flex items-center space-x-3">
+                                <div class="text-3xl sm:text-4xl lg:text-5xl flex-shrink-0" id="mainWeatherIcon">
                                     <i class="fas fa-cloud-rain text-blue-500 dark:text-blue-400"></i>
                                 </div>
-                                <div>
-                                    <div class="text-3xl sm:text-4xl lg:text-5xl font-light text-gray-900 dark:text-white"
-                                        id="mainTemp">25°</div>
-                                    <div class="text-gray-700 dark:text-gray-300 text-sm sm:text-base" id="feelsLike">
-                                        Feels like 28°</div>
-                                    <div class="text-gray-600 dark:text-gray-400 text-xs sm:text-sm mt-1"
-                                        id="tempRange">H: 30° L: 20°</div>
+                                <div class="min-w-0">
+                                    <div class="text-3xl sm:text-4xl lg:text-5xl font-light text-gray-900 dark:text-white" id="mainTemp">25°</div>
+                                    <div class="text-gray-700 dark:text-gray-300 text-xs sm:text-sm" id="feelsLike">Feels like 28°</div>
+                                    <div class="text-gray-600 dark:text-gray-400 text-xs sm:text-sm mt-1" id="tempRange">H: 30° L: 20°</div>
                                 </div>
                             </div>
 
                             <div class="text-left sm:text-right w-full sm:w-auto">
-                                <p id="weatherDescription"
-                                    class="text-base sm:text-lg text-gray-800 dark:text-gray-200 capitalize mb-1">Heavy Rain</p>
-                                <div class="text-gray-600 dark:text-gray-400 text-xs" id="current-date-display"></div>
+                                <p id="weatherDescription" class="text-sm sm:text-base lg:text-lg text-gray-800 dark:text-gray-200 capitalize mb-1 truncate">Heavy Rain</p>
+                                <div class="text-gray-600 dark:text-gray-400 text-xs truncate" id="current-date-display"></div>
                             </div>
                         </div>
 
-           
-                        <div class="grid grid-cols-3 gap-3">
-                            <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
-                                <div class="flex items-center justify-between mb-2">
-                                    <span class="text-gray-700 dark:text-gray-300 text-xs font-medium">Rain Chance</span>
-                                    <i class="fas fa-tint text-blue-500 dark:text-blue-400 text-sm"></i>
+                        <!-- Weather Stats Grid -->
+                        <div class="grid grid-cols-3 gap-2 sm:gap-3">
+                            <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-2 sm:p-3">
+                                <div class="flex items-center justify-between mb-1 sm:mb-2">
+                                    <span class="text-gray-700 dark:text-gray-300 text-[10px] sm:text-xs font-medium truncate">Rain</span>
+                                    <i class="fas fa-tint text-blue-500 dark:text-blue-400 text-xs sm:text-sm flex-shrink-0"></i>
                                 </div>
-                                <div class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
-                                    <span id="rainChance">90</span><span class="text-sm">%</span>
-                                </div>
-                            </div>
-
-                            <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
-                                <div class="flex items-center justify-between mb-2">
-                                    <span class="text-gray-700 dark:text-gray-300 text-xs font-medium">Rainfall</span>
-                                    <i class="fas fa-cloud-rain text-blue-500 dark:text-blue-400 text-sm"></i>
-                                </div>
-                                <div class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
-                                    <span id="rainfall">2.5</span> <span class="text-xs font-normal">mm/h</span>
+                                <div class="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 dark:text-white">
+                                    <span id="rainChance">90</span><span class="text-xs">%</span>
                                 </div>
                             </div>
 
-                            <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
-                                <div class="flex items-center justify-between mb-2">
-                                    <span class="text-gray-700 dark:text-gray-300 text-xs font-medium">Humidity</span>
-                                    <i class="fas fa-water text-blue-500 dark:text-blue-400 text-sm"></i>
+                            <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-2 sm:p-3">
+                                <div class="flex items-center justify-between mb-1 sm:mb-2">
+                                    <span class="text-gray-700 dark:text-gray-300 text-[10px] sm:text-xs font-medium truncate">Rainfall</span>
+                                    <i class="fas fa-cloud-rain text-blue-500 dark:text-blue-400 text-xs sm:text-sm flex-shrink-0"></i>
                                 </div>
-                                <div class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
+                                <div class="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 dark:text-white">
+                                    <span id="rainfall">2.5</span> <span class="text-[10px] sm:text-xs font-normal">mm</span>
+                                </div>
+                            </div>
+
+                            <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-2 sm:p-3">
+                                <div class="flex items-center justify-between mb-1 sm:mb-2">
+                                    <span class="text-gray-700 dark:text-gray-300 text-[10px] sm:text-xs font-medium truncate">Humid</span>
+                                    <i class="fas fa-water text-blue-500 dark:text-blue-400 text-xs sm:text-sm flex-shrink-0"></i>
+                                </div>
+                                <div class="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 dark:text-white">
                                     <span id="humidity">85</span><span class="text-xs">%</span>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-              
-                    <div
-                        class="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300">
-                        <div class="flex items-center justify-between mb-4">
-                            <h3 class="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">User Statistics</h3>
-                            <i class="fas fa-users text-blue-500 dark:text-blue-400 text-base sm:text-lg"></i>
+                    <!-- User Statistics Card -->
+                    <div class="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl p-3 sm:p-4 md:p-6 border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300">
+                        <div class="flex items-center justify-between mb-3 sm:mb-4">
+                            <h3 class="text-sm sm:text-base lg:text-lg font-semibold text-gray-900 dark:text-white truncate">User Statistics</h3>
+                            <i class="fas fa-users text-blue-500 dark:text-blue-400 text-base lg:text-lg flex-shrink-0"></i>
                         </div>
                         
-                        <div class="space-y-4">
-                    
-                            <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                        <div class="space-y-3 sm:space-y-4">
+                            <!-- Total Users -->
+                            <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3 sm:p-4">
                                 <div class="flex items-center justify-between mb-2">
-                                    <span class="text-gray-700 dark:text-gray-300 text-sm font-medium">Total Users</span>
-                                    <i class="fas fa-user-friends text-green-500 dark:text-green-400 text-sm"></i>
+                                    <span class="text-gray-700 dark:text-gray-300 text-xs sm:text-sm font-medium">Total Users</span>
+                                    <i class="fas fa-user-friends text-green-500 dark:text-green-400 text-sm flex-shrink-0"></i>
                                 </div>
                                 <div class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
                                     {{ $totalUsers ?? 0 }}
@@ -140,23 +130,22 @@
                                 <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">Registered users</div>
                             </div>
 
-                            <div class="grid grid-cols-2 gap-3">
-                            
-                                <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
-                                    <div class="flex items-center justify-between mb-2">
-                                        <span class="text-gray-700 dark:text-gray-300 text-xs font-medium">Active</span>
-                                        <i class="fas fa-user-check text-blue-500 dark:text-blue-400 text-xs"></i>
+                            <!-- Active & Verified Grid -->
+                            <div class="grid grid-cols-2 gap-2 sm:gap-3">
+                                <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-2 sm:p-3">
+                                    <div class="flex items-center justify-between mb-1 sm:mb-2">
+                                        <span class="text-gray-700 dark:text-gray-300 text-[10px] sm:text-xs font-medium">Active</span>
+                                        <i class="fas fa-user-check text-blue-500 dark:text-blue-400 text-xs flex-shrink-0"></i>
                                     </div>
                                     <div class="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">
                                         {{ $activeUsers ?? 0 }}
                                     </div>
                                 </div>
 
-                           
-                                <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
-                                    <div class="flex items-center justify-between mb-2">
-                                        <span class="text-gray-700 dark:text-gray-300 text-xs font-medium">Verified</span>
-                                        <i class="fas fa-user-shield text-purple-500 dark:text-purple-400 text-xs"></i>
+                                <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-2 sm:p-3">
+                                    <div class="flex items-center justify-between mb-1 sm:mb-2">
+                                        <span class="text-gray-700 dark:text-gray-300 text-[10px] sm:text-xs font-medium">Verified</span>
+                                        <i class="fas fa-user-shield text-purple-500 dark:text-purple-400 text-xs flex-shrink-0"></i>
                                     </div>
                                     <div class="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">
                                         {{ $verifiedUsers ?? 0 }}
@@ -167,69 +156,67 @@
                     </div>
                 </div>
 
-            
-                <div
-                    class="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200 dark:border-gray-700 shadow-lg">
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
-                        <h3 class="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-2 sm:mb-0">Recent Logs</h3>
+                <!-- Recent Logs Card -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl p-3 sm:p-4 md:p-6 border border-gray-200 dark:border-gray-700 shadow-lg">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-3 sm:mb-4 gap-2">
+                        <h3 class="text-sm sm:text-base lg:text-lg font-semibold text-gray-900 dark:text-white">Recent Logs</h3>
                         <a href="{{ route('logs.show') }}" 
-                           class="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors text-sm flex items-center space-x-1">
+                           class="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors text-xs sm:text-sm flex items-center space-x-1 flex-shrink-0">
                             <span>View All</span>
                             <i class="fas fa-arrow-right text-xs"></i>
                         </a>
                     </div>
 
-                  <div class="space-y-3">
-    @if(isset($recentLogs) && $recentLogs->count() > 0)
-        @foreach($recentLogs as $log)
-            <div class="flex items-start justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
-                <div class="flex items-start space-x-3 flex-1">
-                    
-              
-                    <div class="flex-shrink-0 mt-1">
-                        @if($log->fname === 'error')
-                            <i class="fas fa-exclamation-circle text-red-500 text-sm"></i>
-                        @elseif($log->fname === 'warning')
-                            <i class="fas fa-exclamation-triangle text-yellow-500 text-sm"></i>
-                        @elseif($log->fname === 'info')
-                            <i class="fas fa-info-circle text-blue-500 text-sm"></i>
+                    <div class="space-y-2 sm:space-y-3">
+                        @if(isset($recentLogs) && $recentLogs->count() > 0)
+                            @foreach($recentLogs as $log)
+                                <div class="flex items-start justify-between p-2 sm:p-3 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
+                                    <div class="flex items-start space-x-2 sm:space-x-3 flex-1 min-w-0">
+                                        <!-- Icon -->
+                                        <div class="flex-shrink-0 mt-0.5 sm:mt-1">
+                                            @if($log->fname === 'error')
+                                                <i class="fas fa-exclamation-circle text-red-500 text-xs sm:text-sm"></i>
+                                            @elseif($log->fname === 'warning')
+                                                <i class="fas fa-exclamation-triangle text-yellow-500 text-xs sm:text-sm"></i>
+                                            @elseif($log->fname === 'info')
+                                                <i class="fas fa-info-circle text-blue-500 text-xs sm:text-sm"></i>
+                                            @else
+                                                <i class="fas fa-circle text-gray-500 text-xs sm:text-sm"></i>
+                                            @endif
+                                        </div>
+
+                                        <!-- Content -->
+                                        <div class="flex-1 min-w-0">
+                                            <p class="text-xs sm:text-sm text-gray-900 dark:text-white font-medium truncate">
+                                                {{ $log->action ?? 'No message' }}
+                                            </p>
+                                            <div class="flex flex-col xs:flex-row xs:items-center xs:justify-between text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mt-1 gap-1">
+                                                <span class="capitalize">{{ $log->fname ?? 'info' }}</span>
+                                                <span class="whitespace-nowrap">{{ $log->created_at ? $log->created_at->format('M d, H:i') : 'Unknown' }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
                         @else
-                            <i class="fas fa-circle text-gray-500 text-sm"></i>
+                            <div class="text-center py-6 sm:py-8">
+                                <i class="fas fa-clipboard-list text-gray-400 text-2xl sm:text-3xl mb-2 sm:mb-3"></i>
+                                <p class="text-gray-500 dark:text-gray-400 text-xs sm:text-sm">No recent logs available</p>
+                            </div>
                         @endif
                     </div>
-
-               
-                    <div class="flex-1 min-w-0">
-                        <p class="text-sm text-gray-900 dark:text-white font-medium truncate">
-                            {{ $log->action ?? 'No message' }}
-                        </p>
-                        <div class="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
-                            <span class="capitalize">{{ $log->fname ?? 'info' }}</span>
-                            <span>{{ $log->created_at ? $log->created_at->format('M d, H:i') : 'Unknown time' }}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        @endforeach
-    @else
-        <div class="text-center py-8">
-            <i class="fas fa-clipboard-list text-gray-400 text-3xl mb-3"></i>
-            <p class="text-gray-500 dark:text-gray-400">No recent logs available</p>
-        </div>
-    @endif
-</div>
                 </div>
             </div>
 
             <!-- Error State -->
-            <div id="errorState" class="hidden text-center py-12">
+            <div id="errorState" class="hidden text-center py-8 sm:py-12">
                 <div class="text-red-500 dark:text-red-400 text-3xl sm:text-5xl mb-3">
                     <i class="fas fa-exclamation-triangle"></i>
                 </div>
                 <h3 class="text-gray-900 dark:text-white text-base sm:text-lg mb-2">
                     Unable to Load Weather Data
                 </h3>
-                <p class="text-gray-600 dark:text-gray-400 mb-4 text-sm">
+                <p class="text-gray-600 dark:text-gray-400 mb-4 text-sm px-4">
                     Please check your internet connection and try again.
                 </p>
                 <button onclick="location.reload()"
@@ -358,7 +345,7 @@
                 {
                     enableHighAccuracy: true,
                     timeout: 10000,
-                    maximumAge: 300000, // 5 minutes
+                    maximumAge: 300000,
                 }
             );
         });
@@ -367,6 +354,24 @@
 
 @push('styles')
     <style>
+        /* Prevent horizontal scroll */
+        body {
+            overflow-x: hidden;
+        }
+
+        /* Custom breakpoint for extra small screens */
+        @media (min-width: 375px) {
+            .xs\:flex-row {
+                flex-direction: row;
+            }
+            .xs\:items-center {
+                align-items: center;
+            }
+            .xs\:justify-between {
+                justify-content: space-between;
+            }
+        }
+
         /* Enhanced backdrop blur */
         .backdrop-blur-xl {
             backdrop-filter: blur(16px);
@@ -443,22 +448,6 @@
             animation: slideInUp 0.6s ease-out forwards;
         }
 
-        .weather-card:nth-child(1) {
-            animation-delay: 0.1s;
-        }
-
-        .weather-card:nth-child(2) {
-            animation-delay: 0.2s;
-        }
-
-        .weather-card:nth-child(3) {
-            animation-delay: 0.3s;
-        }
-
-        .weather-card:nth-child(4) {
-            animation-delay: 0.4s;
-        }
-
         /* Focus styles */
         input:focus {
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
@@ -473,33 +462,13 @@
             background: rgba(255, 255, 255, 0.8);
         }
 
-        .bg-white\/70 {
-            background: rgba(255, 255, 255, 0.7);
-        }
-
         @media (prefers-color-scheme: dark) {
             .dark\:bg-gray-800\/90 {
                 background: rgba(31, 41, 55, 0.9);
             }
 
-            .dark\:bg-gray-800\/80 {
-                background: rgba(31, 41, 55, 0.8);
-            }
-
-            .dark\:bg-gray-800\/70 {
-                background: rgba(31, 41, 55, 0.7);
-            }
-
             .dark\:bg-gray-700\/50 {
                 background: rgba(55, 65, 81, 0.5);
-            }
-        }
-
-        /* Responsive text scaling */
-        @media (max-width: 640px) {
-            .text-responsive-xl {
-                font-size: 1.5rem;
-                line-height: 2rem;
             }
         }
 
@@ -508,10 +477,29 @@
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
         }
 
-        /* Weather icon hover effects */
-        .weather-icon-hover:hover {
-            transform: scale(1.05);
-            transition: transform 0.2s ease-in-out;
+        /* Ensure proper text truncation */
+        .truncate {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* Mobile-specific optimizations */
+        @media (max-width: 639px) {
+            /* Reduce padding on mobile */
+            .p-6 {
+                padding: 1rem;
+            }
+            
+            /* Optimize font sizes for mobile */
+            .text-5xl {
+                font-size: 2.5rem;
+            }
+            
+            /* Prevent text from being too small */
+            html {
+                -webkit-text-size-adjust: 100%;
+            }
         }
     </style>
 @endpush

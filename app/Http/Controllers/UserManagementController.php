@@ -55,7 +55,20 @@ class UserManagementController extends Controller
             'email' => 'required|email|unique:users',
             'password' => 'required|min:6|confirmed',
             'role' => 'nullable|in:user,admin',
-        ]);
+        ], [
+            'fname.required' => 'First name is required',
+            'lname.required' => 'Last name is required',
+            'email.required' => 'Email is required',
+            'email.email' => 'Please enter a valid email address',
+            'email.unique' => 'This email is already taken',
+            'password.required' => 'Password is required',
+            'password.min' => 'Password must be at least 6 characters',
+            'password.confirmed' => 'Password confirmation does not match',
+            'role.in' => 'Invalid role selected',
+        ]
+    
+    
+    );
 
 
         
@@ -73,12 +86,12 @@ class UserManagementController extends Controller
         
         Logs::create([
             'userID' => $authUser->userID,
-            'action' => $user->lname . " added a new user: {$validated['lname']}.",
+            'action' => $authUser->lname . " added a new user: {$validated['lname']}.",
             'timestamp' => now(),
         ]);
 
 
-        return redirect()->route('admin.user_management');
+        return redirect()->route('admin.user_management')->with('success', 'User created successfully');
     }
 
        public function show(string $id)
@@ -108,7 +121,7 @@ public function edit($id)
 
     public function update(Request $request, string $id)
 {
-    // Use userID as the primary key
+
     $user = User::findOrFail($id);
 
     $validated = $request->validate([
@@ -118,7 +131,18 @@ public function edit($id)
         'password' => 'nullable|min:6',
         'role' => 'required|in:user,admin',
         'user_status' => 'nullable|in:active,inactive',
-    ]);
+    ], [
+            'fname.required' => 'First name is required',
+            'lname.required' => 'Last name is required',
+            'email.required' => 'Email is required',
+            'email.email' => 'Please enter a valid email address',
+            'email.unique' => 'This email is already taken',
+            'password.required' => 'Password is required',
+            'password.min' => 'Password must be at least 6 characters',
+            'password.confirmed' => 'Password confirmation does not match',
+            'role.in' => 'Invalid role selected',
+        ]
+    );
 
     $user->fname = $validated['fname'];
     $user->lname = $validated['lname'];
@@ -142,11 +166,11 @@ public function edit($id)
 
     Logs::create([
         'userID' => $authUser->userID,
-        'action' => $user->lname. " updated a user: {$validated['lname']}.",
+        'action' => $authUser->lname. " updated a user: {$validated['lname']}.",
         'timestamp' => now(),
     ]);
 
-    return redirect()->route('admin.user_management');
+    return redirect()->route('admin.user_management')->with('success', 'User updated successfully');
 }
 
 public function destroy(string $id)
@@ -164,13 +188,15 @@ public function destroy(string $id)
             ->with('error', 'You cannot delete your own account.');
     }
 
-    $userToDelete->delete();
-
-    Logs::create([
+        Logs::create([
         'userID' => $currentUser->userID,
         'action' => $currentUser->lname . " deleted a user: {$userToDelete->lname}.",
         'timestamp' => now(),
     ]);
+
+    $userToDelete->delete();
+
+
 
     return redirect()->route('admin.user_management')
         ->with('success', 'User deleted successfully');

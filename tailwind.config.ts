@@ -1,5 +1,6 @@
+/** @type {import('tailwindcss').Config} */
 export default {
-  darkMode: 'class', // 'media' kung gusto system-based
+  darkMode: 'media', // or 'media' if you want system-based dark mode
   content: [
     "./resources/**/*.blade.php",
     "./resources/**/*.js",

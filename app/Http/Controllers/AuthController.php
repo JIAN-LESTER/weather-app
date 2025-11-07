@@ -15,43 +15,22 @@ use Laravel\Socialite\Facades\Socialite;
 
 class AuthController extends Controller
 {
-    // public function register(Request $request){
-    //     $validated = $request->validate([
-    //         'email' => 'required|string|email|max:100|unique:users,email',
-    //         'password' => 'required|string|min:8|confirmed'
-    //     ]);
-
-    //     $user = User::create([
-    //         'userID' => Str::uuid(), 
-    //         'email' => $validated['email'],
-    //         'password' => bcrypt($validated['password']),
-    //         'role' => 'user',
-    //         'user_status' => 'active',
-    //         'verification_token' => Str::random(64),
-
-    //     ]);
-
-    //     Logs::create([
-    //         'userID' => $user->userID, 
-    //         'action' => 'Registered own account. Email verification sent to '. $user->email. ".",
-    //         'timestamp' => now(),
-    //     ]);
-
-    //     Mail::to($user->email)->send(new VerifyEmail($user));
-
-    //     return redirect()->route('loginForm')->with('success', 'Registration successful! Please check your email to verify your account.');
-    
-    // }
-
 public function register(Request $request)
 {
     $validated = $request->validate([
         'email' => 'required|string|email|max:100|unique:users,email',
         'password' => 'required|string|min:8|confirmed'
+    ],[
+        'email.required' => 'Email is required',
+        'email.email' => 'Please enter a valid email address',
+        'email.unique' => 'This email is already registered',
+        'email.max' => 'Email cannot exceed 100 characters',
+        'password.required' => 'Password is required',
+        'password.confirmed' => 'Password confirmation does not match',
+        'password.min' => 'Password must be at least 8 characters',
     ]);
 
-    $user = User::create([
-        'userID' => Str::uuid(), 
+    $user = User::create([ 
         'email' => $validated['email'],
         'password' => bcrypt($validated['password']),
         'role' => 'user',
@@ -61,11 +40,11 @@ public function register(Request $request)
 
     Logs::create([
         'userID' => $user->userID, 
-        'action' => 'Registered own account (auto-verified).',
+        'action' => "{$user->lname} Registered own account.",
         'timestamp' => now(),
     ]);
 
-    // No verification email sent
+    
 
     return redirect()->route('loginForm')->with('success', 'Registration successful! You can log in now.');
 }
@@ -131,8 +110,12 @@ public function register(Request $request)
     $request->validate([
         'email' => 'required|email',
         'password' => 'required'
+    ],[
+        'email.required' => 'Email is required',
+        'email.email' => 'Please enter a valid email address',
+        'password.required' => 'Password is required',
+        'password.min' => 'Password must be at least 8 characters',
     ]);
-
     $user = User::whereRaw('LOWER(email) = ?', [strtolower($request->email)])->first();
     if (!$user) {
         return back()->with('error', 'No account found')->withInput();
@@ -170,9 +153,9 @@ public function register(Request $request)
     // ✅ Actually authenticate the user
     Auth::login($user);
 
-    Logs::create([
-        'userID' => $user->userID,
-        'action' => 'Successful login',
+        Logs::create([
+            'userID' => $user->userID,
+            'action' => "Logged in successfully.",
         'timestamp' => now(),
     ]);
 
@@ -185,13 +168,13 @@ public function register(Request $request)
 
     // Role-based dashboard redirection
     if ($user->role === 'admin') {
-        return redirect()->route('admin.dashboard');
+        return redirect()->route('admin.dashboard')->with("success","Logged in successfully");
     } elseif ($user->role === 'user') {
-        return redirect()->route('user.dashboard');
+        return redirect()->route('user.dashboard')->with("success","Logged in successfully");
     }
 
     // Fallback
-    return redirect()->route('login')->with('error', 'Unable to determine dashboard.');
+    return redirect()->route('login')->with('error', 'Login failed.');
 }
 
 
@@ -266,10 +249,10 @@ public function register(Request $request)
     private function redirectAfterGoogleAuth($user)
     {
         if ($user->role === 'admin') {
-            return redirect()->route('admin.dashboard');
+            return redirect()->route('admin.dashboard')->with('success', 'Logged in successfully');
         }
         
-        return redirect()->intended('/dashboard'); // or wherever regular users should go
+        return redirect()->intended('user.dashboard')->with('success', 'Logged in successfully'); 
     }
 
     /**
@@ -341,7 +324,7 @@ public function register(Request $request)
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/login');
+        return redirect('/login')->with('success', 'Logged out successfully.');
     }
 
     public function showLoginForm()

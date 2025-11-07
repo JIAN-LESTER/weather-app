@@ -11,7 +11,7 @@ class LogsController extends Controller
     {
 
        $search = $request->get('search');
-        $filter = $request->get('filter', 'all'); 
+        $filter = $request->get('filter', 'action');
         $startDate = $request->get('start_date');
         $endDate = $request->get('end_date');
 

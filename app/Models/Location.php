@@ -28,6 +28,18 @@ class Location extends Model
         return $this->hasMany(WeatherReport::class, 'locID', 'locID');
     }
 
+    public function alerts()
+{
+    return $this->hasMany(Alert::class, 'locID', 'locID');
+}
+
+public function activeAlerts()
+{
+    return $this->alerts()
+        ->where('is_active', true)
+        ->where('expires_at', '>', now());
+}
+
     /**
      * Get snapshots through weather reports relationship
      */

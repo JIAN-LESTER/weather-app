@@ -10,35 +10,26 @@ class Kernel extends ConsoleKernel
     /**
      * Define the application's command schedule.
      */
-    protected function schedule(Schedule $schedule): void
-    {
-        // Store weather forecasts every 15 minutes
-        $schedule->command('weather:store-forecasts')
-            ->everyMinute()
-            ->timezone('Asia/Manila')
-            ->withoutOverlapping()
-            ->onSuccess(function () {
-                \Log::info('Weather forecasts stored successfully - ' . now()->format('Y-m-d H:i:s'));
-            })
-            ->onFailure(function () {
-                \Log::error('Failed to store weather forecasts - ' . now()->format('Y-m-d H:i:s'));
-            });
+   protected function schedule(Schedule $schedule): void
+{
 
-        // Delete old weather reports every 15 minutes
-        $schedule->command('weather:delete-old-reports')
-            ->everyMinute()
-            ->timezone('Asia/Manila')
-            ->withoutOverlapping()
-            ->onSuccess(function () {
-                \Log::info('Old weather reports cleanup completed - ' . now()->format('Y-m-d H:i:s'));
-            })
-            ->onFailure(function () {
-                \Log::error('Failed to delete old weather reports - ' . now()->format('Y-m-d H:i:s'));
-            });
+    \Log::info('🔥 KERNEL SCHEDULE METHOD CALLED!');
+    // Test: Simple log every minute
+    $schedule->call(function () {
+        \Log::info('✅ SCHEDULER IS ALIVE! Time: ' . now()->format('Y-m-d H:i:s'));
+        file_put_contents(storage_path('logs/scheduler-proof.txt'), 'Last run: ' . now()->format('Y-m-d H:i:s') . PHP_EOL, FILE_APPEND);
+    })->everyMinute()->name('test-scheduler');
 
+    // Store forecasts every minute (for testing) - REMOVED TIMEZONE
+    $schedule->command('weather:store-forecasts')
+        ->everyMinute()
+        ->name('store-forecasts');
 
-        $schedule->command('schedule:list')->daily();
-    }
+    // Delete old reports every minute (for testing) - REMOVED TIMEZONE
+    $schedule->command('weather:delete-old-reports')
+        ->everyMinute()
+        ->name('delete-old-reports');
+}
 
     /**
      * Register the commands for the application.
